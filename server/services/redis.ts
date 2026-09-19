@@ -146,3 +146,18 @@ export async function checkRateLimit(
     resetSeconds
   }
 }
+
+/**
+ * Check live Redis connection status
+ */
+export async function getRedisStatus(): Promise<{ connected: boolean; provider: string }> {
+  if (redisClient) {
+    try {
+      await redisClient.ping()
+      return { connected: true, provider: REDIS_URL ? 'Upstash/Cloud Redis' : 'Local Redis' }
+    } catch {
+      return { connected: false, provider: 'Memory Fallback (Redis unreachable)' }
+    }
+  }
+  return { connected: false, provider: 'Memory Fallback (No Redis URL configured)' }
+}
