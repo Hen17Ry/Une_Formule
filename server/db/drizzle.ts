@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-import { eq, desc, sql } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -39,6 +39,7 @@ class DrizzleDatabaseManager {
   public db: ReturnType<typeof drizzle<typeof schema>> | null = null
   private pool: Pool | null = null
   private isFallback = false
+  private initPromise: Promise<void> | null = null
 
   private fallbackData: {
     adminUsers: AdminUserRecord[]
@@ -53,7 +54,17 @@ class DrizzleDatabaseManager {
   private fallbackPath = path.resolve(process.cwd(), '.data/drizzle_store.json')
 
   constructor() {
-    this.init()
+    this.initPromise = this.init()
+  }
+
+  private async ensureInitialized() {
+    if (this.initPromise) {
+      try {
+        await this.initPromise
+      } catch (err) {
+        console.warn('[Drizzle ORM] Error during initialization:', err)
+      }
+    }
   }
 
   private hashPassword(password: string): string {
@@ -83,7 +94,9 @@ class DrizzleDatabaseManager {
         this.pool = new Pool({
           connectionString,
           ssl: isSsl ? { rejectUnauthorized: false } : undefined,
-          connectionTimeoutMillis: 3000
+          connectionTimeoutMillis: 5000,
+          idleTimeoutMillis: 30000,
+          max: 10
         })
       } else {
         this.pool = new Pool({
@@ -92,7 +105,7 @@ class DrizzleDatabaseManager {
           database,
           user,
           password,
-          connectionTimeoutMillis: 1500
+          connectionTimeoutMillis: 2000
         })
       }
 
@@ -101,12 +114,11 @@ class DrizzleDatabaseManager {
       client.release()
 
       this.db = drizzle(this.pool, { schema })
-      console.log('[Drizzle ORM] Connected to PostgreSQL cloud database')
+      console.log('[Drizzle ORM] Connected successfully to PostgreSQL database')
 
       await this.initTablesAndSeed()
     } catch (err) {
       console.warn('[Drizzle ORM] PostgreSQL connection failed, switching to memory fallback:', err)
-      // Standalone memory/file fallback mode
       this.isFallback = true
       this.initFallback()
     }
@@ -115,45 +127,51 @@ class DrizzleDatabaseManager {
   private async initTablesAndSeed() {
     if (!this.pool || !this.db) return
 
-    // Execute table migrations
-    await this.pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        role VARCHAR(50) NOT NULL DEFAULT 'ADMIN',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
+    try {
+      // Execute table migrations
+      await this.pool.query(`
+        CREATE TABLE IF NOT EXISTS admin_users (
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          role VARCHAR(50) NOT NULL DEFAULT 'ADMIN',
+          created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE TABLE IF NOT EXISTS testimonials (
-        id SERIAL PRIMARY KEY,
-        first_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NULL,
-        content TEXT NOT NULL,
-        rating INT NOT NULL DEFAULT 5,
-        allow_publication VARCHAR(50) NOT NULL DEFAULT 'FIRST_NAME',
-        status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
+        CREATE TABLE IF NOT EXISTS testimonials (
+          id SERIAL PRIMARY KEY,
+          first_name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) NULL,
+          content TEXT NOT NULL,
+          rating INT NOT NULL DEFAULT 5,
+          allow_publication VARCHAR(50) NOT NULL DEFAULT 'FIRST_NAME',
+          status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+          created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
 
-      CREATE TABLE IF NOT EXISTS testimonial_events (
-        id SERIAL PRIMARY KEY,
-        testimonial_id INT NULL REFERENCES testimonials(id) ON DELETE CASCADE,
-        action VARCHAR(100) NOT NULL,
-        performed_by VARCHAR(255) NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `)
+        CREATE TABLE IF NOT EXISTS testimonial_events (
+          id SERIAL PRIMARY KEY,
+          testimonial_id INT NULL REFERENCES testimonials(id) ON DELETE CASCADE,
+          action VARCHAR(100) NOT NULL,
+          performed_by VARCHAR(255) NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+      `)
 
-    // Seed default admin
-    const existing = await this.db.select().from(schema.adminUsers).where(eq(schema.adminUsers.email, 'admin@uneformule.fr'))
-    if (existing.length === 0) {
-      await this.db.insert(schema.adminUsers).values({
-        email: 'admin@uneformule.fr',
-        passwordHash: this.hashPassword('Formule2026!'),
-        role: 'ADMIN'
-      })
+      // Seed default admin
+      const existing = await this.db.select().from(schema.adminUsers).where(eq(schema.adminUsers.email, 'admin@uneformule.fr'))
+      if (existing.length === 0) {
+        await this.db.insert(schema.adminUsers).values({
+          email: 'admin@uneformule.fr',
+          passwordHash: this.hashPassword('Formule2026!'),
+          role: 'ADMIN'
+        })
+      }
+    } catch (err) {
+      console.error('[Drizzle ORM] Error initializing tables/seed:', err)
+      this.isFallback = true
+      this.initFallback()
     }
   }
 
@@ -188,7 +206,7 @@ class DrizzleDatabaseManager {
           createdAt: new Date().toISOString()
         }
       ],
-      testimonials: [], // ZERO MOCK DATA - STARTS CLEAN
+      testimonials: [],
       testimonialEvents: []
     }
     this.saveFallback()
@@ -197,14 +215,16 @@ class DrizzleDatabaseManager {
   private saveFallback() {
     try {
       fs.writeFileSync(this.fallbackPath, JSON.stringify(this.fallbackData, null, 2), 'utf-8')
-    } catch (err) {
-      console.error('[Drizzle] Failed to save JSON fallback:', err)
+    } catch {
+      // Ignored in read-only environments
     }
   }
 
   // --- PUBLIC DRIZZLE ORM METHODS ---
 
   public async getAdminUserByEmail(email: string): Promise<AdminUserRecord | null> {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       return this.fallbackData.adminUsers.find(u => u.email.toLowerCase() === email.toLowerCase()) || null
     }
@@ -247,6 +267,8 @@ class DrizzleDatabaseManager {
 
   // Public Get Approved Testimonials (status = 'APPROVED')
   public async getApprovedTestimonials(): Promise<any[]> {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       return this.fallbackData.testimonials
         .filter(t => t.status === 'APPROVED')
@@ -266,6 +288,7 @@ class DrizzleDatabaseManager {
     rating: number
     allow_publication?: string
   }): Promise<any> {
+    await this.ensureInitialized()
     const rating = Math.min(5, Math.max(1, data.rating))
 
     if (this.isFallback || !this.db) {
@@ -286,7 +309,6 @@ class DrizzleDatabaseManager {
       }
       this.fallbackData.testimonials.unshift(record)
 
-      // Audit Log Creation
       await this.logEvent(newId, 'creation', 'public_user')
       this.saveFallback()
       return this.formatTestimonialRecord(record)
@@ -308,6 +330,8 @@ class DrizzleDatabaseManager {
 
   // Admin Methods
   public async getAllTestimonials(): Promise<any[]> {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       return [...this.fallbackData.testimonials]
         .sort((a, b) => b.id - a.id)
@@ -319,6 +343,7 @@ class DrizzleDatabaseManager {
   }
 
   public async updateTestimonialStatus(id: number, status: 'PENDING' | 'APPROVED' | 'REJECTED', adminEmail: string): Promise<boolean> {
+    await this.ensureInitialized()
     const action = status === 'APPROVED' ? 'validation' : status === 'REJECTED' ? 'rejection' : 'reset_pending'
 
     if (this.isFallback || !this.db) {
@@ -343,6 +368,7 @@ class DrizzleDatabaseManager {
   }
 
   public async updateTestimonial(id: number, data: any, adminEmail: string): Promise<boolean> {
+    await this.ensureInitialized()
     const firstName = data.firstName || data.first_name || data.publication_name
     const allowPub = data.allowPublication || data.allow_publication
     const content = data.content
@@ -378,12 +404,14 @@ class DrizzleDatabaseManager {
   }
 
   public async deleteTestimonial(id: number, adminEmail: string): Promise<boolean> {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       const initialLen = this.fallbackData.testimonials.length
       this.fallbackData.testimonials = this.fallbackData.testimonials.filter(t => t.id !== id)
       const deleted = this.fallbackData.testimonials.length < initialLen
       if (deleted) {
-        this.logEvent(id, 'deletion', adminEmail)
+        await this.logEvent(id, 'deletion', adminEmail)
         this.saveFallback()
       }
       return deleted
@@ -396,6 +424,8 @@ class DrizzleDatabaseManager {
 
   // Audit Event Logger
   public async logEvent(testimonialId: number | null, action: string, performedBy = 'system'): Promise<void> {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       const newId = this.fallbackData.testimonialEvents.length > 0
         ? Math.max(...this.fallbackData.testimonialEvents.map(e => e.id)) + 1
@@ -420,6 +450,8 @@ class DrizzleDatabaseManager {
 
   // Real Dashboard Stats
   public async getDashboardStats() {
+    await this.ensureInitialized()
+
     if (this.isFallback || !this.db) {
       const testimonials = this.fallbackData.testimonials
       const totalTestimonials = testimonials.length
