@@ -1,115 +1,70 @@
+<script setup lang="ts">
+import { ArrowRight } from '@lucide/vue'
+import { AUTHOR, BOOK } from '~/data/book'
+
+useSeo({ title: `À propos de l’auteur — ${AUTHOR.name}`, description: AUTHOR.bio[0]! })
+const line = ref<HTMLElement>()
+let st: any
+onMounted(async () => {
+  const { gsap } = await useGsap()
+  if (!line.value || prefersReducedMotion()) return
+  const t = gsap.fromTo(line.value, { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: line.value.parentElement, start: 'top 70%', end: 'bottom 60%', scrub: 0.6 } })
+  st = t.scrollTrigger
+})
+onBeforeUnmount(() => st?.kill())
+</script>
+
 <template>
-  <div class="min-h-screen bg-[#F8F4EE] text-[#3A2115] font-sans antialiased selection:bg-[#B08D57]/20 selection:text-[#3A2115]">
-    <Navbar />
-
-    <main class="pt-28 pb-20">
-      <!-- Breadcrumb -->
-      <div class="container mx-auto px-6 md:px-12 lg:px-16 mb-8">
-        <nav class="text-xs uppercase tracking-widest text-[#B08D57] flex items-center gap-2">
-          <NuxtLink to="/" class="hover:underline">Accueil</NuxtLink>
-          <span>/</span>
-          <span class="text-[#3A2115]/60">L'Auteur</span>
-        </nav>
-      </div>
-
-      <!-- Hero / Bio Header -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-16">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div class="lg:col-span-7 space-y-6">
-            <span class="inline-block uppercase tracking-[0.4em] text-[#B08D57] font-semibold text-xs md:text-sm">
-              Biographie & Alignment
-            </span>
-            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-[#3A2115] font-normal leading-tight">
-              Dieudonné Sossa GOSSOU
-            </h1>
-            <p class="font-serif italic text-xl md:text-2xl text-[#B08D57] font-light leading-relaxed">
-              « Consultant en Performance Humaine, Strategic Leadership & Auteur de La Formule. »
-            </p>
-            <p class="text-[#5A4234] text-base md:text-lg font-light leading-relaxed">
-              Dieudonné Sossa GOSSOU accompagne les dirigeants, entrepreneurs et décideurs dans la conception de trajectoires d'excellence durables. Son travail se concentre sur l'élimination de la dispersion cognitive, l'optimisation des systèmes de décision et l'alignement entre ambition personnelle et impact collectif.
-            </p>
+  <div class="relative overflow-x-clip pb-28 pt-40">
+    <BrandRings class="pointer-events-none absolute -right-60 -top-40 h-[50rem] w-[50rem] opacity-40" />
+    <div class="container relative">
+      <div class="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+        <header>
+          <p v-reveal class="label-gold">À propos de l’auteur</p>
+          <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">{{ AUTHOR.name }}</UiSplitReveal>
+          <ul v-reveal.stagger class="mt-7 flex flex-wrap gap-2">
+            <li v-for="r in AUTHOR.roles" :key="r" class="rounded-full border border-line bg-white/60 px-4 py-1.5 font-sans text-sm text-ink-soft">{{ r }}</li>
+          </ul>
+          <div class="prose-book mt-10 max-w-2xl">
+            <p v-for="(p, i) in AUTHOR.bio" :key="i" v-reveal>{{ p }}</p>
           </div>
-
-          <!-- Author Card Showcase -->
-          <div class="lg:col-span-5 flex justify-center">
-            <div class="bg-[#FFFDF9] border border-[#B08D57]/30 rounded-3xl p-8 shadow-md text-center space-y-6 max-w-sm w-full">
-              <div class="w-32 h-32 rounded-full bg-[#120D09] border-2 border-[#B08D57] mx-auto flex items-center justify-center text-[#C7A45D] font-serif text-3xl font-medium shadow-inner">
-                DG
-              </div>
-              <div>
-                <h3 class="font-serif text-2xl text-[#3A2115]">Dieudonné Sossa GOSSOU</h3>
-                <p class="text-xs uppercase tracking-widest text-[#B08D57] font-medium mt-1">Auteur & Strategic Advisor</p>
-              </div>
-              <div class="border-t border-[#B08D57]/20 pt-4 text-xs text-[#5A4234] space-y-2">
-                <p>✦ Expert en Leadership & Haute Performance</p>
-                <p>✦ Concepteur de la Méthodologie α + β = Ω</p>
-                <p>✦ Conférencier International</p>
-              </div>
+        </header>
+        <div v-reveal="'scale'" class="relative mx-auto aspect-square w-full max-w-[28rem]">
+          <BrandRings class="absolute inset-[-12%] h-[124%] w-[124%] opacity-80" />
+          <div class="absolute inset-[11%] grid place-items-center rounded-full text-[#FFFDF9] shadow-book [background:var(--cover-soft)]">
+            <div class="px-6 text-center">
+              <p class="font-display text-[clamp(3.4rem,7vw,5rem)] leading-none tracking-[0.06em]">D·S·G</p>
+              <span class="mx-auto mt-4 block h-px w-14 bg-white/60" aria-hidden="true" />
+              <p class="mt-4 font-sans text-[0.66rem] uppercase tracking-[0.3em] text-white/85">Cotonou · Bénin</p>
             </div>
           </div>
         </div>
+      </div>
+
+      <section class="mt-28" aria-labelledby="parcours">
+        <p v-reveal class="label-gold">Le parcours</p>
+        <h2 id="parcours" class="mt-4 font-display text-display-md">La rigueur du mathématicien, <em class="text-caramel">le terrain de l’accompagnement</em>.</h2>
+        <ol class="relative mt-14 space-y-12 pl-10 md:pl-0">
+          <span aria-hidden="true" class="absolute bottom-0 left-[7px] top-0 w-px bg-line md:left-1/2" />
+          <span ref="line" aria-hidden="true" class="absolute bottom-0 left-[7px] top-0 w-px origin-top bg-caramel md:left-1/2" />
+          <li v-for="(t, i) in AUTHOR.timeline" :key="t.year" v-reveal class="relative md:grid md:grid-cols-2 md:gap-16">
+            <span aria-hidden="true" class="absolute -left-10 top-2 h-[15px] w-[15px] rounded-full border-2 border-caramel bg-paper md:left-1/2 md:-translate-x-1/2" />
+            <div :class="i % 2 ? 'md:col-start-2' : 'md:text-right'">
+              <p class="font-display text-[2.6rem] leading-none text-caramel">{{ t.year }}</p>
+              <h3 class="mt-3 font-display text-[1.6rem]">{{ t.title }}</h3>
+              <p class="mt-2 font-serif text-[1.08rem] leading-relaxed text-ink-soft" :class="i % 2 ? '' : 'md:ml-auto'">{{ t.text }}</p>
+            </div>
+          </li>
+        </ol>
       </section>
 
-      <!-- Philosophy & Key Pillars -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-20">
-        <div class="bg-[#FFFDF9] border border-[#B08D57]/30 rounded-3xl p-8 md:p-12 shadow-sm space-y-8 max-w-4xl mx-auto">
-          <h2 class="font-serif text-3xl text-[#3A2115] pb-4 border-b border-[#B08D57]/20">
-            La Philosophie de l'Auteur
-          </h2>
-
-          <div class="space-y-6 text-[#5A4234] text-base md:text-lg font-light leading-relaxed">
-            <p>
-              Convaincu que le vrai leadership ne réside pas dans l'agitation mais dans l'intensité de la présence et la clarté du choix, Dieudonné Sossa GOSSOU développe des protocoles d'action fondés sur la rigueur analytique et la profondeur humaine.
-            </p>
-
-            <blockquote class="border-l-2 border-[#B08D57] pl-6 py-2 font-serif italic text-xl text-[#B08D57]">
-              « Construire une grande œuvre ne demande pas plus de temps, mais une étanchéité absolue contre tout ce qui ne sert pas la vision suprême. »
-            </blockquote>
-
-            <p>
-              À travers le livre <strong>Une Formule</strong>, il met à disposition un cadre d'auto-coaching et de structuration stratégique accessible à toute personne désireuse d'atteindre le sommet de son art sans compromettre sa santé ou son intégrité.
-            </p>
-          </div>
-
-          <div class="pt-6 border-t border-[#B08D57]/20 flex flex-wrap gap-4">
-            <NuxtLink
-              to="/le-livre"
-              class="inline-block text-xs uppercase tracking-[0.25em] font-medium text-[#F8F4ED] bg-[#B08D57] hover:bg-[#3A2115] transition-all rounded-full px-8 py-3.5 shadow-md"
-            >
-              Découvrir son Ouvrage
-            </NuxtLink>
-            <NuxtLink
-              to="/les-7-leviers"
-              class="inline-block text-xs uppercase tracking-[0.25em] font-medium text-[#B08D57] border border-[#B08D57]/40 hover:bg-[#B08D57]/10 transition-all rounded-full px-8 py-3.5"
-            >
-              Les 7 Leviers
-            </NuxtLink>
-          </div>
+      <div v-reveal class="mt-28 rounded-[36px] border border-line bg-paper-2/70 px-8 py-14 text-center md:px-16">
+        <p class="mx-auto max-w-3xl font-display text-[clamp(1.8rem,3.4vw,2.8rem)] italic leading-tight text-ink">« {{ BOOK.maxim }} »</p>
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+          <UiButton to="/extraits" variant="outline">Lire l’avant-propos</UiButton>
+          <UiButton to="/commander" :icon="ArrowRight">Commander le livre</UiButton>
         </div>
-      </section>
-    </main>
-
-    <Footer />
+      </div>
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import Navbar from '~/components/navigation/Navbar.vue'
-import Footer from '~/components/navigation/Footer.vue'
-import { useSeo } from '~/composables/useSeo'
-import { useJsonLd } from '~/composables/useJsonLd'
-
-const { injectPersonSchema, injectBreadcrumbSchema } = useJsonLd()
-
-useSeo({
-  title: 'Dieudonné Sossa GOSSOU : Auteur du livre Une Formule',
-  description: 'Biographie et parcours de Dieudonné Sossa GOSSOU, auteur du livre Une Formule et consultant en performance humaine et leadership stratégique.',
-  path: '/auteur'
-})
-
-injectPersonSchema()
-injectBreadcrumbSchema([
-  { name: 'Accueil', item: '/' },
-  { name: 'L\'Auteur', item: '/auteur' }
-])
-</script>

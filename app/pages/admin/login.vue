@@ -1,104 +1,45 @@
-<template>
-  <div class="min-h-screen bg-[#120D09] text-[#F6F0E7] flex items-center justify-center p-6 relative overflow-hidden">
-    <!-- Ambient Gold Glow -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#B08D57]/15 via-transparent to-transparent pointer-events-none" />
-
-    <div class="w-full max-w-md bg-[#1C130D] border border-[#B08D57]/30 rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <a href="/" class="inline-flex items-center gap-2 font-serif text-2xl tracking-[0.25em] text-[#F6F0E7] font-medium mb-3">
-          <span class="text-[#C7A45D]">Α</span>
-          <span>+</span>
-          <span class="text-[#C7A45D]">β</span>
-          <span>=</span>
-          <span class="text-[#C7A45D]">Ω</span>
-        </a>
-        <h1 class="font-serif text-2xl text-[#F6F0E7] font-normal mb-1">
-          Espace Administration
-        </h1>
-        <p class="text-xs text-[#D4C8BE]/60 tracking-widest uppercase">
-          Maison d'Édition · Accès Réservé
-        </p>
-      </div>
-
-      <!-- Login Form -->
-      <form class="space-y-5" @submit.prevent="handleLogin">
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-[#C7A45D] font-medium mb-2">
-            Adresse Email
-          </label>
-          <input
-            v-model="email"
-            type="email"
-            required
-            placeholder="admin@uneformule.fr"
-            class="w-full bg-[#120D09] border border-[#B08D57]/30 rounded-xl px-4 py-3 text-sm text-[#F6F0E7] focus:outline-none focus:border-[#C7A45D]"
-          >
-        </div>
-
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-[#C7A45D] font-medium mb-2">
-            Mot de Passe
-          </label>
-          <input
-            v-model="password"
-            type="password"
-            required
-            placeholder="••••••••••••"
-            class="w-full bg-[#120D09] border border-[#B08D57]/30 rounded-xl px-4 py-3 text-sm text-[#F6F0E7] focus:outline-none focus:border-[#C7A45D]"
-          >
-        </div>
-
-        <div v-if="errorMsg" class="text-xs text-red-400 bg-red-900/30 p-3 rounded-xl border border-red-800/40">
-          {{ errorMsg }}
-        </div>
-
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="w-full text-xs uppercase tracking-[0.25em] font-medium text-[#120D09] bg-[#C7A45D] hover:bg-[#F6F0E7] transition-all duration-300 rounded-full py-3.5 shadow-lg disabled:opacity-50 mt-4 font-sans"
-        >
-          <span v-if="isLoading">Connexion en cours...</span>
-          <span v-else>Accéder au Tableau de Bord</span>
-        </button>
-      </form>
-
-      <div class="mt-8 pt-6 border-t border-[#B08D57]/15 text-center text-xs text-[#D4C8BE]/40">
-        <a href="/" class="hover:text-[#C7A45D] transition-colors">← Retourner au site public</a>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref } from 'vue'
+import { Lock } from '@lucide/vue'
+definePageMeta({ layout: 'bare', middleware: 'admin' })
+useHead({ title: 'Connexion — Administration Une Formule', meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
-const email = ref('admin@uneformule.fr')
-const password = ref('Formule2026!')
-const isLoading = ref(false)
-const errorMsg = ref('')
-const router = useRouter()
+const route = useRoute()
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+const error = ref('')
 
-const handleLogin = async () => {
-  isLoading.value = true
-  errorMsg.value = ''
-
+async function submit() {
+  error.value = ''
+  loading.value = true
   try {
-    const res = await $fetch<{ success: boolean }>('/api/auth/login', {
-      method: 'POST',
-      body: {
-        email: email.value,
-        password: password.value
-      }
-    })
-
-    if (res.success) {
-      router.push('/admin')
-    }
-  } catch (err: any) {
-    errorMsg.value = err.data?.statusMessage || 'Identifiants invalides.'
+    await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
+    const next = String(route.query.next || '/admin')
+    await navigateTo(next.startsWith('/admin') ? next : '/admin')
+  } catch (e: any) {
+    error.value = e?.data?.statusMessage || 'Connexion impossible.'
   } finally {
-    isLoading.value = false
+    loading.value = false
   }
 }
 </script>
+
+<template>
+  <div class="relative grid min-h-dvh place-items-center overflow-hidden px-5 py-16">
+    <BrandRings class="pointer-events-none absolute left-1/2 top-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 -translate-y-1/2 opacity-50" />
+    <div class="relative w-full max-w-md">
+      <div class="text-center">
+        <span class="mx-auto grid h-16 w-16 place-items-center rounded-full font-display text-3xl text-[#FFFDF9] shadow-book [background:var(--cover-gradient)]">Ω</span>
+        <h1 class="mt-6 font-display text-4xl">Administration</h1>
+        <p class="mt-2 font-sans text-sm text-ink-muted">Avis des lecteurs, commandes et réglages.</p>
+      </div>
+      <form class="surface mt-10 space-y-6 p-8" @submit.prevent="submit">
+        <UiField v-model="email" label="Email" type="email" autocomplete="username" required />
+        <UiField v-model="password" label="Mot de passe" type="password" autocomplete="current-password" required />
+        <p v-if="error" class="rounded-2xl border border-danger/30 bg-danger/5 px-4 py-3 font-sans text-sm text-danger" role="alert">{{ error }}</p>
+        <UiButton type="submit" block size="lg" :loading="loading" :icon-left="Lock" :magnetic="false">Se connecter</UiButton>
+      </form>
+      <p class="mt-6 text-center"><NuxtLink to="/" class="font-sans text-sm text-ink-muted hover:text-ink">← Retour au site</NuxtLink></p>
+    </div>
+  </div>
+</template>

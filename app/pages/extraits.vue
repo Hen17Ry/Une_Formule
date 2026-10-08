@@ -1,112 +1,93 @@
-<template>
-  <div class="min-h-screen bg-[#F8F4EE] text-[#3A2115] font-sans antialiased selection:bg-[#B08D57]/20 selection:text-[#3A2115]">
-    <Navbar />
+<script setup lang="ts">
+import { ShoppingBag } from '@lucide/vue'
+import { EXCERPTS } from '~/data/book'
 
-    <main class="pt-28 pb-20">
-      <!-- Breadcrumb -->
-      <div class="container mx-auto px-6 md:px-12 lg:px-16 mb-8">
-        <nav class="text-xs uppercase tracking-widest text-[#B08D57] flex items-center gap-2">
-          <NuxtLink to="/" class="hover:underline">Accueil</NuxtLink>
-          <span>/</span>
-          <span class="text-[#3A2115]/60">Extraits</span>
-        </nav>
+useSeo({ title: 'Extraits du livre', description: 'Lisez trois extraits d’Une Formule : La magie du titre, la note explicative de la formule Α + β = Ω et l’ouverture de l’avant-propos.' })
+
+const route = useRoute()
+const current = ref(EXCERPTS.findIndex(e => `#${e.slug}` === route.hash))
+if (current.value < 0) current.value = 0
+const excerpt = computed(() => EXCERPTS[current.value]!)
+const progress = ref(0)
+const article = ref<HTMLElement>()
+
+function select(i: number) {
+  current.value = i
+  history.replaceState(history.state, '', `#${EXCERPTS[i]!.slug}`)
+  const top = document.getElementById('lecture')
+  const lenis = (useNuxtApp().$lenis as any)?.()
+  if (top && window.scrollY > top.offsetTop) lenis ? lenis.scrollTo(top, { offset: -100 }) : top.scrollIntoView()
+}
+
+function onScroll() {
+  const el = article.value
+  if (!el) return
+  const r = el.getBoundingClientRect()
+  progress.value = Math.min(1, Math.max(0, (window.innerHeight * 0.6 - r.top) / r.height))
+}
+onMounted(() => { window.addEventListener('scroll', onScroll, { passive: true }); onScroll() })
+onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+</script>
+
+<template>
+  <div class="relative overflow-x-clip pb-28 pt-40">
+    <div class="fixed inset-x-0 top-0 z-[55] h-[3px] origin-left bg-caramel" :style="{ transform: `scaleX(${progress})` }" aria-hidden="true" />
+    <BrandRings class="pointer-events-none absolute -left-56 -top-32 h-[46rem] w-[46rem] opacity-40" />
+    <div class="container relative">
+      <header class="mx-auto max-w-3xl text-center">
+        <p v-reveal class="label-gold">Extraits du livre</p>
+        <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Ouvrir le livre, <em class="text-caramel">un peu</em>.</UiSplitReveal>
+        <p v-reveal class="mx-auto mt-6 max-w-xl font-serif text-[1.2rem] leading-relaxed text-ink-soft">Trois extraits, publiés tels quels, dans l’ordre voulu par l’auteur.</p>
+      </header>
+
+      <div id="lecture" role="tablist" aria-label="Extraits" class="sticky top-[84px] z-20 mx-auto mt-14 flex max-w-3xl gap-1 overflow-x-auto rounded-full border border-line bg-paper/85 p-1.5 shadow-soft backdrop-blur-xl" data-lenis-prevent>
+        <button
+          v-for="(e, i) in EXCERPTS"
+          :id="`tab-${e.slug}`"
+          :key="e.slug"
+          role="tab"
+          type="button"
+          :aria-selected="current === i"
+          :aria-controls="`panel-${e.slug}`"
+          class="relative min-h-[44px] flex-1 whitespace-nowrap rounded-full px-4 font-sans text-[0.9rem] transition-colors duration-300"
+          :class="current === i ? 'bg-copper text-[#FFFDF9]' : 'text-ink-soft hover:text-ink'"
+          @click="select(i)"
+        >
+          <span class="hidden opacity-70 sm:inline">{{ e.label }} · </span>{{ e.title }}
+        </button>
       </div>
 
-      <!-- Header -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-16">
-        <div class="max-w-4xl">
-          <span class="inline-block uppercase tracking-[0.4em] text-[#B08D57] font-semibold text-xs md:text-sm mb-4">
-            Passages Choisis & Citations
-          </span>
-          <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-[#3A2115] font-normal leading-tight mb-6">
-            Extraits du Livre Une Formule
-          </h1>
-          <p class="font-serif italic text-xl md:text-2xl text-[#B08D57] font-light leading-relaxed">
-            « Une immersion directe dans la puissance stylistique et philosophique de l'ouvrage. »
-          </p>
-        </div>
-      </section>
-
-      <!-- Excerpts List -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-20 space-y-12">
+      <Transition mode="out-in" enter-active-class="transition duration-700 ease-expo" enter-from-class="opacity-0 translate-y-6" leave-active-class="transition duration-200" leave-to-class="opacity-0">
         <article
-          v-for="(extrait, index) in extraits"
-          :key="index"
-          class="bg-[#FFFDF9] border border-[#B08D57]/30 rounded-3xl p-8 md:p-12 shadow-sm space-y-6 max-w-4xl mx-auto"
+          :id="`panel-${excerpt.slug}`"
+          ref="article"
+          :key="excerpt.slug"
+          role="tabpanel"
+          :aria-labelledby="`tab-${excerpt.slug}`"
+          class="relative mx-auto mt-12 max-w-3xl rounded-[8px] border border-line bg-[#fffdf8] px-7 py-14 shadow-lift sm:px-12 md:px-20 md:py-20"
         >
-          <div class="flex items-center justify-between border-b border-[#B08D57]/20 pb-4">
-            <span class="text-xs uppercase tracking-[0.3em] text-[#B08D57] font-semibold">
-              Extrait {{ index + 1 }} · {{ extrait.chapitre }}
-            </span>
-            <span class="text-xs text-[#5A4234] font-mono">Page {{ extrait.page }}</span>
+          <p class="text-center font-sans text-[0.68rem] uppercase tracking-[0.3em] text-ink-muted">{{ excerpt.label }}</p>
+          <h2 class="mt-3 text-center font-display text-display-sm">{{ excerpt.title }}</h2>
+          <span class="rule-gold mx-auto mt-6" aria-hidden="true" />
+          <p v-if="excerpt.formula" class="formula mt-8 text-center text-6xl text-ink" aria-label="Alpha plus bêta égale oméga">Α <span class="text-gold">+</span> <em class="text-caramel">β</em> <span class="text-gold">=</span> Ω</p>
+          <div class="prose-book mt-10">
+            <p v-for="(p, i) in excerpt.paragraphs" :key="i" :class="i === 0 && 'first-letter:float-left first-letter:mr-3 first-letter:mt-1.5 first-letter:font-display first-letter:text-[4.8rem] first-letter:leading-[0.78] first-letter:text-caramel'">{{ p }}</p>
           </div>
-
-          <blockquote class="font-serif italic text-xl md:text-2xl text-[#3A2115] leading-relaxed border-l-2 border-[#B08D57] pl-6 py-2">
-            « {{ extrait.texte }} »
-          </blockquote>
-
-          <p class="text-[#5A4234] text-sm md:text-base font-light leading-relaxed">
-            {{ extrait.commentaire }}
-          </p>
+          <p v-if="excerpt.note" class="mt-10 border-t border-line pt-6 text-center font-sans text-sm italic text-ink-muted">{{ excerpt.note }}</p>
+          <p class="mt-12 text-center font-sans text-[0.68rem] uppercase tracking-[0.3em] text-ink-muted">Une Formule …</p>
         </article>
-      </section>
+      </Transition>
 
-      <!-- CTA -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 text-center">
-        <div class="bg-[#120D09] text-[#F6F0E7] rounded-3xl p-10 md:p-14 border border-[#B08D57]/40 max-w-3xl mx-auto space-y-6">
-          <h2 class="font-serif text-3xl text-[#F6F0E7]">Envie de poursuivre la lecture ?</h2>
-          <p class="text-[#D4C8BE]/80 text-sm font-light">Commandez votre exemplaire de l'édition complète dès aujourd'hui.</p>
-          <NuxtLink
-            to="/commander"
-            class="inline-block text-xs uppercase tracking-[0.25em] font-medium text-[#120D09] bg-[#C7A45D] hover:bg-[#F6F0E7] transition-all rounded-full px-8 py-3.5 shadow-md"
-          >
-            Obtenir le Livre
-          </NuxtLink>
-        </div>
-      </section>
-    </main>
+      <div class="mx-auto mt-10 flex max-w-3xl items-center justify-between gap-4">
+        <button v-if="current > 0" type="button" class="min-h-[44px] font-sans text-sm text-ink-soft hover:text-ink" @click="select(current - 1)">← {{ EXCERPTS[current - 1]!.title }}</button>
+        <span v-else />
+        <button v-if="current < EXCERPTS.length - 1" type="button" class="min-h-[44px] font-sans text-sm text-ink-soft hover:text-ink" @click="select(current + 1)">{{ EXCERPTS[current + 1]!.title }} →</button>
+      </div>
 
-    <Footer />
+      <div v-reveal class="mx-auto mt-20 flex max-w-3xl flex-col items-center gap-6 rounded-[32px] border border-line bg-paper-2/70 px-8 py-12 text-center">
+        <p class="font-display text-display-sm">La suite est entre les pages.</p>
+        <UiButton to="/commander" size="lg" :icon-left="ShoppingBag">Commander le livre</UiButton>
+      </div>
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import Navbar from '~/components/navigation/Navbar.vue'
-import Footer from '~/components/navigation/Footer.vue'
-import { useSeo } from '~/composables/useSeo'
-import { useJsonLd } from '~/composables/useJsonLd'
-
-const { injectBreadcrumbSchema } = useJsonLd()
-
-const extraits = [
-  {
-    chapitre: 'Chapitre I - La Vision de Clarté',
-    page: '24',
-    texte: 'La clarté n\'est pas la certitude du résultat, mais l\'immobilité absolue de l\'intention. Lorsque vous cessez de négocier avec la dispersion, l\'objectif devient l\'unique direction possible.',
-    commentaire: 'Cet extrait pose les fondations du premier levier : éliminer les arbitrages parasites pour sanctuariser son attention.'
-  },
-  {
-    chapitre: 'Chapitre II - La Maîtrise du Temps',
-    page: '58',
-    texte: 'Le temps ne s\'économise pas : il s\'investit ou il s\'évapore. Ceux qui régnent sur leur destin ne comptent pas les heures, ils mesurent la densité d\'impact injectée dans chaque seconde.',
-    commentaire: 'Une réflexion profonde sur la différence fondamentale entre la gestion d\'agenda passive et la souveraineté temporelle active.'
-  },
-  {
-    chapitre: 'Chapitre IV - L\'Effet de Levier',
-    page: '112',
-    texte: 'Le travailleur acharné vend son temps ; l\'architecte construit des leviers. Si votre présence reste le seul moteur de votre création, vous n\'avez pas bâti un empire, mais une cage dorée.',
-    commentaire: 'Le Levier 04 invite à concevoir des architectures organisationnelles et technologiques autonomes.'
-  }
-]
-
-useSeo({
-  title: 'Extraits & Citations du livre Une Formule',
-  description: 'Consultez les meilleurs extraits, leçons et citations du livre Une Formule par Dieudonné Sossa GOSSOU.',
-  path: '/extraits'
-})
-
-injectBreadcrumbSchema([
-  { name: 'Accueil', item: '/' },
-  { name: 'Extraits', item: '/extraits' }
-])
-</script>

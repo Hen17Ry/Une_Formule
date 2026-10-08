@@ -1,193 +1,103 @@
-<template>
-  <div class="min-h-screen bg-[#F8F4EE] text-[#3A2115] font-sans antialiased selection:bg-[#B08D57]/20 selection:text-[#3A2115]">
-    <Navbar />
-
-    <main v-if="lever" class="pt-28 pb-20">
-      <!-- Breadcrumb -->
-      <div class="container mx-auto px-6 md:px-12 lg:px-16 mb-8">
-        <nav class="text-xs uppercase tracking-widest text-[#B08D57] flex items-center gap-2">
-          <NuxtLink to="/" class="hover:underline">Accueil</NuxtLink>
-          <span>/</span>
-          <NuxtLink to="/les-7-leviers" class="hover:underline">Les 7 Leviers</NuxtLink>
-          <span>/</span>
-          <span class="text-[#3A2115]/60">{{ lever.title }}</span>
-        </nav>
-      </div>
-
-      <!-- Hero Section -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-16">
-        <div class="max-w-4xl">
-          <div class="flex items-center gap-4 mb-4">
-            <span class="font-serif text-5xl md:text-6xl text-[#B08D57] font-medium">{{ lever.number }}</span>
-            <span class="text-xs md:text-sm uppercase tracking-[0.3em] text-[#5A4234] font-semibold">
-              Levier {{ lever.number }} / 07 · Chapitre du Livre
-            </span>
-          </div>
-
-          <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-[#3A2115] font-normal leading-tight mb-6">
-            {{ lever.title }}
-          </h1>
-
-          <p class="text-lg md:text-xl text-[#5A4234] uppercase tracking-widest font-medium mb-6">
-            {{ lever.subtitle }}
-          </p>
-
-          <blockquote class="border-l-2 border-[#B08D57] pl-6 py-2 font-serif italic text-xl md:text-2xl text-[#B08D57] mb-8 bg-[#FFFDF9] rounded-r-2xl">
-            {{ lever.quote }}
-          </blockquote>
-        </div>
-      </section>
-
-      <!-- Main Body Article -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 mb-20">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <!-- Main Content -->
-          <div class="lg:col-span-8 bg-[#FFFDF9] border border-[#B08D57]/30 rounded-3xl p-8 md:p-12 shadow-sm space-y-6">
-            <h2 class="font-serif text-2xl md:text-3xl text-[#3A2115] pb-4 border-b border-[#B08D57]/20">
-              Analyse Approfondie du Levier {{ lever.number }}
-            </h2>
-
-            <p class="text-[#5A4234] text-base md:text-lg font-light leading-relaxed">
-              {{ lever.p1 }}
-            </p>
-
-            <p class="text-[#5A4234] text-base md:text-lg font-light leading-relaxed">
-              {{ lever.p2 }}
-            </p>
-
-            <p v-if="lever.p3" class="text-[#5A4234] text-base md:text-lg font-light leading-relaxed">
-              {{ lever.p3 }}
-            </p>
-
-            <!-- Key Takeaways Box -->
-            <div class="mt-8 bg-[#F8F4EE] border border-[#B08D57]/40 rounded-2xl p-6 md:p-8 space-y-4">
-              <h3 class="font-serif text-xl text-[#3A2115] flex items-center gap-2">
-                <span class="text-[#B08D57]">✦</span>
-                <span>Principes d'Action Fondamentaux</span>
-              </h3>
-              <ul class="space-y-3">
-                <li
-                  v-for="(t, i) in lever.takeaways"
-                  :key="i"
-                  class="flex items-start gap-3 text-sm md:text-base text-[#5A4234]"
-                >
-                  <span class="text-[#B08D57] font-semibold shrink-0">0{{ i + 1 }}.</span>
-                  <span>{{ t }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Sidebar -->
-          <div class="lg:col-span-4 space-y-6">
-            <!-- Book CTA Sidebar Box -->
-            <div class="bg-[#120D09] text-[#F6F0E7] border border-[#B08D57]/40 rounded-3xl p-8 space-y-6">
-              <span class="text-xs uppercase tracking-[0.3em] text-[#C7A45D] font-semibold block">Ouvrage Complet</span>
-              <h3 class="font-serif text-2xl text-[#F6F0E7]">Approfondir dans le Livre</h3>
-              <p class="text-xs md:text-sm text-[#D4C8BE]/80 font-light leading-relaxed">
-                Le Levier {{ lever.number }} fait partie des 7 piliers de la formule α + β = Ω. Retrouvez les protocoles d'application complets dans le livre relié.
-              </p>
-              <NuxtLink
-                to="/commander"
-                class="block w-full text-center text-xs uppercase tracking-[0.25em] font-medium text-[#120D09] bg-[#C7A45D] hover:bg-[#F6F0E7] transition-all rounded-full py-3.5 shadow-md"
-              >
-                Commander le Livre
-              </NuxtLink>
-            </div>
-
-            <!-- All Levers Quick Navigation -->
-            <div class="bg-[#FFFDF9] border border-[#B08D57]/30 rounded-3xl p-6 space-y-4">
-              <h4 class="font-serif text-lg text-[#3A2115] border-b border-[#B08D57]/20 pb-2">
-                Tous les 7 Leviers
-              </h4>
-              <ul class="space-y-2 text-xs font-medium">
-                <li v-for="l in leviers" :key="l.slug">
-                  <NuxtLink
-                    :to="`/les-7-leviers/${l.slug}`"
-                    class="flex items-center justify-between p-2 rounded-lg transition-colors"
-                    :class="l.slug === lever.slug ? 'bg-[#B08D57]/15 text-[#B08D57] font-semibold' : 'hover:bg-[#F8F4EE] text-[#5A4234]'"
-                  >
-                    <span>{{ l.number }}. {{ l.title }}</span>
-                    <span v-if="l.slug === lever.slug">✓</span>
-                  </NuxtLink>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Next / Prev Lever Navigation Bar -->
-      <section class="container mx-auto px-6 md:px-12 lg:px-16 pt-8 border-t border-[#B08D57]/20">
-        <div class="flex items-center justify-between gap-4">
-          <NuxtLink
-            v-if="prevLever"
-            :to="`/les-7-leviers/${prevLever.slug}`"
-            class="text-xs uppercase tracking-widest text-[#B08D57] hover:text-[#3A2115] transition-colors flex items-center gap-2"
-          >
-            <span>← Levier {{ prevLever.number }} : {{ prevLever.title }}</span>
-          </NuxtLink>
-          <div v-else />
-
-          <NuxtLink
-            v-if="nextLever"
-            :to="`/les-7-leviers/${nextLever.slug}`"
-            class="text-xs uppercase tracking-widest text-[#B08D57] hover:text-[#3A2115] transition-colors flex items-center gap-2"
-          >
-            <span>Levier {{ nextLever.number }} : {{ nextLever.title }} →</span>
-          </NuxtLink>
-          <div v-else />
-        </div>
-      </section>
-    </main>
-
-    <!-- 404 Fallback if invalid slug -->
-    <div v-else class="min-h-screen flex items-center justify-center pt-28 pb-20 px-6">
-      <div class="text-center space-y-4">
-        <h1 class="font-serif text-4xl text-[#3A2115]">Levier non trouvé</h1>
-        <p class="text-[#5A4234]">Le levier demandé n'existe pas ou a été déplacé.</p>
-        <NuxtLink to="/les-7-leviers" class="inline-block text-xs uppercase tracking-widest bg-[#B08D57] text-[#F8F4ED] px-6 py-3 rounded-full">
-          Retour aux 7 leviers
-        </NuxtLink>
-      </div>
-    </div>
-
-    <Footer />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from '#imports'
-import Navbar from '~/components/navigation/Navbar.vue'
-import Footer from '~/components/navigation/Footer.vue'
-import { useLevers } from '~/composables/useLevers'
-import { useSeo } from '~/composables/useSeo'
-import { useJsonLd } from '~/composables/useJsonLd'
+import { ArrowLeft, ArrowRight, MessageSquareQuote, FlaskConical, NotebookPen } from '@lucide/vue'
+import { LEVERS, leverBySlug } from '~/data/book'
 
 const route = useRoute()
-const slug = computed(() => route.params.slug as string)
-const { leviers, getLeverBySlug } = useLevers()
-const { injectBreadcrumbSchema } = useJsonLd()
+const lever = computed(() => leverBySlug(String(route.params.slug)))
+if (!lever.value) throw createError({ statusCode: 404, statusMessage: 'Levier introuvable', fatal: true })
+const l = lever.value!
+const prev = LEVERS.find(x => x.n === l.n - 1)
+const next = LEVERS.find(x => x.n === l.n + 1)
 
-const lever = computed(() => getLeverBySlug(slug.value))
-
-const currentIndex = computed(() => leviers.findIndex((l) => l.slug === slug.value))
-const prevLever = computed(() => currentIndex.value > 0 ? leviers[currentIndex.value - 1] : undefined)
-const nextLever = computed(() => currentIndex.value < leviers.length - 1 ? leviers[currentIndex.value + 1] : undefined)
-
-if (lever.value) {
-  useSeo({
-    title: lever.value.metaTitle,
-    description: lever.value.metaDescription,
-    path: `/les-7-leviers/${lever.value.slug}`,
-    keywords: lever.value.keywords
-  })
-
-  injectBreadcrumbSchema([
-    { name: 'Accueil', item: '/' },
-    { name: 'Les 7 Leviers', item: '/les-7-leviers' },
-    { name: lever.value.title, item: `/les-7-leviers/${lever.value.slug}` }
-  ])
-}
+useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.mechanism[0]}`, type: 'article' })
 </script>
+
+<template>
+  <div class="relative overflow-x-clip pb-24">
+    <!-- En-tête -->
+    <header class="relative overflow-x-clip pb-20 pt-40">
+      <div aria-hidden="true" class="absolute inset-0" :style="{ background: `radial-gradient(60% 80% at 80% 20%, ${l.color}1f, transparent 70%)` }" />
+      <span aria-hidden="true" class="pointer-events-none absolute -right-10 top-16 select-none font-display text-[clamp(16rem,40vw,34rem)] leading-none text-transparent opacity-50 [-webkit-text-stroke:1.5px_var(--c)]" :style="{ '--c': l.color }">{{ l.n }}</span>
+      <div class="container relative">
+        <NuxtLink to="/les-7-leviers" class="inline-flex min-h-[44px] items-center gap-2 font-sans text-sm text-ink-muted hover:text-ink"><ArrowLeft class="h-4 w-4" aria-hidden="true" /> Les 7 leviers</NuxtLink>
+        <div v-reveal class="mt-8 flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full" :style="{ background: l.color }" aria-hidden="true" />
+          <p class="label">Levier {{ l.n }} sur 7</p>
+        </div>
+        <UiSplitReveal tag="h1" immediate class="mt-5 max-w-4xl font-display text-display-lg">{{ l.title }}</UiSplitReveal>
+        <p v-reveal class="mt-8 max-w-2xl font-serif text-[1.35rem] italic leading-relaxed text-ink-soft">{{ l.question }}</p>
+      </div>
+    </header>
+
+    <div class="container grid gap-16 lg:grid-cols-[1fr_20rem]">
+      <article class="max-w-3xl">
+        <figure v-reveal class="relative rounded-[28px] border border-line bg-white/70 p-8 shadow-soft md:p-12">
+          <span aria-hidden="true" class="absolute -top-7 left-8 font-display text-[6rem] leading-none" :style="{ color: l.color }">“</span>
+          <blockquote class="font-display text-[1.7rem] leading-snug text-ink md:text-[2rem]">{{ l.quote }}</blockquote>
+          <figcaption class="mt-5 font-sans text-xs uppercase tracking-[0.24em] text-ink-muted">Ouverture du levier {{ l.n }}</figcaption>
+        </figure>
+
+        <section class="mt-16" aria-labelledby="mecanisme">
+          <p class="label-gold">Le mécanisme</p>
+          <h2 id="mecanisme" class="mt-3 font-display text-display-sm">Comment ce levier agit</h2>
+          <div class="prose-book mt-6">
+            <p v-for="(p, i) in l.mechanism" :key="i" v-reveal>{{ p }}</p>
+            <p v-reveal>Dans l’économie du livre, ce levier <em>{{ l.role }}</em></p>
+          </div>
+        </section>
+
+        <section class="mt-16" aria-labelledby="science">
+          <p class="label-gold flex items-center gap-2"><FlaskConical class="h-4 w-4" aria-hidden="true" /> Le socle scientifique</p>
+          <h2 id="science" class="mt-3 font-display text-display-sm">Sur quoi il s’appuie</h2>
+          <p v-reveal class="prose-book mt-6">{{ l.science }}</p>
+          <ul v-reveal.stagger class="mt-6 flex flex-wrap gap-2">
+            <li v-for="r in l.references" :key="r" class="rounded-full border border-line bg-white/70 px-4 py-2 font-sans text-sm text-ink-soft">{{ r }}</li>
+          </ul>
+          <p v-if="l.echo" v-reveal class="mt-8 rounded-[22px] bg-paper-2 px-6 py-5 font-serif text-[1.05rem] leading-relaxed text-ink-soft"><span class="font-sans text-xs uppercase tracking-[0.2em] text-ink-muted">Un écho extérieur · </span>{{ l.echo }}</p>
+        </section>
+
+        <section class="mt-16" aria-labelledby="exercices">
+          <p class="label-gold flex items-center gap-2"><NotebookPen class="h-4 w-4" aria-hidden="true" /> Application {{ l.n }}</p>
+          <h2 id="exercices" class="mt-3 font-display text-display-sm">Les exercices</h2>
+          <p v-reveal class="mt-4 font-serif text-lg italic text-ink-soft">{{ l.practice }}</p>
+          <div v-reveal.stagger class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div v-for="e in l.exercises" :key="e.n" class="rounded-[24px] border border-line bg-white/70 p-6">
+              <p class="font-sans text-xs uppercase tracking-[0.22em]" :style="{ color: l.color }">Exercice {{ e.n }}</p>
+              <h3 class="mt-2 font-display text-[1.45rem] leading-tight">{{ e.title }}</h3>
+              <p class="mt-3 font-serif text-[1.02rem] leading-relaxed text-ink-soft">{{ e.text }}</p>
+            </div>
+          </div>
+          <p class="mt-6 font-sans text-sm text-ink-muted">Le déroulé complet de chaque exercice se trouve dans le livre.</p>
+        </section>
+      </article>
+
+      <aside class="lg:pt-2">
+        <div class="sticky top-28 space-y-4">
+          <div class="rounded-[28px] p-7 text-[#FFFDF9] [background:var(--cover-soft)]">
+            <MessageSquareQuote class="h-6 w-6" aria-hidden="true" />
+            <p class="mt-4 font-display text-[1.7rem] leading-tight">Vous avez pratiqué ce levier ?</p>
+            <p class="mt-2 font-sans text-sm text-white/90">Votre retour nourrit la prochaine édition.</p>
+            <NuxtLink :to="`/retours/${l.slug}`" class="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#FFFDF9] px-5 font-sans text-sm font-medium text-umber transition-transform duration-500 ease-expo hover:-translate-y-0.5">Donner mon retour <ArrowRight class="h-4 w-4" aria-hidden="true" /></NuxtLink>
+          </div>
+          <div class="rounded-[28px] border border-line bg-white/70 p-7">
+            <p class="font-display text-[1.5rem] leading-tight">Le livre complet</p>
+            <p class="mt-2 font-sans text-sm text-ink-muted">Sept leviers, seize exercices, une section Sources.</p>
+            <UiButton to="/commander" size="sm" class="mt-5">Commander</UiButton>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="container mt-24 grid gap-4 border-t border-line pt-10 sm:grid-cols-2" aria-label="Leviers voisins">
+      <NuxtLink v-if="prev" :to="`/les-7-leviers/${prev.slug}`" class="group rounded-[24px] border border-line p-6 transition-colors hover:border-caramel">
+        <span class="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted"><ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" /> Levier {{ prev.n }}</span>
+        <span class="mt-2 block font-display text-2xl">{{ prev.short }}</span>
+      </NuxtLink>
+      <span v-else />
+      <NuxtLink v-if="next" :to="`/les-7-leviers/${next.slug}`" class="group rounded-[24px] border border-line p-6 text-right transition-colors hover:border-caramel">
+        <span class="flex items-center justify-end gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted">Levier {{ next.n }} <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+        <span class="mt-2 block font-display text-2xl">{{ next.short }}</span>
+      </NuxtLink>
+    </nav>
+  </div>
+</template>

@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   Une Formule — design tokens (palette tirée de la couverture)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --paper: #fbf7f1;
+  --paper-2: #f5ece0;
+  --paper-3: #efe3d3;
+  --line: #e6d6c3;
+  --ink: #2e1f15;
+  --ink-soft: #4a3426;
+  --muted: #73563f;
+  --caramel: #a36b43;
+  --copper: #8a5530;
+  --umber: #714324;
+  --gold: #b08a45;
+  --gold-light: #d9bf86;
+
+  --cover-gradient: linear-gradient(170deg, #b27a50 0%, #a36b43 35%, #8a5530 70%, #714324 100%);
+  --cover-soft: linear-gradient(165deg, #cfa47c 0%, #bb855a 45%, #a36b43 100%);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.87, 0, 0.13, 1);
+  --nav-h: 76px;
+
+  color-scheme: light only;
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: calc(var(--nav-h) + 24px);
+    overflow-x: clip;
+  }
+
+  body {
+    @apply font-sans text-[1.0625rem] leading-relaxed text-ink;
+    background: var(--paper);
+    font-weight: 380;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  /* Grain papier très léger, pour donner de la matière aux aplats crème */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .44 0 0 0 0 .26 0 0 0 0 .14 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  /* Chiffres alignés (Cormorant utilise des chiffres elzéviriens par défaut) */
+  .font-display, h1, h2, h3, h4 { font-feature-settings: 'lnum' 1; }
+
+  p { text-wrap: pretty; }
+
+  ::selection {
+    background: var(--caramel);
+    color: #fffdf9;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--copper);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  a, button, [role='button'], label[for], summary, select {
+    cursor: pointer;
+  }
+
+  img, video, canvas { max-width: 100%; }
+}
+
+@layer components {
+  .label {
+    @apply font-sans text-[0.72rem] font-medium uppercase tracking-label text-ink-muted;
+  }
+
+  .label-gold {
+    @apply font-sans text-[0.72rem] font-medium uppercase tracking-label;
+    color: var(--gold-deep, #94702f);
+  }
+
+  .rule-gold {
+    display: block;
+    height: 1px;
+    width: 3.5rem;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .prose-book {
+    @apply font-serif text-[1.18rem] leading-[1.75] text-ink-soft;
+  }
+  .prose-book p + p { margin-top: 1.1em; }
+  .prose-book em { color: var(--ink); }
+
+  .surface {
+    @apply rounded-[28px] border border-line bg-white/70 shadow-soft backdrop-blur-sm;
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease-out);
+  }
+  .link-underline:hover, .link-underline:focus-visible { background-size: 100% 1px; }
+
+  .formula {
+    @apply font-display;
+    font-feature-settings: 'lnum';
+    letter-spacing: 0.04em;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-copper focus:px-5 focus:py-3 focus:text-paper;
+  }
+}
+
+/* ─────────────── Lenis ─────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ─────────────── Transitions de page ─────────────── */
+.page-enter-active { transition: opacity 0.55s var(--ease-out), transform 0.7s var(--ease-out); }
+.page-leave-active { transition: opacity 0.3s ease, transform 0.35s ease; }
+.page-enter-from { opacity: 0; transform: translateY(18px); }
+.page-leave-to { opacity: 0; transform: translateY(-8px); }
+
+/* Révélations (état initial seulement si JS prêt, sinon contenu visible) */
+.js-ready [data-reveal] { opacity: 0; transform: translateY(28px); }
+.js-ready [data-reveal='fade'] { transform: none; }
+.js-ready [data-reveal='scale'] { transform: scale(0.96); }
+.js-ready [data-reveal-stagger] > * { opacity: 0; transform: translateY(28px); }
+
+/* Intro du hero : masquée seulement une fois JS + GSAP prêts, avec filet de sécurité. */
+.js-ready [data-title], .js-ready [data-intro] { opacity: 0; animation: uf-failsafe 0.6s ease 6s forwards; }
+@keyframes uf-failsafe { to { opacity: 1; } }
+
+/* Lignes de texte découpées (SplitText) */
+.split-line { overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js-ready [data-reveal], .js-ready [data-reveal-stagger] > * { opacity: 1 !important; transform: none !important; }
+}

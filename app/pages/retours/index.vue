@@ -1,100 +1,50 @@
+<script setup lang="ts">
+import { ArrowUpRight } from '@lucide/vue'
+import { LEVERS } from '~/data/book'
+useSeo({ title: 'Retours des lecteurs', description: 'Donnez votre retour sur l’un des sept leviers du livre Une Formule, ou sur le livre en général.' })
+</script>
+
 <template>
-  <div class="relative bg-[#F8F4ED] min-h-screen text-[#3A2115] selection:bg-[#B08D57] selection:text-[#F8F4ED]">
-    <!-- Navbar -->
-    <NavigationNavbar />
-
-    <!-- Header Section -->
-    <section class="pt-32 pb-16 md:pt-40 md:pb-20 px-6 sm:px-10 md:px-16 lg:px-24 border-b border-[#B08D57]/20">
-      <div class="container mx-auto max-w-5xl text-center">
-        <span class="inline-block uppercase tracking-[0.4em] text-[#B08D57] font-semibold text-xs md:text-sm mb-4">
-          Galerie Éditoriale
-        </span>
-        <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl text-[#3A2115] font-normal tracking-tight mb-6">
-          Retours des Lecteurs
-        </h1>
-        <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#B08D57]/60 to-transparent mx-auto mb-6" />
-        <p class="text-[#5A4234] text-base md:text-lg font-light max-w-2xl mx-auto leading-relaxed mb-10">
-          Témoignages authentiques validés et transmis par les lecteurs d'Une Formule.
+  <div class="relative overflow-x-clip pb-28 pt-40">
+    <BrandRings class="pointer-events-none absolute -right-56 -top-40 h-[48rem] w-[48rem] opacity-40" />
+    <div class="container relative">
+      <header class="max-w-3xl">
+        <p v-reveal class="label-gold">Retours des lecteurs</p>
+        <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Votre lecture <em class="text-caramel">compte</em>.</UiSplitReveal>
+        <p v-reveal class="mt-6 max-w-2xl font-serif text-[1.25rem] leading-relaxed text-ink-soft">
+          Choisissez le levier sur lequel vous souhaitez vous exprimer, ou donnez un retour sur le livre entier. Quelques minutes suffisent : seules la note et l’autorisation de citation sont requises.
         </p>
+      </header>
 
-        <!-- CTA Button to open Feedback Modal -->
-        <button
-          type="button"
-          class="inline-flex items-center gap-3 text-xs md:text-sm uppercase tracking-[0.25em] font-medium text-[#F8F4ED] bg-[#B08D57] hover:bg-[#3A2115] transition-all duration-300 rounded-full px-8 py-3.5 shadow-lg group"
-          @click="isModalOpen = true"
+      <div v-reveal.stagger class="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <UiSpotlight
+          v-for="l in LEVERS"
+          :key="l.n"
+          tag="article"
+          class="group rounded-[28px] border border-line bg-white/70 shadow-soft transition-[transform,box-shadow] duration-500 ease-expo hover:-translate-y-1 hover:shadow-lift"
+          :color="`${l.color}22`"
         >
-          <span>Partager votre expérience</span>
-          <span class="transition-transform duration-300 group-hover:translate-x-1">→</span>
-        </button>
+          <NuxtLink :to="`/retours/${l.slug}`" class="flex h-full min-h-[15rem] flex-col p-7">
+            <div class="flex items-center justify-between">
+              <span class="grid h-11 w-11 place-items-center rounded-full font-display text-xl text-[#FFFDF9]" :style="{ background: l.color }">{{ l.n }}</span>
+              <ArrowUpRight class="h-5 w-5 text-ink-muted transition-transform duration-500 ease-expo group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-ink" aria-hidden="true" />
+            </div>
+            <p class="mt-auto pt-8 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted">Levier {{ l.n }}</p>
+            <h2 class="mt-2 font-display text-[1.65rem] leading-tight">{{ l.short }}</h2>
+          </NuxtLink>
+        </UiSpotlight>
+        <NuxtLink to="/retours/general" class="group relative flex min-h-[15rem] flex-col overflow-hidden rounded-[28px] p-7 text-[#FFFDF9] shadow-lift [background:var(--cover-soft)]">
+          <BrandRings class="absolute -right-24 -top-24 h-80 w-80 opacity-60" :spin="false" />
+          <ArrowUpRight class="relative ml-auto h-5 w-5 transition-transform duration-500 ease-expo group-hover:-translate-y-1 group-hover:translate-x-1" aria-hidden="true" />
+          <p class="relative mt-auto font-sans text-xs uppercase tracking-[0.22em] text-white/85">Le livre en entier</p>
+          <h2 class="relative mt-2 font-display text-[1.65rem] leading-tight text-[#FFFDF9]">Retour général</h2>
+        </NuxtLink>
       </div>
-    </section>
 
-    <!-- Main Content Gallery & Interactive Carousel -->
-    <section class="py-16 md:py-24 px-6 sm:px-10 md:px-16 lg:px-24">
-      <div class="container mx-auto max-w-6xl">
-        <!-- Loading State -->
-        <div v-if="pending" class="text-center py-20 text-[#5A4234]">
-          <span class="font-serif italic text-lg">Consultation des retours validés...</span>
-        </div>
-
-        <!-- Elegant Empty State (ZERO FAKE DATA) -->
-        <div v-else-if="testimonials.length === 0" class="text-center py-20 bg-[#FFFDF9] rounded-3xl border border-[#B08D57]/20 max-w-xl mx-auto p-10 shadow-sm relative overflow-hidden">
-          <div class="w-16 h-16 bg-[#B08D57]/10 text-[#B08D57] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-serif">
-            Ω
-          </div>
-          <span class="inline-block uppercase tracking-[0.3em] text-[#B08D57] text-xs font-semibold mb-3">
-            Espace Éditorial Vierge
-          </span>
-          <h3 class="font-serif text-2xl md:text-3xl text-[#3A2115] mb-4 font-normal">
-            Votre expérience sera la première pierre de cette collection.
-          </h3>
-          <p class="text-sm text-[#5A4234] font-light mb-8 max-w-md mx-auto leading-relaxed">
-            Vous avez parcouru Une Formule ? Soyez le premier lecteur à transmettre votre vision et vos résultats.
-          </p>
-          <button
-            type="button"
-            class="text-xs uppercase tracking-[0.2em] font-medium text-[#F8F4ED] bg-[#B08D57] hover:bg-[#3A2115] transition-all rounded-full px-8 py-3.5 shadow-md"
-            @click="isModalOpen = true"
-          >
-            Écrire le premier témoignage
-          </button>
-        </div>
-
-        <!-- Public Carousel Display for Approved Testimonials -->
-        <div v-else>
-          <TestimonialsPublicCarousel :testimonials="testimonials" />
-        </div>
+      <div v-reveal class="mt-16 flex flex-col items-start justify-between gap-6 border-t border-line pt-10 md:flex-row md:items-center">
+        <p class="max-w-xl font-serif text-lg text-ink-soft">Chaque retour est relu avant publication. Votre adresse email n’est jamais affichée.</p>
+        <UiButton to="/avis" variant="outline" :icon="ArrowUpRight">Lire les avis publiés</UiButton>
       </div>
-    </section>
-
-    <!-- Feedback Modal -->
-    <TestimonialsFeedbackModal
-      :is-open="isModalOpen"
-      @close="isModalOpen = false"
-      @submitted="onSubmitted"
-    />
-
-    <!-- Footer -->
-    <NavigationFooter />
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useAnalytics } from '../../composables/useAnalytics'
-
-const isModalOpen = ref(false)
-const { trackEvent } = useAnalytics()
-
-const { data: responseData, pending, refresh } = await useFetch('/api/testimonials')
-
-const testimonials = computed(() => responseData.value?.data || [])
-
-const onSubmitted = () => {
-  refresh()
-}
-
-onMounted(() => {
-  trackEvent('page_view', { page: '/retours' })
-})
-</script>

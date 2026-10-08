@@ -1,151 +1,142 @@
-<template>
-  <div class="min-h-screen bg-[#120D09] text-[#F6F0E7] selection:bg-[#B08D57] selection:text-[#120D09]">
-    <!-- Admin Header Navigation -->
-    <header class="bg-[#1C130D] border-b border-[#B08D57]/20 py-4 px-6 md:px-12 flex items-center justify-between sticky top-0 z-40">
-      <div class="flex items-center space-x-6">
-        <a href="/" class="font-serif text-xl tracking-[0.2em] text-[#F6F0E7] font-medium flex items-center gap-2">
-          <span class="text-[#C7A45D]">Α</span>
-          <span>+</span>
-          <span class="text-[#C7A45D]">β</span>
-          <span>=</span>
-          <span class="text-[#C7A45D]">Ω</span>
-        </a>
-        <span class="hidden sm:inline-block text-xs uppercase tracking-widest text-[#C7A45D]/80 border-l border-[#B08D57]/30 pl-4">
-          Administration · PostgreSQL & Redis Engine
-        </span>
-      </div>
+<script setup lang="ts">
+import { ArrowRight, Star, Check, EyeOff } from '@lucide/vue'
+import { LEVERS, formatXof } from '~/data/book'
 
-      <!-- Navigation Tabs -->
-      <nav class="flex items-center space-x-2 sm:space-x-4 text-xs uppercase tracking-wider font-medium">
-        <NuxtLink to="/admin" class="px-4 py-2 rounded-full bg-[#C7A45D] text-[#120D09] shadow-sm font-semibold">
-          Vue Principale
-        </NuxtLink>
-        <NuxtLink to="/admin/testimonials" class="px-4 py-2 rounded-full text-[#D4C8BE] hover:text-[#C7A45D] hover:bg-[#B08D57]/10 transition-colors">
-          Témoignages Modération
-        </NuxtLink>
-        <button type="button" class="text-xs uppercase tracking-widest text-red-400 hover:text-red-300 ml-4 border border-red-800/40 px-3 py-1.5 rounded-full" @click="handleLogout">
-          Déconnexion
-        </button>
-      </nav>
+definePageMeta({ layout: 'admin', middleware: 'admin' })
+const { data, refresh } = useFetch<any>('/api/admin/overview', { server: false, key: 'admin-overview' })
+const { push } = useToasts()
+
+const leverRows = computed(() => (data.value?.reviews.byLever ?? []).map((r: any) => ({
+  ...r,
+  label: r.key === 'general' ? 'Général' : `L${r.key} · ${LEVERS[Number(r.key) - 1]?.short}`,
+  color: r.key === 'general' ? '#A36B43' : LEVERS[Number(r.key) - 1]?.color
+})))
+const maxCount = computed(() => Math.max(1, ...leverRows.value.map((r: any) => r.count)))
+
+async function quick(id: number, status: 'APPROVED' | 'REJECTED') {
+  try {
+    await adminFetch(`/api/admin/reviews/${id}`, { method: 'PATCH', body: { status } })
+    push(status === 'APPROVED' ? 'Avis rendu visible.' : 'Avis masqué.')
+    refresh()
+  } catch (e: any) { push(e?.data?.statusMessage || 'Action impossible.', 'error') }
+}
+
+const EVENT_LABELS: Record<string, string> = {
+  'review:created': 'Nouvel avis reçu', 'review:approved': 'Avis rendu visible', 'review:hidden': 'Avis masqué', 'review:reset': 'Avis remis en attente', 'review:edited': 'Avis modifié', 'review:deleted': 'Avis supprimé',
+  'order:created': 'Commande créée', 'order:paid': 'Paiement confirmé', 'order:status_shipped': 'Commande expédiée', 'order:status_delivered': 'Commande livrée', 'order:status_cancelled': 'Commande annulée', 'order:note': 'Note ajoutée',
+  'settings:updated': 'Réglages mis à jour', 'auth:login': 'Connexion admin'
+}
+const eventLabel = (e: any) => EVENT_LABELS[`${e.entity}:${e.action}`] || `${e.entity} · ${e.action}`
+</script>
+
+<template>
+  <div>
+    <header class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="label">Tableau de bord</p>
+        <h1 class="mt-2 font-display text-[2.6rem] leading-tight">Bonjour.</h1>
+      </div>
+      <p v-if="data" class="text-sm text-ink-muted">Mode de vente : <strong class="text-ink">{{ data.settings.saleMode === 'PREORDER' ? 'Précommande' : 'Disponible' }}</strong> · {{ formatXof(data.settings.priceXof) }}</p>
     </header>
 
-    <!-- Main Content -->
-    <main class="p-6 md:p-12 max-w-7xl mx-auto space-y-10">
-      <!-- Title Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#B08D57]/20 pb-6">
-        <div>
-          <span class="text-xs uppercase tracking-[0.3em] text-[#C7A45D] font-semibold block mb-1">
-            Tableau de Bord PostgreSQL & Audit Trail
-          </span>
-          <h1 class="font-serif text-3xl md:text-4xl text-[#F6F0E7]">
-            Statistiques & Métriques Réelles
-          </h1>
+    <div v-if="!data" class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div v-for="i in 4" :key="i" class="h-32 animate-pulse rounded-[24px] bg-white/70" />
+    </div>
+    <template v-else>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <NuxtLink to="/admin/avis?status=PENDING" class="group rounded-[24px] border border-line bg-white p-6 shadow-soft transition-shadow hover:shadow-lift">
+          <p class="label">Avis en attente</p>
+          <p class="mt-3 font-display text-5xl">{{ data.reviews.pending }}</p>
+          <p class="mt-2 flex items-center gap-1 text-sm text-ink-muted">À modérer <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></p>
+        </NuxtLink>
+        <div class="rounded-[24px] border border-line bg-white p-6 shadow-soft">
+          <p class="label">Note moyenne</p>
+          <p class="mt-3 flex items-baseline gap-2 font-display text-5xl">{{ data.reviews.average ? String(data.reviews.average).replace('.', ',') : '—' }}<Star class="h-6 w-6 fill-gold text-gold-deep" :stroke-width="1.4" aria-hidden="true" /></p>
+          <p class="mt-2 text-sm text-ink-muted">{{ data.reviews.total }} avis · {{ data.reviews.approved }} visibles</p>
         </div>
-        <div class="flex items-center space-x-3">
-          <NuxtLink to="/admin/testimonials" class="text-xs uppercase tracking-widest bg-[#B08D57]/20 text-[#C7A45D] border border-[#B08D57]/40 px-5 py-2.5 rounded-full hover:bg-[#C7A45D] hover:text-[#120D09] transition-all font-medium">
-            Gérer la modération →
-          </NuxtLink>
-        </div>
-      </div>
-
-      <!-- Real KPIs Grid (NO FAKE DATA) -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <!-- KPI 1: Real Total Submissions -->
-        <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-2xl p-5 text-center shadow-md">
-          <span class="text-[10px] uppercase tracking-widest text-[#D4C8BE]/60 block mb-2">Témoignages Reçus</span>
-          <span class="font-serif text-3xl text-[#F6F0E7] font-medium">{{ stats?.totalTestimonials || 0 }}</span>
-        </div>
-
-        <!-- KPI 2: Real Approved -->
-        <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-2xl p-5 text-center shadow-md">
-          <span class="text-[10px] uppercase tracking-widest text-[#D4C8BE]/60 block mb-2">Validés (APPROVED)</span>
-          <span class="font-serif text-3xl text-emerald-400 font-medium">{{ stats?.approvedTestimonials || 0 }}</span>
-        </div>
-
-        <!-- KPI 3: Real Pending -->
-        <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-2xl p-5 text-center shadow-md">
-          <span class="text-[10px] uppercase tracking-widest text-[#D4C8BE]/60 block mb-2">En Attente (PENDING)</span>
-          <span class="font-serif text-3xl text-amber-400 font-medium">{{ stats?.pendingTestimonials || 0 }}</span>
-        </div>
-
-        <!-- KPI 4: Real Rejected -->
-        <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-2xl p-5 text-center shadow-md">
-          <span class="text-[10px] uppercase tracking-widest text-[#D4C8BE]/60 block mb-2">Refusés (REJECTED)</span>
-          <span class="font-serif text-3xl text-red-400 font-medium">{{ stats?.rejectedTestimonials || 0 }}</span>
-        </div>
-
-        <!-- KPI 5: Real Avg Rating -->
-        <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-2xl p-5 text-center shadow-md">
-          <span class="text-[10px] uppercase tracking-widest text-[#D4C8BE]/60 block mb-2">Note Moyenne</span>
-          <span class="font-serif text-3xl text-[#C7A45D] font-medium">
-            {{ stats?.avgRating !== null ? `★ ${stats.avgRating}` : '-' }}
-          </span>
+        <NuxtLink to="/admin/commandes?status=PAID" class="group rounded-[24px] border border-line bg-white p-6 shadow-soft transition-shadow hover:shadow-lift">
+          <p class="label">Commandes payées</p>
+          <p class="mt-3 font-display text-5xl">{{ data.orders.paid }}</p>
+          <p class="mt-2 flex items-center gap-1 text-sm text-ink-muted">{{ data.orders.toShip }} à expédier <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></p>
+        </NuxtLink>
+        <div class="rounded-[24px] p-6 text-[#FFFDF9] shadow-soft [background:var(--cover-soft)]">
+          <p class="font-sans text-[0.72rem] font-medium uppercase tracking-label text-white/85">Chiffre d’affaires</p>
+          <p class="mt-3 font-display text-[2.4rem] leading-tight">{{ formatXof(data.orders.revenue) }}</p>
+          <p class="mt-2 text-sm text-white/90">{{ data.orders.copies }} exemplaire{{ data.orders.copies > 1 ? 's' : '' }} vendu{{ data.orders.copies > 1 ? 's' : '' }}</p>
         </div>
       </div>
 
-      <!-- Historical Audit Trail Table (testimonial_events) -->
-      <div class="bg-[#1C130D] border border-[#B08D57]/25 rounded-3xl p-6 sm:p-8">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h3 class="font-serif text-xl text-[#F6F0E7]">Historique d'Audit (`testimonial_events`)</h3>
-            <p class="text-xs text-[#D4C8BE]/60">Traçabilité complète des créations, validations, rejets et suppressions</p>
+      <div class="mt-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="pending-title">
+          <div class="flex items-center justify-between">
+            <h2 id="pending-title" class="font-display text-2xl">À modérer</h2>
+            <NuxtLink to="/admin/avis" class="text-sm text-copper hover:underline">Tout voir</NuxtLink>
           </div>
-          <span class="text-xs text-[#C7A45D] tracking-widest uppercase font-mono">PostgreSQL Audit</span>
-        </div>
+          <ul v-if="data.reviews.latestPending.length" class="mt-5 divide-y divide-line">
+            <li v-for="r in data.reviews.latestPending" :key="r.id" class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
+              <NuxtLink :to="`/admin/avis?id=${r.id}`" class="min-w-0 flex-1">
+                <p class="text-xs text-ink-muted">{{ r.kind === 'GENERAL' ? 'Retour général' : `Levier ${r.lever}` }} · {{ fmtDate(r.createdAt) }} · {{ r.rating }}/5</p>
+                <p class="mt-1 line-clamp-2 font-serif text-[1.02rem] text-ink">{{ Object.values(r.answers)[0] || '(sans commentaire)' }}</p>
+              </NuxtLink>
+              <div class="flex shrink-0 gap-2">
+                <button v-if="r.consent !== 'NO'" type="button" class="inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-ok/10 px-4 text-sm text-ok hover:bg-ok/20" @click="quick(r.id, 'APPROVED')"><Check class="h-4 w-4" aria-hidden="true" /> Visible</button>
+                <button type="button" class="inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-ink/[.05] px-4 text-sm text-ink-soft hover:bg-ink/10" @click="quick(r.id, 'REJECTED')"><EyeOff class="h-4 w-4" aria-hidden="true" /> Masquer</button>
+              </div>
+            </li>
+          </ul>
+          <p v-else class="mt-6 rounded-2xl bg-paper-2/60 px-5 py-8 text-center text-sm text-ink-muted">Aucun avis en attente.</p>
+        </section>
 
-        <div v-if="!stats?.eventsHistory || stats.eventsHistory.length === 0" class="text-center py-10 text-[#D4C8BE]/40 text-xs italic">
-          Aucun événement d'audit enregistré pour le moment.
-        </div>
-
-        <div v-else class="space-y-3 font-mono text-xs">
-          <div
-            v-for="evt in stats.eventsHistory"
-            :key="evt.id"
-            class="p-4 bg-[#120D09] rounded-xl border border-[#B08D57]/15 flex items-center justify-between text-[#D4C8BE]/80"
-          >
-            <div class="flex items-center space-x-4">
-              <span
-                class="px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-semibold"
-                :class="{
-                  'bg-blue-900/40 text-blue-300 border border-blue-700/50': evt.action === 'creation',
-                  'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50': evt.action === 'validation',
-                  'bg-amber-900/40 text-amber-300 border border-amber-700/50': evt.action === 'rejection',
-                  'bg-red-900/40 text-red-300 border border-red-700/50': evt.action === 'deletion'
-                }"
-              >
-                {{ evt.action }}
-              </span>
-              <span class="text-[#F6F0E7] font-sans">Témoignage #{{ evt.testimonial_id }}</span>
-              <span class="text-[#D4C8BE]/50 text-[11px]">Par : {{ evt.performed_by }}</span>
-            </div>
-            <span class="text-[10px] text-[#D4C8BE]/40">{{ formatDate(evt.created_at) }}</span>
-          </div>
-        </div>
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="levers-title">
+          <h2 id="levers-title" class="font-display text-2xl">Retours par levier</h2>
+          <ul class="mt-5 space-y-3">
+            <li v-for="r in leverRows" :key="r.key" class="grid grid-cols-[9rem_1fr_3.5rem] items-center gap-3 text-sm">
+              <span class="truncate text-ink-soft" :title="r.label">{{ r.label }}</span>
+              <span class="h-2.5 overflow-hidden rounded-full bg-paper-2"><span class="block h-full rounded-full transition-all duration-700" :style="{ width: `${(r.count / maxCount) * 100}%`, background: r.color }" /></span>
+              <span class="text-right tabular-nums text-ink">{{ r.count }}<span v-if="r.average" class="text-ink-muted"> · {{ String(r.average).replace('.', ',') }}</span></span>
+            </li>
+          </ul>
+          <p class="mt-4 text-xs text-ink-muted">Nombre de retours · note moyenne</p>
+        </section>
       </div>
-    </main>
+
+      <div class="mt-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="orders-title">
+          <div class="flex items-center justify-between">
+            <h2 id="orders-title" class="font-display text-2xl">Dernières commandes</h2>
+            <NuxtLink to="/admin/commandes" class="text-sm text-copper hover:underline">Tout voir</NuxtLink>
+          </div>
+          <ul v-if="data.orders.latest.length" class="mt-5 divide-y divide-line">
+            <li v-for="o in data.orders.latest" :key="o.id">
+              <NuxtLink :to="`/admin/commandes?id=${o.id}`" class="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div>
+                  <p class="font-medium text-ink">{{ o.firstName }} {{ o.lastName }} <span class="font-normal text-ink-muted">· {{ o.city }}</span></p>
+                  <p class="text-xs text-ink-muted">{{ o.reference }} · {{ fmtDate(o.createdAt) }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="tabular-nums">{{ formatXof(o.total) }}</span>
+                  <span class="rounded-full px-3 py-1 text-xs" :class="ORDER_STATUS[o.status]?.cls">{{ ORDER_STATUS[o.status]?.label }}</span>
+                </div>
+              </NuxtLink>
+            </li>
+          </ul>
+          <p v-else class="mt-6 rounded-2xl bg-paper-2/60 px-5 py-8 text-center text-sm text-ink-muted">Aucune commande pour l’instant.</p>
+        </section>
+
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="activity-title">
+          <h2 id="activity-title" class="font-display text-2xl">Activité</h2>
+          <ol v-if="data.events.length" class="mt-5 space-y-4">
+            <li v-for="e in data.events.slice(0, 10)" :key="e.id" class="flex gap-3 text-sm">
+              <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-caramel" aria-hidden="true" />
+              <div>
+                <p class="text-ink">{{ eventLabel(e) }}<span v-if="e.entityId" class="text-ink-muted"> #{{ e.entityId }}</span></p>
+                <p class="text-xs text-ink-muted">{{ fmtDate(e.createdAt) }} · {{ e.actor }}</p>
+              </div>
+            </li>
+          </ol>
+          <p v-else class="mt-6 text-sm text-ink-muted">Rien pour l’instant.</p>
+        </section>
+      </div>
+    </template>
   </div>
 </template>
-
-<script setup lang="ts">
-// Protect route check
-const { data: authData } = await useFetch('/api/auth/me')
-const router = useRouter()
-
-if (!authData.value?.authenticated) {
-  router.push('/admin/login')
-}
-
-const { data: statsData } = await useFetch('/api/admin/stats')
-const stats = computed(() => statsData.value?.data)
-
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
-}
-
-const handleLogout = async () => {
-  await $fetch('/api/auth/logout', { method: 'POST' })
-  router.push('/admin/login')
-}
-</script>
