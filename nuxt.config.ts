@@ -1,38 +1,81 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://www.uneformule.com'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
+
+  modules: ['@nuxtjs/tailwindcss'],
+
+  css: [
+    '@fontsource-variable/cormorant-garamond/wght.css',
+    '@fontsource-variable/cormorant-garamond/wght-italic.css',
+    '@fontsource-variable/eb-garamond/wght.css',
+    '@fontsource-variable/eb-garamond/wght-italic.css',
+    '@fontsource-variable/jost/wght.css',
+    '~/assets/css/main.css'
+  ],
+
+  tailwindcss: {
+    cssPath: false,
+    configPath: 'tailwind.config.ts'
+  },
+
   runtimeConfig: {
+    // Les secrets (KkiaPay, session) sont lus directement dans process.env côté serveur :
+    // voir server/utils/env.ts. Rien de secret n’est exposé au navigateur.
     public: {
-      siteUrl: process.env.SITE_URL || 'https://uneformule.com',
-      gaId: process.env.NUXT_PUBLIC_GA_ID || ''
+      siteUrl,
+      gaId: ''
     }
   },
-  modules: [
-    '@nuxtjs/tailwindcss',
-    ['@nuxtjs/google-fonts', {
-      families: {
-        'Playfair Display': [400, 600, 700],
-        Inter: [300, 400, 500, 600]
-      },
-      display: 'swap',
-      prefetch: true,
-      preconnect: true,
-      preload: true,
-      download: true,
-      inject: true
-    }]
-  ],
+
   app: {
     head: {
-      title: 'Une Formule : α + β = Ω | Livre par Dieudonné Sossa GOSSOU',
+      htmlAttrs: { lang: 'fr' },
+      title: 'Une Formule… 7 leviers pour construire la vie que vous désirez',
       meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=5' },
-        { name: 'description', content: 'Une Formule : α + β = Ω. L\'ouvrage d\'exception conçu comme un véritable outil de transformation personnelle, d\'élévation stratégique et de maîtrise des 7 leviers par Dieudonné Sossa GOSSOU.' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+        { name: 'theme-color', content: '#FBF7F1' },
+        { name: 'color-scheme', content: 'light only' },
         { name: 'format-detection', content: 'telephone=no' }
       ],
-      htmlAttrs: {
-        lang: 'fr'
-      }
+      link: [
+        { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' }
+      ]
+    },
+    pageTransition: { name: 'page', mode: 'out-in' }
+  },
+
+  routeRules: {
+    // Anciennes URL → nouvelle architecture
+    '/le-livre': { redirect: { to: '/', statusCode: 301 } },
+    '/la-genese': { redirect: { to: '/extraits', statusCode: 301 } },
+    '/temoignages': { redirect: { to: '/avis', statusCode: 301 } },
+    '/articles': { redirect: { to: '/', statusCode: 301 } },
+    '/articles/**': { redirect: { to: '/', statusCode: 301 } },
+    '/questions': { redirect: { to: '/faq', statusCode: 301 } },
+    '/admin/**': { ssr: false, headers: { 'x-robots-tag': 'noindex, nofollow' } },
+    '/admin': { ssr: false, headers: { 'x-robots-tag': 'noindex, nofollow' } },
+    '/api/**': { headers: { 'x-robots-tag': 'noindex' } },
+    '/models/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/images/**': { headers: { 'cache-control': 'public, max-age=2592000' } }
+  },
+
+  nitro: {
+    compressPublicAssets: true
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: ['gsap', 'gsap/ScrollTrigger', 'gsap/SplitText', 'lenis', 'three', '@lucide/vue']
     }
+  },
+
+  typescript: {
+    strict: true
   }
 })
