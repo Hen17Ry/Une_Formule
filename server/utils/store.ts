@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS events (
 
 class PgStore implements Store {
   readonly kind = 'postgres' as const
-  constructor(private db: ReturnType<typeof drizzle<typeof schema>>) {}
+  constructor(private db: ReturnType<typeof drizzle<typeof schema>>, readonly pool: pg.Pool) {}
 
   async getAdminByEmail(email: string) {
     const rows = await this.db.select().from(schema.adminUsers).where(eq(schema.adminUsers.email, email.toLowerCase()))
@@ -274,7 +274,12 @@ class PgStore implements Store {
   }
 
   async logEvent(e: Omit<AppEvent, 'id' | 'createdAt'>) {
-    await this.db.insert(schema.events).values(e)
+    // Le journal d’activité ne doit jamais faire échouer l’action principale.
+    try {
+      await this.db.insert(schema.events).values(e)
+    } catch (err: any) {
+      console.error('[store] Journal d’activité indisponible :', err?.code, err?.message)
+    }
   }
 
   async listEvents(limit = 30) {
@@ -450,6 +455,8 @@ class FileStore implements Store {
 /* ─────────────────────────── Initialisation ─────────────────────────── */
 
 let storePromise: Promise<Store> | null = null
+/** Dernière erreur de connexion PostgreSQL (pour /api/health). */
+export let lastDbError: { code: string, message: string } | null = null
 
 async function migrateLegacyTestimonials(pool: pg.Pool) {
   // Reprend les avis de l’ancienne version du site (table testimonials) une seule fois.
@@ -487,9 +494,10 @@ async function createStore(): Promise<Store> {
       await pool.query(DDL)
       await migrateLegacyTestimonials(pool).catch(err => console.warn('[store] Migration des anciens témoignages ignorée :', err?.message))
       console.info('[store] PostgreSQL connecté')
-      return new PgStore(drizzle(pool, { schema }))
+      return new PgStore(drizzle(pool, { schema }), pool)
     } catch (err: any) {
-      console.error('[store] PostgreSQL injoignable, bascule sur le stockage fichier :', err?.message)
+      lastDbError = { code: String(err?.code || err?.name || 'ERREUR'), message: String(err?.message || '').slice(0, 200) }
+      console.error('[store] PostgreSQL injoignable, bascule sur le stockage fichier :', err?.code, err?.message)
     }
   }
 
