@@ -5,7 +5,7 @@ const schema = z.object({
   next: z.string().min(MIN_PASSWORD_LENGTH, `Le nouveau mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`).max(200)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const me = await requireAdmin(event)
   await rateLimit(event, 'password', 8, 10 * 60)
   const parsed = schema.safeParse(await readBody(event))

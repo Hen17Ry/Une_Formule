@@ -13,7 +13,7 @@ const schema = z.object({
   preorderNote: z.string().trim().max(400)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const admin = await requireAdmin(event)
   const parsed = schema.safeParse(await readBody(event))
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message || 'Réglages invalides.' })

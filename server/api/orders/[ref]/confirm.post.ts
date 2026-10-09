@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const schema = z.object({ transactionId: z.string().trim().min(3).max(80) })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   await rateLimit(event, 'confirm', 20, 15 * 60)
   const ref = String(getRouterParam(event, 'ref') || '').toUpperCase()
   const parsed = schema.safeParse(await readBody(event))

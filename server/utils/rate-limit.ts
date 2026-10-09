@@ -6,9 +6,13 @@ import Redis from 'ioredis'
 let redis: Redis | null = null
 const url = process.env.REDIS_URL || process.env.KV_URL
 if (url) {
-  redis = new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true, enableOfflineQueue: false })
-  redis.on('error', () => {})
-  redis.connect().catch(() => { redis = null })
+  try {
+    redis = new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true, enableOfflineQueue: false, connectTimeout: 2500, commandTimeout: 1500 })
+    redis.on('error', () => {})
+    redis.connect().catch(() => { redis = null })
+  } catch {
+    redis = null
+  }
 }
 
 const memory = new Map<string, { count: number, resetAt: number }>()
@@ -28,6 +32,7 @@ export async function rateLimit(event: H3Event, bucket: string, max: number, win
       return
     } catch (err: any) {
       if (err?.statusCode === 429) throw err
+      // Redis indisponible : on retombe sur la limite en mémoire.
     }
   }
 

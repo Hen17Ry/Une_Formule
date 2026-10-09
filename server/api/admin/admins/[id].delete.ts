@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const me = await requireAdmin(event)
   const id = Number(getRouterParam(event, 'id'))
   const store = await useStore()

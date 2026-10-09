@@ -1,7 +1,7 @@
 import { getPublicCache, setPublicCache } from '../../utils/review-cache'
 import type { PublicReview } from '#shared/types'
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const query = getQuery(event)
   let all = getPublicCache()
   if (!all) {

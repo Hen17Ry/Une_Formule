@@ -3,7 +3,7 @@ import { z } from 'zod'
 const schema = z.object({ email: z.string().trim().email(), password: z.string().min(1).max(200) })
 
 /* Connexion : l’email et le mot de passe sont vérifiés contre la table admin_users de la base. */
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   await rateLimit(event, 'login', 6, 10 * 60)
   const parsed = schema.safeParse(await readBody(event))
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: 'Email et mot de passe requis.' })

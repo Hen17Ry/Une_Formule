@@ -5,7 +5,7 @@ const schema = z.object({
   password: z.string().min(MIN_PASSWORD_LENGTH, `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`).max(200)
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const me = await requireAdmin(event)
   const parsed = schema.safeParse(await readBody(event))
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message || 'Requête invalide.' })

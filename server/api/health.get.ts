@@ -10,7 +10,7 @@ const EXPECTED: Record<string, string[]> = {
   events: ['id', 'entity', 'entity_id', 'action', 'actor', 'created_at']
 }
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   setResponseHeader(event, 'cache-control', 'no-store')
   const store = await useStore()
   const report: Record<string, any> = {

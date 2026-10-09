@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   await requireAdmin(event)
   const store = await useStore()
   const orders = await store.listOrders()

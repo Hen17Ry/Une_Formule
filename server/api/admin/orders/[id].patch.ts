@@ -5,7 +5,7 @@ const schema = z.object({
   adminNote: z.string().max(1000).nullable().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const admin = await requireAdmin(event)
   const id = Number(getRouterParam(event, 'id'))
   const parsed = schema.safeParse(await readBody(event))

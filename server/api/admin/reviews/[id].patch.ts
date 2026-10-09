@@ -7,7 +7,7 @@ const schema = z.object({
   featured: z.boolean().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const admin = await requireAdmin(event)
   const id = Number(getRouterParam(event, 'id'))
   const parsed = schema.safeParse(await readBody(event))

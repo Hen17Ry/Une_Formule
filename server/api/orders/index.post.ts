@@ -13,7 +13,7 @@ const schema = z.object({
   website: z.string().optional()
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   await rateLimit(event, 'order', 20, 15 * 60)
 
   const parsed = schema.safeParse(await readBody(event))

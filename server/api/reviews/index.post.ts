@@ -17,7 +17,7 @@ const schema = z.object({
   website: z.string().optional() // pot de miel anti-robots
 })
 
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   await rateLimit(event, 'review', 20, 15 * 60)
 
   const parsed = schema.safeParse(await readBody(event))

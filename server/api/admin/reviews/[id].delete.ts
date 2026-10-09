@@ -1,5 +1,5 @@
 import { invalidatePublicCache } from '../../../utils/review-cache'
-export default defineEventHandler(async (event) => {
+export default defineApiHandler(async (event) => {
   const admin = await requireAdmin(event)
   const id = Number(getRouterParam(event, 'id'))
   const store = await useStore()
