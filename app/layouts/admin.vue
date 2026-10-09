@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutDashboard, MessageSquareQuote, Package, Settings, LogOut, ExternalLink, Menu, X } from '@lucide/vue'
+import { LayoutDashboard, MessageSquareQuote, Package, Settings, LogOut, ExternalLink, Menu, X, KeyRound } from '@lucide/vue'
 
 const route = useRoute()
 const open = ref(false)
@@ -12,7 +12,8 @@ const nav = computed(() => [
   { to: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
   { to: '/admin/avis', label: 'Avis des lecteurs', icon: MessageSquareQuote, badge: overview.value?.reviews?.pending },
   { to: '/admin/commandes', label: 'Commandes', icon: Package, badge: overview.value?.orders?.toShip },
-  { to: '/admin/reglages', label: 'Réglages', icon: Settings }
+  { to: '/admin/reglages', label: 'Réglages', icon: Settings },
+  { to: '/admin/acces', label: 'Accès', icon: KeyRound }
 ])
 const isActive = (to: string, exact?: boolean) => exact ? route.path === to : route.path.startsWith(to)
 watch(() => route.fullPath, () => { open.value = false; refresh() })

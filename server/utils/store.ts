@@ -24,7 +24,7 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   preorderNote: 'Précommande : votre exemplaire vous est expédié dès la sortie officielle du livre.'
 }
 
-export interface AdminUser { id: number, email: string, passwordHash: string, role: string }
+export interface AdminUser { id: number, email: string, passwordHash: string, role: string, createdAt?: string | Date }
 
 export type NewReview = Omit<Review, 'id' | 'status' | 'featured' | 'moderatedBy' | 'moderatedAt' | 'createdAt' | 'updatedAt' | 'publicQuote'> & { publicQuote?: string | null }
 export type ReviewPatch = Partial<Pick<Review, 'status' | 'publicQuote' | 'featured' | 'firstName'>>
@@ -38,6 +38,11 @@ export interface Store {
   readonly kind: 'postgres' | 'file'
   getAdminByEmail(email: string): Promise<AdminUser | null>
   upsertAdmin(email: string, passwordHash: string): Promise<void>
+  listAdmins(): Promise<AdminUser[]>
+  deleteAdmin(id: number): Promise<boolean>
+
+  /** Valeur technique persistée (ex. secret de session) ; créée une seule fois si absente. */
+  ensureKv<T>(key: string, create: () => T): Promise<T>
 
   createReview(input: NewReview): Promise<Review>
   getReview(id: number): Promise<Review | null>
@@ -146,6 +151,24 @@ class PgStore implements Store {
     await this.db.insert(schema.adminUsers)
       .values({ email: email.toLowerCase(), passwordHash, role: 'ADMIN' })
       .onConflictDoUpdate({ target: schema.adminUsers.email, set: { passwordHash } })
+  }
+
+  async listAdmins() {
+    return this.db.select().from(schema.adminUsers).orderBy(schema.adminUsers.id)
+  }
+
+  async deleteAdmin(id: number) {
+    const rows = await this.db.delete(schema.adminUsers).where(eq(schema.adminUsers.id, id)).returning({ id: schema.adminUsers.id })
+    return rows.length > 0
+  }
+
+  async ensureKv<T>(key: string, create: () => T): Promise<T> {
+    const [row] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, key))
+    if (row) return row.value as T
+    // ON CONFLICT DO NOTHING : si deux instances démarrent en même temps, une seule valeur gagne.
+    await this.db.insert(schema.settings).values({ key, value: create() as any }).onConflictDoNothing()
+    const [saved] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, key))
+    return saved!.value as T
   }
 
   async createReview(input: NewReview) {
@@ -263,6 +286,7 @@ class PgStore implements Store {
 /* ─────────────────────────── Fichier JSON (dev) ─────────────────────────── */
 
 interface FileData {
+  kv?: Record<string, unknown>
   adminUsers: AdminUser[]
   reviews: Review[]
   orders: Order[]
@@ -302,8 +326,28 @@ class FileStore implements Store {
   async upsertAdmin(email: string, passwordHash: string) {
     const existing = this.data.adminUsers.find(u => u.email === email.toLowerCase())
     if (existing) existing.passwordHash = passwordHash
-    else this.data.adminUsers.push({ id: this.nextId(this.data.adminUsers), email: email.toLowerCase(), passwordHash, role: 'ADMIN' })
+    else this.data.adminUsers.push({ id: this.nextId(this.data.adminUsers), email: email.toLowerCase(), passwordHash, role: 'ADMIN', createdAt: now().toISOString() })
     this.save()
+  }
+
+  async listAdmins() {
+    return [...this.data.adminUsers]
+  }
+
+  async deleteAdmin(id: number) {
+    const before = this.data.adminUsers.length
+    this.data.adminUsers = this.data.adminUsers.filter(u => u.id !== id)
+    this.save()
+    return this.data.adminUsers.length < before
+  }
+
+  async ensureKv<T>(key: string, create: () => T): Promise<T> {
+    this.data.kv ??= {}
+    if (!(key in this.data.kv)) {
+      this.data.kv[key] = create()
+      this.save()
+    }
+    return this.data.kv[key] as T
   }
 
   async createReview(input: NewReview) {
@@ -455,11 +499,6 @@ async function createStore(): Promise<Store> {
 }
 
 export function useStore(): Promise<Store> {
-  if (!storePromise) {
-    storePromise = createStore().then(async (store) => {
-      await ensureAdminFromEnv(store)
-      return store
-    })
-  }
+  if (!storePromise) storePromise = createStore()
   return storePromise
 }

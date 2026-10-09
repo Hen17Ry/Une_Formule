@@ -100,11 +100,11 @@ const inputCls = 'h-12 w-full rounded-2xl border border-line bg-paper/60 px-4 te
           </p>
           <p class="mt-4 text-sm leading-relaxed text-ink-soft">Les clés se règlent dans les variables d’environnement du serveur (jamais ici) :</p>
           <ul class="mt-3 space-y-1 font-mono text-xs text-ink-soft">
-            <li>NUXT_PUBLIC_KKIAPAY_PUBLIC_KEY</li>
-            <li>NUXT_KKIAPAY_PRIVATE_KEY</li>
-            <li>NUXT_KKIAPAY_SECRET_KEY</li>
-            <li>NUXT_PUBLIC_KKIAPAY_SANDBOX=false (production)</li>
-            <li>NUXT_KKIAPAY_WEBHOOK_SECRET</li>
+            <li>KKIAPAY_PUBLIC_KEY</li>
+            <li>KKIAPAY_PRIVATE_KEY</li>
+            <li>KKIAPAY_SECRET_KEY</li>
+            <li>KKIAPAY_SANDBOX=false (paiements réels)</li>
+            <li>KKIAPAY_WEBHOOK_SECRET</li>
           </ul>
           <p class="mt-5 text-sm font-medium">URL du webhook à déclarer chez KkiaPay</p>
           <div class="mt-2 flex items-center gap-2 rounded-2xl bg-paper-2/70 p-2 pl-4">

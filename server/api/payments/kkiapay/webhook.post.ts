@@ -3,7 +3,7 @@ import crypto from 'node:crypto'
 /* Webhook KkiaPay (filet de sécurité si le navigateur se ferme avant la confirmation).
    URL à déclarer dans le tableau de bord KkiaPay : https://<domaine>/api/payments/kkiapay/webhook */
 export default defineEventHandler(async (event) => {
-  const expected = useRuntimeConfig().kkiapay.webhookSecret as string
+  const expected = kkiapayConfig().webhookSecret
   const received = getHeader(event, 'x-kkiapay-secret') || ''
   if (!expected || received.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected))) {
     throw createError({ statusCode: 401, statusMessage: 'Signature invalide.' })

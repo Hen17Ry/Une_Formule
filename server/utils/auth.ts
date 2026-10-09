@@ -1,10 +1,21 @@
 import crypto from 'node:crypto'
 import { promisify } from 'node:util'
 import type { H3Event } from 'h3'
-import type { Store } from './store'
+
+/* ───────────────────────────────────────────────────────────────
+   Authentification admin : les comptes vivent dans la table
+   admin_users de la base. Aucun identifiant n’est lu dans le .env.
+   ─────────────────────────────────────────────────────────────── */
 
 const scrypt = promisify(crypto.scrypt) as (pw: string, salt: Buffer, keylen: number, opts: crypto.ScryptOptions) => Promise<Buffer>
 const N = 16384, R = 8, P = 1, KEYLEN = 64
+
+/** Ancien hachage du site précédent (SHA-256 + sel fixe). */
+const LEGACY_SALT = 'une_formule_salt_2026'
+/** Mot de passe par défaut de l’ancien site, publié dans le dépôt : toujours refusé. */
+const LEGACY_DEFAULT_PASSWORD = 'Formule2026!'
+
+export const MIN_PASSWORD_LENGTH = 10
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.randomBytes(16)
@@ -12,8 +23,17 @@ export async function hashPassword(password: string): Promise<string> {
   return `scrypt$${N}$${R}$${P}$${salt.toString('base64')}$${hash.toString('base64')}`
 }
 
-/** Seuls les mots de passe hachés avec scrypt sont acceptés (l’ancien hachage SHA-256 public est refusé). */
+export function isLegacyHash(stored: string) {
+  return /^[a-f0-9]{64}$/i.test(stored)
+}
+
+/** Vérifie un mot de passe contre le hachage stocké en base (scrypt, ou ancien SHA-256). */
 export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  if (isLegacyHash(stored)) {
+    if (password === LEGACY_DEFAULT_PASSWORD) return false
+    const legacy = crypto.createHash('sha256').update(password + LEGACY_SALT).digest()
+    return crypto.timingSafeEqual(legacy, Buffer.from(stored, 'hex'))
+  }
   const parts = stored.split('$')
   if (parts.length !== 6 || parts[0] !== 'scrypt') return false
   const [, n, r, p, saltB64, hashB64] = parts
@@ -22,42 +42,27 @@ export async function verifyPassword(password: string, stored: string): Promise<
   return crypto.timingSafeEqual(actual, expected)
 }
 
-/** Crée ou met à jour le compte admin défini par NUXT_ADMIN_EMAIL / NUXT_ADMIN_PASSWORD. */
-export async function ensureAdminFromEnv(store: Store) {
-  const email = (process.env.NUXT_ADMIN_EMAIL || process.env.ADMIN_EMAIL || '').trim().toLowerCase()
-  const password = process.env.NUXT_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || ''
-  if (!email || !password) {
-    console.warn('[auth] NUXT_ADMIN_EMAIL / NUXT_ADMIN_PASSWORD non définis : aucun compte admin créé.')
-    return
-  }
-  if (password.length < 10) {
-    console.error('[auth] NUXT_ADMIN_PASSWORD doit contenir au moins 10 caractères.')
-    return
-  }
-  const existing = await store.getAdminByEmail(email)
-  if (existing && await verifyPassword(password, existing.passwordHash)) return
-  await store.upsertAdmin(email, await hashPassword(password))
-  console.info(`[auth] Compte admin prêt : ${email}`)
-}
-
-let devSecret: string | null = null
-
-function sessionPassword(): string {
-  const configured = process.env.NUXT_SESSION_PASSWORD || ''
-  if (configured.length >= 32) return configured
-  if (process.env.NODE_ENV === 'production') {
-    throw createError({ statusCode: 500, statusMessage: 'NUXT_SESSION_PASSWORD manquant (32 caractères minimum).' })
-  }
-  devSecret ??= crypto.randomBytes(32).toString('hex')
-  return devSecret
+/**
+ * Secret de chiffrement des cookies de session.
+ * SESSION_SECRET (32 caractères min.) s’il est défini ; sinon un secret aléatoire
+ * généré une fois et conservé en base (table settings).
+ */
+let cachedSecret: string | null = null
+async function sessionSecret(): Promise<string> {
+  if (cachedSecret) return cachedSecret
+  const configured = readEnv('SESSION_SECRET', 'NUXT_SESSION_PASSWORD')
+  if (configured.length >= 32) return (cachedSecret = configured)
+  const store = await useStore()
+  cachedSecret = await store.ensureKv('session_secret', () => crypto.randomBytes(32).toString('hex'))
+  return cachedSecret
 }
 
 interface AdminSession { email?: string, at?: number }
 
-export function adminSession(event: H3Event) {
+export async function adminSession(event: H3Event) {
   return useSession<AdminSession>(event, {
     name: 'uf_admin',
-    password: sessionPassword(),
+    password: await sessionSecret(),
     maxAge: 60 * 60 * 24 * 7,
     cookie: {
       httpOnly: true,
@@ -68,9 +73,15 @@ export function adminSession(event: H3Event) {
   })
 }
 
+/** Exige une session admin valide ET un compte toujours présent en base. */
 export async function requireAdmin(event: H3Event): Promise<string> {
   const session = await adminSession(event)
   const email = session.data.email
   if (!email) throw createError({ statusCode: 401, statusMessage: 'Session expirée. Veuillez vous reconnecter.' })
+  const store = await useStore()
+  if (!(await store.getAdminByEmail(email))) {
+    await session.clear()
+    throw createError({ statusCode: 401, statusMessage: 'Ce compte administrateur n’existe plus.' })
+  }
   return email
 }

@@ -24,10 +24,22 @@ Sans `DATABASE_URL`, les données sont écrites dans `.data/une-formule.json` (d
 
 ## Variables d’environnement
 
-Voir `.env.example`. En production, **obligatoires** : `DATABASE_URL`, `NUXT_SESSION_PASSWORD`, `NUXT_ADMIN_EMAIL`, `NUXT_ADMIN_PASSWORD`, et les clés KkiaPay.
+Voir `.env.example`. En production : `DATABASE_URL` et les clés `KKIAPAY_*` (toutes de type *Secret* sur Vercel, rien n’est exposé au navigateur hors clé publique transmise au moment du paiement).
 
-> Sécurité : l’ancien compte admin par défaut (mot de passe publié dans le dépôt) n’est plus accepté.
-> Seuls les mots de passe définis via `NUXT_ADMIN_PASSWORD` (hachés en scrypt) permettent la connexion.
+## Comptes administrateurs
+
+Les comptes sont **dans la base** (table `admin_users`, mots de passe hachés en scrypt). La connexion vérifie l’email et le mot de passe en base ; aucun identifiant n’est lu dans le `.env`.
+
+Créer le premier compte, ou réinitialiser un mot de passe :
+
+```bash
+DATABASE_URL="postgres://…" pnpm admin:create vous@exemple.com "un-mot-de-passe-solide"
+```
+
+Ensuite, depuis `/admin/acces` : changer son mot de passe, ajouter ou retirer des administrateurs.
+
+> L’ancien mot de passe par défaut (publié dans le dépôt) est refusé. Les autres mots de passe de l’ancien site
+> restent valables et sont re-chiffrés en scrypt à la première connexion.
 
 ## Paiement KkiaPay
 
@@ -36,7 +48,7 @@ Voir `.env.example`. En production, **obligatoires** : `DATABASE_URL`, `NUXT_SES
 3. Au succès, `POST /api/orders/:ref/confirm` **vérifie la transaction côté serveur** auprès de KkiaPay (statut, montant) puis passe la commande en `PAID`.
 4. Filet de sécurité : le webhook `POST /api/payments/kkiapay/webhook` (en-tête `x-kkiapay-secret`) fait la même vérification si le navigateur s’est fermé.
 
-Tester d’abord avec `NUXT_PUBLIC_KKIAPAY_SANDBOX=true` et les clés *sandbox*.
+Tester d’abord avec `KKIAPAY_SANDBOX=true` et les clés *sandbox*.
 
 ## Données
 

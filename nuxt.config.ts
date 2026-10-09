@@ -22,22 +22,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Server only — set with NUXT_SESSION_PASSWORD, NUXT_KKIAPAY_PRIVATE_KEY, …
-    sessionPassword: '',
-    adminEmail: '',
-    adminPassword: '',
-    kkiapay: {
-      privateKey: '',
-      secretKey: '',
-      webhookSecret: ''
-    },
+    // Les secrets (KkiaPay, session) sont lus directement dans process.env côté serveur :
+    // voir server/utils/env.ts. Rien de secret n’est exposé au navigateur.
     public: {
       siteUrl,
-      gaId: '',
-      kkiapay: {
-        publicKey: '',
-        sandbox: true
-      }
+      gaId: ''
     }
   },
 
@@ -52,8 +41,10 @@ export default defineNuxtConfig({
         { name: 'format-detection', content: 'telephone=no' }
       ],
       link: [
+        { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'icon', href: '/favicon.ico', sizes: 'any' }
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' }
       ]
     },
     pageTransition: { name: 'page', mode: 'out-in' }

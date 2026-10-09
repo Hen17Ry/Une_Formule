@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   try {
-    const session = await adminSession(event)
-    return { authenticated: !!session.data.email, email: session.data.email ?? null }
+    const email = await requireAdmin(event)
+    return { authenticated: true, email }
   } catch {
     return { authenticated: false, email: null }
   }

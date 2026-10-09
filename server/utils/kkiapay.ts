@@ -1,4 +1,5 @@
-/* Vérification côté serveur d’une transaction KkiaPay (même appel que @kkiapay-org/nodejs-sdk). */
+/* Paiement KkiaPay : configuration + vérification côté serveur d’une transaction
+   (même appel que @kkiapay-org/nodejs-sdk). */
 
 export interface KkiapayTransaction {
   transactionId: string
@@ -14,13 +15,19 @@ export interface KkiapayTransaction {
   client?: { fullname?: string, phone?: string, email?: string }
 }
 
+/**
+ * Variables (toutes côté serveur, type « Secret » sur Vercel) :
+ *   KKIAPAY_PUBLIC_KEY, KKIAPAY_PRIVATE_KEY, KKIAPAY_SECRET_KEY,
+ *   KKIAPAY_SANDBOX (true par défaut), KKIAPAY_WEBHOOK_SECRET.
+ * La clé publique n’est transmise au navigateur qu’au moment d’ouvrir le paiement.
+ */
 export function kkiapayConfig() {
-  const config = useRuntimeConfig()
-  const publicKey = config.public.kkiapay.publicKey as string
-  const privateKey = config.kkiapay.privateKey as string
-  const secretKey = config.kkiapay.secretKey as string
-  const sandbox = String(config.public.kkiapay.sandbox) !== 'false'
-  return { publicKey, privateKey, secretKey, sandbox, ready: !!(publicKey && privateKey && secretKey) }
+  const publicKey = readEnv('KKIAPAY_PUBLIC_KEY', 'PUBLIC_KKIAPAY_PUBLIC_KEY', 'NUXT_PUBLIC_KKIAPAY_PUBLIC_KEY')
+  const privateKey = readEnv('KKIAPAY_PRIVATE_KEY', 'NUXT_KKIAPAY_PRIVATE_KEY')
+  const secretKey = readEnv('KKIAPAY_SECRET_KEY', 'NUXT_KKIAPAY_SECRET_KEY')
+  const sandbox = readEnv('KKIAPAY_SANDBOX', 'PUBLIC_KKIAPAY_SANDBOX', 'NUXT_PUBLIC_KKIAPAY_SANDBOX').toLowerCase() !== 'false'
+  const webhookSecret = readEnv('KKIAPAY_WEBHOOK_SECRET', 'NUXT_KKIAPAY_WEBHOOK_SECRET')
+  return { publicKey, privateKey, secretKey, sandbox, webhookSecret, ready: !!(publicKey && privateKey && secretKey) }
 }
 
 export async function verifyKkiapayTransaction(transactionId: string): Promise<KkiapayTransaction> {
