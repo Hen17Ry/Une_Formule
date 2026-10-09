@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ArrowRight, BookOpen } from '@lucide/vue'
-import { BOOK } from '~/data/book'
+import { ArrowRight, PenLine } from '@lucide/vue'
+import { BOOK, LEVERS } from '~/data/book'
 
 const section = ref<HTMLElement>()
 const canvas = ref<HTMLCanvasElement>()
@@ -110,14 +110,14 @@ onMounted(async () => {
   })
   tl.to(proxy, { p: 1, duration: 1, ease: 'none', onUpdate: () => scene?.setProgress(proxy.p) }, 0)
     // 1 — le livre
-    .to('[data-layer="1"]', { opacity: 0, y: -60, duration: 0.12 }, 0.14)
+    .to('[data-layer="1"]', { autoAlpha: 0, y: -60, duration: 0.12 }, 0.14)
     .to('[data-scroll-hint]', { opacity: 0, duration: 0.05 }, 0.02)
     // 2 — la maxime
-    .fromTo('[data-layer="2"]', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.08 }, 0.27)
+    .fromTo('[data-layer="2"]', { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.08 }, 0.27)
     .fromTo('[data-maxim-word]', { opacity: 0.12 }, { opacity: 1, duration: 0.16, stagger: 0.012, ease: 'none' }, 0.3)
-    .to('[data-layer="2"]', { opacity: 0, y: -50, duration: 0.08 }, 0.53)
+    .to('[data-layer="2"]', { autoAlpha: 0, y: -50, duration: 0.08 }, 0.53)
     // 3 — la formule
-    .fromTo('[data-layer="3"]', { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.64)
+    .fromTo('[data-layer="3"]', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.08 }, 0.64)
     .fromTo('[data-glyph]', { yPercent: 60, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.16, stagger: 0.03, ease: 'expo.out' }, 0.66)
     .fromTo('[data-layer3-text]', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.08 }, 0.82)
     // décor
@@ -161,33 +161,55 @@ const scrollToNext = () => {
       <div data-book-wrap class="absolute inset-0">
         <canvas ref="canvas" class="absolute inset-0 h-full w-full transition-opacity duration-1000" :class="ready && !failed ? 'opacity-100' : 'opacity-0'" aria-hidden="true" />
         <Transition leave-active-class="transition-opacity duration-700" leave-to-class="opacity-0">
-          <div v-if="!ready || failed" class="pointer-events-none absolute left-1/2 top-[34%] -translate-x-1/2 -translate-y-1/2 lg:left-[68%] lg:top-1/2">
-            <BrandBook :width="failed ? 300 : 260" :interactive="false" :rotate="-28" class="max-lg:scale-[.72]" />
+          <div v-if="!ready || failed" class="pointer-events-none absolute left-1/2 top-[31%] -translate-x-1/2 -translate-y-1/2 lg:left-[68%] lg:top-1/2">
+            <BrandBook :width="failed ? 300 : 260" :interactive="false" :rotate="-28" class="max-lg:scale-[.62]" />
           </div>
         </Transition>
       </div>
 
-      <!-- Étape 1 : le livre -->
-      <div data-layer="1" class="container pointer-events-none absolute inset-0 flex items-end pb-[9vh] lg:items-center lg:pb-0">
-        <div class="pointer-events-auto max-w-[46rem] max-lg:mx-auto max-lg:text-center">
-          <p data-intro class="label mb-5 lg:mb-7">Le livre de {{ BOOK.author }}</p>
+      <!-- Étape 1 : le livre + accès direct aux retours -->
+      <div data-layer="1" class="container pointer-events-none absolute inset-0 flex items-end pb-[max(4.5vh,1.25rem)] lg:items-center lg:pb-0">
+        <div class="pointer-events-auto w-full max-w-[46rem] max-lg:mx-auto max-lg:text-center">
+          <p data-intro class="label mb-5 max-lg:hidden lg:mb-7">Le livre de {{ BOOK.author }}</p>
           <h1 id="hero-title" class="text-ink">
-            <span data-title class="block font-display text-[clamp(3.1rem,7vw,7.2rem)] font-semibold uppercase leading-[0.92] tracking-[0.04em]">Une<br>Formule<span class="text-caramel">…</span></span>
-            <span data-intro class="mt-5 flex items-center gap-4 font-sans text-[0.8rem] font-semibold uppercase tracking-[0.34em] text-ink-soft max-lg:justify-center lg:mt-7">
-              <span class="h-px w-10 bg-gold" aria-hidden="true" />7 leviers pour<span class="h-px w-10 bg-gold" aria-hidden="true" />
+            <span data-title class="block font-display text-[clamp(2.6rem,7vw,7.2rem)] font-semibold uppercase leading-[0.92] tracking-[0.04em] [@media(max-height:700px)]:text-[clamp(2.2rem,6vw,5.6rem)] [@media(max-height:600px)]:text-[2rem]">Une<br>Formule<span class="text-caramel">…</span></span>
+            <span data-intro class="mt-4 flex items-center gap-4 font-sans text-[0.74rem] font-semibold uppercase tracking-[0.34em] text-ink-soft max-lg:justify-center sm:text-[0.8rem] lg:mt-7">
+              <span class="h-px w-8 bg-gold sm:w-10" aria-hidden="true" />7 leviers pour<span class="h-px w-8 bg-gold sm:w-10" aria-hidden="true" />
             </span>
-            <span data-intro class="mt-3 block font-display text-[clamp(1.75rem,3.4vw,3.1rem)] font-medium leading-[1.05] text-ink lg:mt-4">Construire la vie<br class="hidden lg:block"> que vous désirez</span>
+            <span data-intro class="mt-2 block font-display text-[clamp(1.55rem,3.4vw,3.1rem)] font-medium leading-[1.05] text-ink sm:mt-3 lg:mt-4">Construire la vie<br class="hidden lg:block"> que vous désirez</span>
           </h1>
-          <p data-intro class="mt-5 hidden max-w-md font-serif text-[1.15rem] leading-relaxed text-ink-soft lg:block">{{ BOOK.hook }}</p>
-          <div data-intro class="mt-7 flex flex-wrap gap-3 max-lg:justify-center lg:mt-10">
-            <UiButton to="/commander" size="lg" :icon="ArrowRight">Commander le livre</UiButton>
-            <UiButton to="/extraits" size="lg" variant="outline" :icon-left="BookOpen" class="max-sm:hidden">Lire un extrait</UiButton>
+          <p data-intro class="mt-5 hidden max-w-md font-serif text-[1.15rem] leading-relaxed text-ink-soft [@media(min-height:920px)]:lg:block">{{ BOOK.hook }}</p>
+
+          <div data-intro class="mt-5 flex flex-wrap gap-2 max-lg:justify-center sm:gap-3 lg:mt-9">
+            <UiButton to="/retours" size="lg" :icon-left="PenLine" class="max-sm:h-12 max-sm:px-5 max-sm:text-[0.9rem]">Donner mon retour</UiButton>
+            <UiButton to="/commander" size="lg" variant="outline" :icon="ArrowRight" class="max-sm:h-12 max-sm:px-5 max-sm:text-[0.9rem] max-[369px]:hidden"><span>Commander<span class="max-sm:hidden"> le livre</span></span></UiButton>
           </div>
+
+          <!-- Accès direct aux formulaires de retour (l’un des buts premiers du site) -->
+          <nav data-intro class="mt-4 sm:mt-6" aria-label="Donner un retour sur un levier">
+            <p class="font-sans text-[0.8rem] text-ink-muted [@media(max-height:700px)]:max-lg:hidden">Vous avez lu un levier ? Votre retour en deux minutes :</p>
+            <ul class="mt-2.5 flex flex-wrap items-center gap-1 max-lg:justify-center min-[375px]:gap-1.5 sm:gap-2">
+              <li v-for="l in LEVERS" :key="l.n">
+                <NuxtLink
+                  :to="`/retours/${l.slug}`"
+                  class="group relative grid h-9 w-9 place-items-center rounded-full font-display text-[1.1rem] min-[375px]:h-10 min-[375px]:w-10 text-[#FFFDF9] shadow-[0_6px_14px_-8px_rgba(46,31,21,.6)] transition-transform duration-500 ease-expo hover:-translate-y-1 focus-visible:-translate-y-1 sm:h-11 sm:w-11"
+                  :style="{ background: l.color }"
+                  :aria-label="`Retour sur le levier ${l.n} : ${l.short}`"
+                >
+                  {{ l.n }}
+                  <span aria-hidden="true" class="pointer-events-none absolute bottom-[calc(100%+10px)] left-1/2 z-10 hidden -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-full border border-line bg-white px-3 py-1.5 font-sans text-xs text-ink opacity-0 shadow-lift transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 lg:block">{{ l.short }}</span>
+                </NuxtLink>
+              </li>
+              <li class="max-sm:hidden">
+                <NuxtLink to="/retours/general" class="inline-flex h-10 items-center rounded-full border border-line-strong bg-white/75 px-4 font-sans text-[0.85rem] text-ink transition-colors hover:border-copper sm:h-11">Le livre</NuxtLink>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
 
       <!-- Étape 2 : la maxime -->
-      <div data-layer="2" class="container pointer-events-none absolute inset-0 flex items-end pb-[12vh] opacity-0 lg:items-center lg:justify-end lg:pb-0" :aria-hidden="reduced || undefined">
+      <div data-layer="2" class="container pointer-events-none invisible absolute inset-0 flex items-end pb-[12vh] opacity-0 lg:items-center lg:justify-end lg:pb-0" :aria-hidden="reduced || undefined">
         <div class="max-w-[36rem] max-lg:text-center">
           <p class="label-gold mb-6">La maxime du livre</p>
           <p class="font-display text-[clamp(2.1rem,4.6vw,4.4rem)] font-medium leading-[1.06] text-ink">
@@ -197,7 +219,7 @@ const scrollToNext = () => {
       </div>
 
       <!-- Étape 3 : la formule -->
-      <div data-layer="3" class="pointer-events-none absolute inset-x-0 top-[13vh] text-center opacity-0 lg:top-[11vh]" :aria-hidden="reduced || undefined">
+      <div data-layer="3" class="pointer-events-none invisible absolute inset-x-0 top-[12vh] text-center opacity-0 lg:top-[10vh]" :aria-hidden="reduced || undefined">
         <p class="label-gold">L’équation du livre</p>
         <p class="formula mt-4 flex items-baseline justify-center gap-[0.28em] text-[clamp(3.6rem,11vw,10rem)] leading-none text-ink" aria-label="Alpha plus bêta égale oméga">
           <span data-glyph aria-hidden="true">Α</span><span data-glyph aria-hidden="true" class="text-gold">+</span><span data-glyph aria-hidden="true" class="italic text-caramel">β</span><span data-glyph aria-hidden="true" class="text-gold">=</span><span data-glyph aria-hidden="true">Ω</span>
@@ -205,6 +227,10 @@ const scrollToNext = () => {
         <p data-layer3-text class="mx-auto mt-5 max-w-xl px-6 font-serif text-[1.15rem] leading-relaxed text-ink-soft md:text-[1.3rem]">
           Vous, plus le mécanisme activé un levier à la fois, égale la version de vous déjà en germe.
         </p>
+        <div data-layer3-text class="pointer-events-auto mt-6 flex flex-wrap justify-center gap-2.5 px-6">
+          <UiButton to="/retours" :icon-left="PenLine">Donner mon retour</UiButton>
+          <UiButton to="/extraits" variant="outline">Lire les extraits</UiButton>
+        </div>
       </div>
 
       <!-- Indicateur d’étapes -->

@@ -74,7 +74,7 @@ export const LEVERS: Lever[] = [
       { n: 4, title: 'Le pari de vingt-quatre heures', text: 'Teste concrètement, en une journée, une action qui contredit cette croyance.' }
     ],
     practice: 'Ces exercices entraîneront votre cerveau à chercher, sans effort supplémentaire, des raisons plutôt que des excuses.',
-    color: '#C7773A'
+    color: '#A85C28'
   },
   {
     n: 3,
@@ -95,7 +95,7 @@ export const LEVERS: Lever[] = [
       { n: 6, title: 'L’ancrage du sentiment recherché', text: 'Installe physiquement, dans le corps, le sentiment que l’on souhaite voir dominer à sa place.' }
     ],
     practice: 'L’objectif est de reprendre la main sur ce filtre, sans jamais y laisser trop de vous-même.',
-    color: '#C29A3A'
+    color: '#977424'
   },
   {
     n: 4,
@@ -117,7 +117,7 @@ export const LEVERS: Lever[] = [
       { n: 9, title: 'La lettre à votre Moi futur', text: 'Couche sur le papier un engagement daté à tenir.' }
     ],
     practice: 'Sur le vif, ces exercices aident à reconnaître laquelle des deux voix a pris le micro.',
-    color: '#6F8450'
+    color: '#667A49'
   },
   {
     n: 5,

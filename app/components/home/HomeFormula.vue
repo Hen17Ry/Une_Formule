@@ -38,18 +38,18 @@ onBeforeUnmount(() => ctx?.revert())
         </p>
       </div>
 
-      <div data-terms class="mt-20 grid items-stretch gap-5 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:gap-3">
+      <div data-terms class="mt-14 grid items-stretch gap-4 md:mt-20 md:grid-cols-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:gap-3">
         <template v-for="(t, i) in FORMULA_TERMS" :key="t.symbol">
-          <UiSpotlight tag="article" class="surface flex flex-col p-8 md:p-10">
+          <UiSpotlight tag="article" class="surface flex flex-col p-7 lg:p-10">
             <div class="flex items-start justify-between">
-              <span data-term-glyph class="formula block bg-clip-text text-[7.5rem] leading-[0.85] text-transparent [background-image:var(--cover-gradient)]" :class="t.symbol === 'β' && 'italic'" aria-hidden="true">{{ t.symbol }}</span>
+              <span data-term-glyph class="formula block bg-clip-text text-[6rem] leading-[0.85] text-transparent lg:text-[7.5rem] [background-image:var(--cover-gradient)]" :class="t.symbol === 'β' && 'italic'" aria-hidden="true">{{ t.symbol }}</span>
               <span class="rounded-full border border-line px-3 py-1 font-sans text-[0.7rem] uppercase tracking-[0.2em] text-ink-muted">{{ t.role }}</span>
             </div>
             <p class="mt-8 font-sans text-xs uppercase tracking-[0.24em] text-ink-muted">{{ t.name }}</p>
-            <h3 class="mt-2 font-display text-[2rem] leading-tight">{{ t.title }}</h3>
+            <h3 class="mt-2 font-display text-[1.75rem] leading-tight lg:text-[2rem]">{{ t.title }}</h3>
             <p class="mt-4 font-serif text-[1.08rem] leading-relaxed text-ink-soft">{{ t.text }}</p>
           </UiSpotlight>
-          <div v-if="i < 2" data-op class="formula grid place-items-center text-5xl text-gold max-lg:-my-2" aria-hidden="true">{{ i === 0 ? '+' : '=' }}</div>
+          <div v-if="i < 2" data-op class="formula grid place-items-center text-5xl text-gold max-md:-my-2 md:max-lg:hidden" aria-hidden="true">{{ i === 0 ? '+' : '=' }}</div>
         </template>
       </div>
 

@@ -4,11 +4,11 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="relative overflow-hidden border-t border-line bg-paper-2/60 pt-20">
+  <footer class="relative overflow-hidden border-t border-line bg-paper-2/60 pt-16 md:pt-20">
     <BrandRings class="pointer-events-none absolute -left-40 -top-40 h-[40rem] w-[40rem] opacity-40" />
     <div class="container relative">
-      <div class="grid gap-14 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div>
+      <div class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-14">
+        <div class="sm:col-span-2 lg:col-span-1">
           <p class="font-display text-[2.4rem] font-semibold uppercase leading-none tracking-[0.1em] text-ink">Une Formule<span class="text-caramel">…</span></p>
           <p class="mt-4 max-w-sm font-serif text-lg italic leading-relaxed text-ink-soft">« {{ BOOK.maxim }} »</p>
           <BrandFormula size="text-3xl" class="mt-6 text-umber" />

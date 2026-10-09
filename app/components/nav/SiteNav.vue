@@ -59,14 +59,14 @@ function onKey(e: KeyboardEvent) {
         <span class="grid h-9 w-9 place-items-center rounded-full text-[1.15rem] text-paper shadow-[0_6px_16px_-8px_rgba(113,67,36,.8)] [background:var(--cover-gradient)] transition-transform duration-700 ease-expo group-hover:rotate-[360deg]">
           <span class="font-display leading-none">Ω</span>
         </span>
-        <span class="font-display text-[1.05rem] font-semibold uppercase tracking-[0.14em] text-ink sm:text-[1.25rem]">Une Formule<span class="text-caramel">…</span></span>
+        <span class="whitespace-nowrap font-display text-[1.05rem] font-semibold uppercase tracking-[0.14em] text-ink sm:text-[1.25rem]">Une Formule<span class="text-caramel">…</span></span>
       </NuxtLink>
 
-      <ul class="hidden items-center gap-1 lg:flex">
+      <ul class="hidden items-center gap-0.5 xl:flex">
         <li v-for="l in links" :key="l.to">
           <NuxtLink
             :to="l.to"
-            class="relative rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
+            class="relative whitespace-nowrap rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
             :class="isActive(l.to) ? 'text-ink' : 'text-ink-soft hover:text-ink'"
           >
             {{ l.label }}
@@ -76,7 +76,7 @@ function onKey(e: KeyboardEvent) {
         <li class="relative" @pointerenter="openFeedback" @pointerleave="closeFeedback">
           <button
             type="button"
-            class="inline-flex items-center gap-1.5 rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
+            class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
             :class="isActive('/retours') || isActive('/avis') ? 'text-ink' : 'text-ink-soft hover:text-ink'"
             :aria-expanded="feedbackOpen"
             aria-controls="nav-feedback"
@@ -124,7 +124,7 @@ function onKey(e: KeyboardEvent) {
         <UiButton to="/commander" size="sm" class="hidden sm:inline-flex">Commander</UiButton>
         <button
           type="button"
-          class="grid h-11 w-11 place-items-center rounded-full border border-line bg-white/60 text-ink transition-colors hover:border-caramel lg:hidden"
+          class="grid h-11 w-11 place-items-center rounded-full border border-line bg-white/60 text-ink transition-colors hover:border-caramel xl:hidden"
           :aria-expanded="menuOpen"
           aria-controls="mobile-menu"
           :aria-label="menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"

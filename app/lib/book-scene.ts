@@ -24,11 +24,11 @@ const KEYS: Record<Layout, { at: number, pose: Pose }[]> = {
     { at: 1.0, pose: { rx: -1.02, ry: 0.0, rz: 0.0, x: 0.0, y: -0.085, z: 0.02, open: 1 } }
   ],
   mobile: [
-    { at: 0.0, pose: { rx: 0.05, ry: -0.5, rz: 0.03, x: 0.0, y: 0.1, z: -0.08, open: 0 } },
-    { at: 0.3, pose: { rx: 0.02, ry: 0.35, rz: -0.02, x: 0.0, y: 0.1, z: -0.08, open: 0 } },
-    { at: 0.58, pose: { rx: -0.95, ry: 0.0, rz: 0.0, x: 0.0, y: -0.07, z: -0.1, open: 0 } },
-    { at: 0.92, pose: { rx: -1.0, ry: 0.0, rz: 0.0, x: 0.0, y: -0.075, z: -0.26, open: 1 } },
-    { at: 1.0, pose: { rx: -1.0, ry: 0.0, rz: 0.0, x: 0.0, y: -0.075, z: -0.26, open: 1 } }
+    { at: 0.0, pose: { rx: 0.05, ry: -0.5, rz: 0.03, x: 0.0, y: 0.13, z: -0.08, open: 0 } },
+    { at: 0.3, pose: { rx: 0.02, ry: 0.35, rz: -0.02, x: 0.0, y: 0.12, z: -0.08, open: 0 } },
+    { at: 0.58, pose: { rx: -0.95, ry: 0.0, rz: 0.0, x: 0.0, y: -0.1, z: -0.1, open: 0 } },
+    { at: 0.92, pose: { rx: -1.0, ry: 0.0, rz: 0.0, x: 0.0, y: -0.13, z: -0.26, open: 1 } },
+    { at: 1.0, pose: { rx: -1.0, ry: 0.0, rz: 0.0, x: 0.0, y: -0.13, z: -0.26, open: 1 } }
   ]
 }
 
@@ -67,6 +67,7 @@ export class BookScene {
   private elapsed = 0
   private bookWidth = 0.151
   private lowPower = false
+  private liftY = 0
   private lastKey = ''
   ready = false
   debugOpen: number | null = null
@@ -179,7 +180,12 @@ export class BookScene {
     this.camera.aspect = w / h
     // Recul de la caméra pour que le livre garde une taille lisible quel que soit le format d’écran.
     const portrait = w / h < 0.85
-    this.camera.position.z = portrait ? 0.98 + (0.85 - w / h) * 0.35 : 0.78
+    // Écrans courts (petits téléphones) : livre un peu plus loin et plus haut pour laisser la place au texte.
+    const short = portrait && h < 700 ? (700 - h) / 700 : 0
+    const tablet = portrait && w >= 600
+    this.liftY = this.layout === 'mobile' ? (tablet ? -0.015 : short * 0.12) : 0
+    const base = tablet ? 1.02 : 1.2 + (0.85 - w / h) * 0.35 // tablettes : livre plus grand
+    this.camera.position.z = portrait ? base + short * 0.6 : 0.78
     this.camera.updateProjectionMatrix()
   }
 
@@ -202,7 +208,8 @@ export class BookScene {
 
     // À l’ouverture, le centre visuel passe du milieu de la couverture au dos du livre.
     this.holder.position.x = -this.bookWidth / 2 * (1 - pose.open)
-    this.pivot.position.set(pose.x, pose.y + float, pose.z)
+    const lift = this.liftY * (1 - pose.open)
+    this.pivot.position.set(pose.x, pose.y + float + lift, pose.z)
     this.pivot.rotation.set(
       pose.rx + this.pointerSmooth.y * 0.09,
       pose.ry + sway + this.pointerSmooth.x * 0.16,
