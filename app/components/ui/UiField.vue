@@ -13,6 +13,8 @@ const props = withDefaults(defineProps<{
   autocomplete?: string
   placeholder?: string
   inputmode?: 'text' | 'tel' | 'email' | 'numeric'
+  /** Saisie brute (code, clé) : ni majuscule auto, ni correction. */
+  raw?: boolean
 }>(), { type: 'text', rows: 4 })
 const emit = defineEmits<{ 'update:modelValue': [string] }>()
 const id = useId()
@@ -50,9 +52,12 @@ const fieldClass = 'w-full rounded-2xl border bg-white/75 px-5 py-4 font-sans te
       :autocomplete="autocomplete"
       :placeholder="placeholder"
       :inputmode="inputmode"
+      :autocapitalize="raw ? 'off' : undefined"
+      :autocorrect="raw ? 'off' : undefined"
+      :spellcheck="raw ? false : undefined"
       :aria-invalid="!!error || undefined"
       :aria-describedby="error || hint ? `${id}-d` : undefined"
-      :class="[fieldClass, 'h-14', error ? 'border-danger/70' : 'border-line hover:border-line-strong focus:border-caramel']"
+      :class="[fieldClass, 'h-14', raw && 'font-mono text-[0.95rem] tracking-wide', error ? 'border-danger/70' : 'border-line hover:border-line-strong focus:border-caramel']"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >
     <div class="mt-2 flex justify-between gap-4 font-sans text-[0.85rem]">

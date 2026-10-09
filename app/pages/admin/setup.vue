@@ -43,7 +43,7 @@ async function submit() {
       </div>
 
       <form v-else class="surface mt-10 space-y-5 p-8" @submit.prevent="submit">
-        <UiField v-model="form.token" label="Code de configuration" type="password" autocomplete="off" required hint="La valeur de ADMIN_SETUP_TOKEN." />
+        <UiField v-model="form.token" label="Code de configuration" autocomplete="off" raw required hint="La valeur de ADMIN_SETUP_TOKEN, copiée depuis Vercel." />
         <UiField v-model="form.email" label="Email de l’administrateur" type="email" autocomplete="username" required />
         <UiField v-model="form.password" label="Nouveau mot de passe" type="password" autocomplete="new-password" required hint="10 caractères minimum." />
         <UiField v-model="form.confirm" label="Confirmer le mot de passe" type="password" autocomplete="new-password" required />

@@ -13,18 +13,22 @@ const schema = z.object({
 })
 
 export default defineApiHandler(async (event) => {
-  await rateLimit(event, 'setup', 5, 15 * 60)
-  const expected = readEnv('ADMIN_SETUP_TOKEN')
+  await rateLimit(event, 'setup', 10, 15 * 60)
+  const expected = setupToken()
   if (expected.length < 16) throw createError({ statusCode: 404, statusMessage: 'Configuration désactivée.' })
 
   const parsed = schema.safeParse(await readBody(event))
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message || 'Requête invalide.' })
 
-  const a = crypto.createHash('sha256').update(parsed.data.token).digest()
+  const given = normalizeSetupToken(parsed.data.token)
+  const a = crypto.createHash('sha256').update(given).digest()
   const b = crypto.createHash('sha256').update(expected).digest()
   if (!crypto.timingSafeEqual(a, b)) {
     await new Promise(r => setTimeout(r, 600))
-    throw createError({ statusCode: 401, statusMessage: 'Code de configuration incorrect.' })
+    const hint = given.length !== expected.length
+      ? ` Vous avez saisi ${given.length} caractères, le code en contient ${expected.length}.`
+      : ' Copiez la valeur exacte affichée sur Vercel.'
+    throw createError({ statusCode: 401, statusMessage: `Code de configuration incorrect.${hint}` })
   }
 
   const store = await useStore()

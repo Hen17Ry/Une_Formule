@@ -1,1 +1,1 @@
-export default defineApiHandler(() => ({ enabled: readEnv('ADMIN_SETUP_TOKEN').length >= 16 }))
+export default defineApiHandler(() => ({ enabled: setupToken().length >= 16 }))
