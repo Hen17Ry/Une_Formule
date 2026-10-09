@@ -36,6 +36,8 @@ Créer le premier compte, ou réinitialiser un mot de passe :
 DATABASE_URL="postgres://…" pnpm admin:create vous@exemple.com "un-mot-de-passe-solide"
 ```
 
+Sans accès direct à la base : ajouter la variable `ADMIN_SETUP_TOKEN` (16 caractères min.) sur Vercel, redéployer, ouvrir `/admin/setup`, puis supprimer la variable.
+
 Ensuite, depuis `/admin/acces` : changer son mot de passe, ajouter ou retirer des administrateurs.
 
 > L’ancien mot de passe par défaut (publié dans le dépôt) est refusé. Les autres mots de passe de l’ancien site

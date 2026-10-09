@@ -15,7 +15,7 @@ export default defineApiHandler(async (event) => {
   if (!user || !ok) {
     await new Promise(r => setTimeout(r, 400))
     if (user && isLegacyHash(user.passwordHash) && parsed.data.password === 'Formule2026!') {
-      throw createError({ statusCode: 401, statusMessage: 'Ce mot de passe par défaut n’est plus accepté. Définissez-en un nouveau avec la commande « pnpm admin:create ».' })
+      throw createError({ statusCode: 401, statusMessage: 'Ce mot de passe par défaut n’est plus accepté. Définissez-en un nouveau sur /admin/setup.' })
     }
     throw createError({ statusCode: 401, statusMessage: 'Identifiants invalides.' })
   }
