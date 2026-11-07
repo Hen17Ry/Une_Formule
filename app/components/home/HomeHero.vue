@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ArrowRight, PenLine } from '@lucide/vue'
-import { BOOK, LEVERS } from '~/data/book'
+import { ArrowDown, PenLine } from '@lucide/vue'
+import { BOOK } from '~/data/book'
 
 const section = ref<HTMLElement>()
 const canvas = ref<HTMLCanvasElement>()
@@ -134,27 +134,22 @@ onBeforeUnmount(() => {
   scene = null
 })
 
-const scrollToNext = () => {
-  const el = document.getElementById('formule')
+function scrollTo(id: string, duration = 2.2) {
+  const el = document.getElementById(id)
   const lenis = (useNuxtApp().$lenis as any)?.()
-  lenis ? lenis.scrollTo(el, { duration: 2.2 }) : el?.scrollIntoView({ behavior: 'smooth' })
+  lenis ? lenis.scrollTo(el, { duration }) : el?.scrollIntoView({ behavior: 'smooth' })
 }
+const scrollToNext = () => scrollTo('leviers')
 </script>
 
 <template>
-  <section ref="section" class="relative" :class="reduced ? 'h-[100svh] min-h-[640px]' : 'h-[330vh] lg:h-[360vh]'" aria-labelledby="hero-title">
+  <section ref="section" class="relative" :class="reduced ? '' : 'h-[330vh] lg:h-[360vh]'" aria-labelledby="hero-title">
     <div class="sticky top-0 h-[100svh] min-h-[600px] overflow-hidden">
       <!-- Décor -->
       <div aria-hidden="true" class="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_40%,#fffaf3_0%,#fbf7f1_40%,#f3e8da_100%)]" />
       <div data-glow aria-hidden="true" class="absolute left-[55%] top-[45%] h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(217,191,134,.35),rgba(196,144,103,.12)_45%,transparent_70%)] opacity-70 max-lg:left-1/2 max-lg:top-[34%]" />
       <div data-rings aria-hidden="true" class="absolute left-[60%] top-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 -translate-y-1/2 max-lg:left-1/2 max-lg:top-[34%] max-lg:h-[110vmax] max-lg:w-[110vmax]">
         <BrandRings class="h-full w-full opacity-50" :spin="false" />
-      </div>
-      <div aria-hidden="true" class="pointer-events-none absolute inset-0 select-none font-display text-caramel/[.13]">
-        <span class="absolute left-[6%] top-[18%] text-[9vmin] italic animate-float">β</span>
-        <span class="absolute right-[7%] top-[14%] text-[7vmin] animate-float [animation-delay:-2s]">Σ</span>
-        <span class="absolute bottom-[12%] left-[44%] text-[8vmin] animate-float [animation-delay:-4s]">Ω</span>
-        <span class="absolute bottom-[22%] right-[4%] text-[6vmin] italic animate-float [animation-delay:-1s]">π</span>
       </div>
 
       <!-- Livre : WebGL, ou couverture en CSS 3D en attendant / en repli -->
@@ -167,7 +162,7 @@ const scrollToNext = () => {
         </Transition>
       </div>
 
-      <!-- Étape 1 : le livre + accès direct aux retours -->
+      <!-- Étape 1 : le livre, accès direct aux retours -->
       <div data-layer="1" class="container pointer-events-none absolute inset-0 flex items-end pb-[max(4.5vh,1.25rem)] lg:items-center lg:pb-0">
         <div class="pointer-events-auto w-full max-w-[46rem] max-lg:mx-auto max-lg:text-center">
           <p data-intro class="label mb-5 max-lg:hidden lg:mb-7">Le livre de {{ BOOK.author }}</p>
@@ -182,29 +177,8 @@ const scrollToNext = () => {
 
           <div data-intro class="mt-5 flex flex-wrap gap-2 max-lg:justify-center sm:gap-3 lg:mt-9">
             <UiButton to="/retours" size="lg" :icon-left="PenLine" class="max-sm:h-12 max-sm:px-5 max-sm:text-[0.9rem]">Donner mon retour</UiButton>
-            <UiButton to="/commander" size="lg" variant="outline" :icon="ArrowRight" class="max-sm:h-12 max-sm:px-5 max-sm:text-[0.9rem] max-[369px]:hidden"><span>Commander<span class="max-sm:hidden"> le livre</span></span></UiButton>
+            <UiButton size="lg" variant="outline" :icon="ArrowDown" class="max-sm:h-12 max-sm:px-5 max-sm:text-[0.9rem]" @click="scrollTo('ou-trouver')">Où trouver le livre</UiButton>
           </div>
-
-          <!-- Accès direct aux formulaires de retour (l’un des buts premiers du site) -->
-          <nav data-intro class="mt-4 sm:mt-6" aria-label="Donner un retour sur un levier">
-            <p class="font-sans text-[0.8rem] text-ink-muted [@media(max-height:700px)]:max-lg:hidden">Vous avez lu un levier ? Votre retour en deux minutes :</p>
-            <ul class="mt-2.5 flex flex-wrap items-center gap-1 max-lg:justify-center min-[375px]:gap-1.5 sm:gap-2">
-              <li v-for="l in LEVERS" :key="l.n">
-                <NuxtLink
-                  :to="`/retours/${l.slug}`"
-                  class="group relative grid h-9 w-9 place-items-center rounded-full font-display text-[1.1rem] min-[375px]:h-10 min-[375px]:w-10 text-[#FFFDF9] shadow-[0_6px_14px_-8px_rgba(46,31,21,.6)] transition-transform duration-500 ease-expo hover:-translate-y-1 focus-visible:-translate-y-1 sm:h-11 sm:w-11"
-                  :style="{ background: l.color }"
-                  :aria-label="`Retour sur le levier ${l.n} : ${l.short}`"
-                >
-                  {{ l.n }}
-                  <span aria-hidden="true" class="pointer-events-none absolute bottom-[calc(100%+10px)] left-1/2 z-10 hidden -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-full border border-line bg-white px-3 py-1.5 font-sans text-xs text-ink opacity-0 shadow-lift transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 lg:block">{{ l.short }}</span>
-                </NuxtLink>
-              </li>
-              <li class="max-sm:hidden">
-                <NuxtLink to="/retours/general" class="inline-flex h-10 items-center rounded-full border border-line-strong bg-white/75 px-4 font-sans text-[0.85rem] text-ink transition-colors hover:border-copper sm:h-11">Le livre</NuxtLink>
-              </li>
-            </ul>
-          </nav>
         </div>
       </div>
 
@@ -251,6 +225,16 @@ const scrollToNext = () => {
         Faites défiler
         <span class="relative h-12 w-px overflow-hidden bg-ink/15" aria-hidden="true"><span class="absolute inset-x-0 top-0 h-1/2 animate-[scrollhint_2.2s_ease-in-out_infinite] bg-caramel" /></span>
       </button>
+    </div>
+
+    <!-- Mouvement réduit : la maxime et la formule, sans animation -->
+    <div v-if="reduced" class="container py-20 text-center">
+      <p class="label-gold">La maxime du livre</p>
+      <p class="mx-auto mt-5 max-w-3xl font-display text-[clamp(2rem,4.4vw,3.6rem)] font-medium leading-[1.08]">
+        <span v-for="(m, i) in maximWords" :key="i" :class="m.em && 'italic text-caramel'">{{ `${m.w} ` }}</span>
+      </p>
+      <p class="formula mt-12 text-[clamp(3rem,9vw,6rem)] leading-none" aria-label="Alpha plus bêta égale oméga">Α <span class="text-gold">+</span> <span class="italic text-caramel">β</span> <span class="text-gold">=</span> Ω</p>
+      <p class="mx-auto mt-5 max-w-xl font-serif text-[1.15rem] leading-relaxed text-ink-soft">Vous, plus le mécanisme activé un levier à la fois, égale la version de vous déjà en germe.</p>
     </div>
   </section>
 </template>

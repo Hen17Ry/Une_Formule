@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { PenLine, ArrowUpRight, Star } from '@lucide/vue'
+import { PenLine, ArrowUpRight } from '@lucide/vue'
 import type { PublicReview } from '#shared/types'
 
-const { data } = await useFetch<{ reviews: PublicReview[], count: number, average: number | null }>('/api/reviews', { query: { limit: 24 }, key: 'home-reviews' })
+const { data } = await useFetch<{ reviews: PublicReview[], count: number }>('/api/reviews', { query: { limit: 6 }, key: 'home-reviews' })
 const reviews = computed(() => data.value?.reviews ?? [])
-const half = computed(() => Math.ceil(reviews.value.length / 2))
 </script>
 
 <template>
@@ -16,21 +15,10 @@ const half = computed(() => Math.ceil(reviews.value.length / 2))
           <UiSplitReveal id="avis-title" class="mt-5 font-display text-display-md">Ce que les lecteurs en <em class="text-caramel">font</em>.</UiSplitReveal>
           <p v-reveal class="mt-5 font-serif text-lg leading-relaxed text-ink-soft">Chaque retour est lu par l’auteur avant toute publication. Il nourrit la prochaine édition.</p>
         </div>
-        <div v-if="data?.count" v-reveal class="flex items-center gap-5 rounded-[24px] border border-line bg-white/60 px-6 py-4">
-          <p class="font-display text-5xl leading-none text-ink"><UiNumberTicker :value="data.average ?? 0" :decimals="1" /></p>
-          <div>
-            <div class="flex gap-0.5" aria-hidden="true"><Star v-for="n in 5" :key="n" class="h-4 w-4 fill-gold text-gold-deep" :stroke-width="1.4" /></div>
-            <p class="mt-1 font-sans text-sm text-ink-muted">{{ data.count }} avis publié{{ data.count > 1 ? 's' : '' }}</p>
-          </div>
-        </div>
       </div>
     </div>
 
-    <div v-if="reviews.length >= 4" class="mt-14 space-y-5">
-      <UiMarquee duration="70s"><BookReviewCard v-for="r in reviews.slice(0, half)" :key="r.id" :review="r" compact /></UiMarquee>
-      <UiMarquee duration="80s" reverse><BookReviewCard v-for="r in reviews.slice(half)" :key="r.id" :review="r" compact /></UiMarquee>
-    </div>
-    <div v-else-if="reviews.length" class="container mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <div v-if="reviews.length" class="container mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       <BookReviewCard v-for="r in reviews" :key="r.id" :review="r" />
     </div>
     <div v-else class="container mt-14">
@@ -43,7 +31,7 @@ const half = computed(() => Math.ceil(reviews.value.length / 2))
 
     <div class="container mt-12 flex flex-wrap items-center justify-center gap-3">
       <UiButton to="/retours" :icon-left="PenLine">Donner mon retour</UiButton>
-      <UiButton v-if="data?.count" to="/avis" variant="outline" :icon="ArrowUpRight">Tous les avis</UiButton>
+      <UiButton v-if="(data?.count ?? 0) > reviews.length" to="/avis" variant="outline" :icon="ArrowUpRight">Tous les avis</UiButton>
     </div>
   </section>
 </template>

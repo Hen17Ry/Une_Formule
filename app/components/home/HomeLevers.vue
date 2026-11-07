@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowUpRight, MessageSquareQuote } from '@lucide/vue'
+import { ArrowUpRight } from '@lucide/vue'
 import { LEVERS } from '~/data/book'
 
 const root = ref<HTMLElement>()
@@ -74,12 +74,9 @@ function onTrackScroll() {
         <h3 class="relative mt-6 max-w-[18ch] font-display text-[2.1rem] leading-[1.08] md:text-[2.4rem]">{{ l.short }}</h3>
         <p class="relative mt-4 font-serif text-[1.1rem] italic leading-relaxed text-ink-soft">{{ l.question }}</p>
         <blockquote class="relative mt-auto border-l-2 pl-5 pt-8 font-serif text-[1.02rem] leading-relaxed text-ink-muted lg:line-clamp-4" :style="{ borderColor: l.color }">« {{ l.quote }} »</blockquote>
-        <div class="relative mt-8 flex flex-wrap gap-2">
-          <NuxtLink :to="`/les-7-leviers/${l.slug}`" class="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-ink/[.04] px-5 text-[0.9rem] text-ink transition-colors hover:bg-ink/[.08]">
-            Explorer <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
-          </NuxtLink>
-          <NuxtLink :to="`/retours/${l.slug}`" class="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line px-5 text-[0.9rem] text-ink-soft transition-colors hover:border-caramel hover:text-ink">
-            <MessageSquareQuote class="h-4 w-4" aria-hidden="true" /> Mon retour
+        <div class="relative mt-8">
+          <NuxtLink :to="`/les-7-leviers/${l.slug}`" class="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-ink/[.04] px-5 text-[0.9rem] text-ink transition-colors after:absolute after:inset-0 after:content-[''] hover:bg-ink/[.08]">
+            Découvrir le levier <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
           </NuxtLink>
         </div>
       </article>

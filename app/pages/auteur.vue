@@ -62,7 +62,7 @@ onBeforeUnmount(() => st?.kill())
         <p class="mx-auto max-w-3xl font-display text-[clamp(1.8rem,3.4vw,2.8rem)] italic leading-tight text-ink">« {{ BOOK.maxim }} »</p>
         <div class="mt-10 flex flex-wrap justify-center gap-3">
           <UiButton to="/extraits" variant="outline">Lire l’avant-propos</UiButton>
-          <UiButton to="/commander" :icon="ArrowRight">Commander le livre</UiButton>
+          <UiButton to="/#ou-trouver" :icon="ArrowRight">Où trouver le livre</UiButton>
         </div>
       </div>
     </div>

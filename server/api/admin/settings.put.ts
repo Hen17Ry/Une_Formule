@@ -10,7 +10,13 @@ const schema = z.object({
   maxPerOrder: z.number().int().min(1).max(50),
   edition: z.string().trim().min(1).max(80),
   deliveryNote: z.string().trim().max(400),
-  preorderNote: z.string().trim().max(400)
+  preorderNote: z.string().trim().max(400),
+  platformLinks: z.array(z.object({
+    label: z.string().trim().min(1, 'Nom de plateforme requis.').max(40),
+    url: z.string().trim().max(500).regex(/^https?:\/\/[^\s]+\.[^\s]+$/i, 'Lien de plateforme invalide (il doit commencer par https://).')
+  })).max(8).default([]),
+  contactEmail: z.string().trim().toLowerCase().max(120).refine(v => !v || z.string().email().safeParse(v).success, 'Adresse de contact invalide.').default(''),
+  isbn: z.string().trim().max(30).default('')
 })
 
 export default defineApiHandler(async (event) => {

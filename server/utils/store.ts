@@ -21,7 +21,10 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   maxPerOrder: 10,
   edition: 'Édition originale',
   deliveryNote: 'Livraison offerte à Cotonou et environs. Envoi possible partout au Bénin et dans la sous-région.',
-  preorderNote: 'Précommande : votre exemplaire vous est expédié dès la sortie officielle du livre.'
+  preorderNote: 'Précommande : votre exemplaire vous est expédié dès la sortie officielle du livre.',
+  platformLinks: [],
+  contactEmail: '',
+  isbn: ''
 }
 
 export interface AdminUser { id: number, email: string, passwordHash: string, role: string, createdAt?: string | Date }

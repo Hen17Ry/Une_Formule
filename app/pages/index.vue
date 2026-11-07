@@ -2,7 +2,7 @@
 import { BOOK } from '~/data/book'
 useSeo({
   title: 'Une Formule… 7 leviers pour construire la vie que vous désirez',
-  description: `${BOOK.hook} Le livre de ${BOOK.author} : extraits, retours des lecteurs et commande en ligne.`,
+  description: `${BOOK.hook} Le livre de ${BOOK.author} : extraits, retours des lecteurs et où trouver le livre.`,
   path: '/',
   type: 'book'
 })
@@ -11,13 +11,10 @@ useSeo({
 <template>
   <div>
     <HomeHero />
-    <HomeFormula />
     <HomeLevers />
-    <HomeTitleMagic />
     <HomeExcerpt />
     <HomeAuthor />
+    <HomeWhere />
     <HomeReviews />
-    <HomeOrder />
-    <HomeFaq />
   </div>
 </template>

@@ -105,10 +105,10 @@ const busyLabel = computed(() => ({ creating: 'Préparation…', paying: 'Paieme
 
       <!-- Formulaire -->
       <div>
-        <div v-if="!shop?.salesOpen || soldOut" class="surface p-10 text-center">
-          <p class="font-display text-display-sm">{{ soldOut ? 'Cette édition est épuisée.' : 'Les commandes sont momentanément fermées.' }}</p>
-          <p class="mx-auto mt-3 max-w-md font-serif text-lg text-ink-soft">Revenez très bientôt. En attendant, vous pouvez lire les extraits.</p>
-          <UiButton to="/extraits" variant="outline" class="mt-8">Lire les extraits</UiButton>
+        <div v-if="!canBuy" class="surface p-10 text-center">
+          <p class="font-display text-display-sm">{{ soldOut ? 'Cette édition est épuisée.' : 'La vente directe est fermée pour le moment.' }}</p>
+          <p class="mx-auto mt-3 max-w-md font-serif text-lg text-ink-soft">Le livre reste disponible sur les plateformes de vente.</p>
+          <UiButton to="/#ou-trouver" variant="outline" class="mt-8">Où trouver le livre</UiButton>
         </div>
 
         <form v-else class="space-y-6" novalidate @submit.prevent="pay">
@@ -166,8 +166,6 @@ const busyLabel = computed(() => ({ creating: 'Préparation…', paying: 'Paieme
               <UiButton type="submit" size="lg" block :loading="step !== 'form'" :disabled="!canBuy" :icon-left="Lock">
                 {{ step !== 'form' ? busyLabel : `Payer ${formatXof(total)}` }}
               </UiButton>
-              <p v-if="!shop?.paymentReady" class="mt-4 text-center font-sans text-sm text-ink-muted">Le paiement en ligne sera activé très prochainement.</p>
-              <p v-else-if="shop?.sandbox" class="mt-4 text-center font-sans text-xs uppercase tracking-[0.2em] text-gold-deep">Mode test KkiaPay : aucun débit réel</p>
               <div class="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-sans text-[0.8rem] text-ink-muted">
                 <span class="inline-flex items-center gap-1.5"><Smartphone class="h-4 w-4" aria-hidden="true" /> MTN MoMo · Moov Money · Celtiis</span>
                 <span class="inline-flex items-center gap-1.5"><CreditCard class="h-4 w-4" aria-hidden="true" /> Visa · Mastercard</span>

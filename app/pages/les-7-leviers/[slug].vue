@@ -82,7 +82,7 @@ useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.me
           <div class="rounded-[28px] border border-line bg-white/70 p-7">
             <p class="font-display text-[1.5rem] leading-tight">Le livre complet</p>
             <p class="mt-2 font-sans text-sm text-ink-muted">Sept leviers, seize exercices, une section Sources.</p>
-            <UiButton to="/commander" size="sm" class="mt-5">Commander</UiButton>
+            <UiButton to="/#ou-trouver" size="sm" class="mt-5">Où trouver le livre</UiButton>
           </div>
         </div>
       </aside>

@@ -24,9 +24,9 @@ import { AUTHOR } from '~/data/book'
         </ul>
         <p v-reveal class="mt-8 max-w-2xl font-serif text-[1.2rem] leading-relaxed text-ink-soft">{{ AUTHOR.bio[2] }}</p>
         <dl v-reveal.stagger class="mt-10 grid max-w-xl grid-cols-3 gap-6 border-t border-line pt-8">
-          <div><dt class="label">Carrière</dt><dd class="mt-2 font-display text-4xl text-ink"><UiNumberTicker :value="1997" :grouping="false" />*</dd></div>
-          <div><dt class="label">Terrain</dt><dd class="mt-2 font-display text-4xl text-ink">+<UiNumberTicker :value="20" /> ans</dd></div>
-          <div><dt class="label">Exercices</dt><dd class="mt-2 font-display text-4xl text-ink"><UiNumberTicker :value="16" /></dd></div>
+          <div><dt class="label">Carrière</dt><dd class="mt-2 font-display text-3xl text-ink sm:text-4xl"><UiNumberTicker :value="1997" :grouping="false" />*</dd></div>
+          <div><dt class="label">Terrain</dt><dd class="mt-2 whitespace-nowrap font-display text-3xl text-ink sm:text-4xl">+<UiNumberTicker :value="20" /> ans</dd></div>
+          <div><dt class="label">Exercices</dt><dd class="mt-2 font-display text-3xl text-ink sm:text-4xl"><UiNumberTicker :value="16" /></dd></div>
         </dl>
         <p class="mt-3 font-sans text-xs text-ink-muted">* début dans l’enseignement des mathématiques.</p>
         <div v-reveal class="mt-10">

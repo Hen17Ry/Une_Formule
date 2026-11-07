@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Save, Copy, CheckCircle2, AlertTriangle } from '@lucide/vue'
+import { Save, Copy, CheckCircle2, AlertTriangle, Plus, Trash2, ExternalLink } from '@lucide/vue'
 import type { PublicSettings, SaleMode } from '#shared/types'
 import { formatXof, xofToEur } from '~/data/book'
 
@@ -31,6 +31,11 @@ async function save() {
   } catch (e: any) { push(e?.data?.statusMessage || 'Enregistrement impossible.', 'error') }
   finally { saving.value = false }
 }
+const SUGGESTED = ['TheBookEdition', 'Amazon', 'Fnac']
+function addLink(label = '') {
+  if (!s.value || s.value.platformLinks.length >= 8) return
+  s.value.platformLinks.push({ label, url: '' })
+}
 const modes: { value: SaleMode, label: string }[] = [{ value: 'PREORDER', label: 'Précommande' }, { value: 'AVAILABLE', label: 'Disponible' }]
 const copy = async () => { await navigator.clipboard.writeText(webhookUrl.value); push('URL copiée.') }
 const inputCls = 'h-12 w-full rounded-2xl border border-line bg-paper/60 px-4 text-[0.98rem] focus:border-caramel focus:outline-none focus:ring-4 focus:ring-caramel/15'
@@ -47,14 +52,34 @@ const inputCls = 'h-12 w-full rounded-2xl border border-line bg-paper/60 px-4 te
     <form v-else class="mt-10 grid gap-6 xl:grid-cols-[1.4fr_1fr]" @submit.prevent="save">
       <div class="space-y-6">
         <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8">
-          <h2 class="font-display text-2xl">Vente</h2>
+          <h2 class="font-display text-2xl">Où trouver le livre</h2>
+          <p class="mt-2 text-sm text-ink-muted">Un bouton par plateforme sur l’accueil. Sans lien, la section affiche « Bientôt disponible ».</p>
+          <ul class="mt-6 space-y-3">
+            <li v-for="(l, i) in s.platformLinks" :key="i" class="grid gap-2 sm:grid-cols-[11rem_1fr_auto]">
+              <input v-model="l.label" maxlength="40" placeholder="Plateforme" aria-label="Nom de la plateforme" required :class="inputCls">
+              <input v-model="l.url" type="url" maxlength="500" placeholder="https://…" aria-label="Lien" required :class="inputCls">
+              <div class="flex gap-1">
+                <a v-if="l.url" :href="l.url" target="_blank" rel="noopener" class="grid h-12 w-12 place-items-center rounded-full text-ink-muted hover:bg-paper-2 hover:text-ink" aria-label="Ouvrir le lien"><ExternalLink class="h-4 w-4" aria-hidden="true" /></a>
+                <button type="button" class="grid h-12 w-12 place-items-center rounded-full text-ink-muted hover:bg-danger/10 hover:text-danger" aria-label="Retirer cette plateforme" @click="s.platformLinks.splice(i, 1)"><Trash2 class="h-4 w-4" aria-hidden="true" /></button>
+              </div>
+            </li>
+          </ul>
+          <div v-if="s.platformLinks.length < 8" class="mt-4 flex flex-wrap gap-2">
+            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-full border border-line px-4 text-sm hover:border-caramel" @click="addLink()"><Plus class="h-4 w-4" aria-hidden="true" />Ajouter</button>
+            <button v-for="name in SUGGESTED.filter(n => !s!.platformLinks.some(l => l.label === n))" :key="name" type="button" class="inline-flex h-10 items-center rounded-full bg-paper-2/70 px-4 text-sm text-ink-soft hover:text-ink" @click="addLink(name)">+ {{ name }}</button>
+          </div>
+        </section>
+
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8">
+          <h2 class="font-display text-2xl">Vente directe</h2>
+          <p class="mt-2 text-sm text-ink-muted">Page /commander séparée (Mobile Money, carte via KkiaPay), accessible depuis « Où trouver le livre ».</p>
           <div class="mt-6">
             <p class="mb-2.5 text-sm font-medium">Mode de vente</p>
             <UiSegmented v-model="s.saleMode" :options="modes" name="saleMode" />
             <p class="mt-2 text-xs text-ink-muted">En précommande, les acheteurs sont prévenus que l’expédition se fait à la sortie du livre.</p>
           </div>
           <label class="mt-6 flex cursor-pointer items-center justify-between gap-4 rounded-2xl bg-paper-2/60 p-4">
-            <span><span class="block text-sm font-medium">Commandes ouvertes</span><span class="text-xs text-ink-muted">Désactivez pour suspendre temporairement les ventes.</span></span>
+            <span><span class="block text-sm font-medium">Vente directe ouverte</span><span class="text-xs text-ink-muted">Désactivée : la page /commander est fermée et le bouton disparaît de l’accueil.</span></span>
             <input v-model="s.salesOpen" type="checkbox" class="peer sr-only">
             <span class="relative h-7 w-12 shrink-0 rounded-full bg-ink/15 transition-colors after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-copper peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-copper" aria-hidden="true" />
           </label>
@@ -80,6 +105,14 @@ const inputCls = 'h-12 w-full rounded-2xl border border-line bg-paper/60 px-4 te
             <label class="block"><span class="mb-2 block text-sm font-medium">Nom de l’édition</span><input v-model="s.edition" maxlength="80" :class="inputCls"></label>
             <label class="block"><span class="mb-2 block text-sm font-medium">Note de livraison</span><textarea v-model="s.deliveryNote" rows="2" maxlength="400" class="w-full rounded-2xl border border-line bg-paper/60 px-4 py-3 text-[0.98rem] focus:border-caramel focus:outline-none" /></label>
             <label class="block"><span class="mb-2 block text-sm font-medium">Note de précommande</span><textarea v-model="s.preorderNote" rows="2" maxlength="400" class="w-full rounded-2xl border border-line bg-paper/60 px-4 py-3 text-[0.98rem] focus:border-caramel focus:outline-none" /></label>
+          </div>
+        </section>
+
+        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8">
+          <h2 class="font-display text-2xl">Mentions légales</h2>
+          <div class="mt-6 grid gap-5 sm:grid-cols-2">
+            <label class="block"><span class="mb-2 block text-sm font-medium">Email de contact</span><input v-model="s.contactEmail" type="email" maxlength="120" placeholder="contact@uneformule.com" :class="inputCls"><span class="mt-1.5 block text-xs text-ink-muted">Affiché dans les mentions légales et le pied de page.</span></label>
+            <label class="block"><span class="mb-2 block text-sm font-medium">ISBN</span><input v-model="s.isbn" maxlength="30" placeholder="978-…" :class="inputCls"><span class="mt-1.5 block text-xs text-ink-muted">Masqué tant qu’il est vide.</span></label>
           </div>
         </section>
 

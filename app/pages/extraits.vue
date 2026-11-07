@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ShoppingBag } from '@lucide/vue'
+import { BookOpen } from '@lucide/vue'
 import { EXCERPTS } from '~/data/book'
 
 useSeo({ title: 'Extraits du livre', description: 'Lisez trois extraits d’Une Formule : La magie du titre, la note explicative de la formule Α + β = Ω et l’ouverture de l’avant-propos.' })
@@ -86,7 +86,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 
       <div v-reveal class="mx-auto mt-20 flex max-w-3xl flex-col items-center gap-6 rounded-[32px] border border-line bg-paper-2/70 px-8 py-12 text-center">
         <p class="font-display text-display-sm">La suite est entre les pages.</p>
-        <UiButton to="/commander" size="lg" :icon-left="ShoppingBag">Commander le livre</UiButton>
+        <UiButton to="/#ou-trouver" size="lg" :icon-left="BookOpen">Où trouver le livre</UiButton>
       </div>
     </div>
   </div>

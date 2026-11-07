@@ -1,30 +1,36 @@
 <script setup lang="ts">
-useSeo({ title: 'Mentions légales et conditions de vente', description: 'Mentions légales du site uneformule.com et conditions de vente du livre Une Formule.' })
+import { BOOK } from '~/data/book'
+useSeo({ title: 'Mentions légales', description: 'Mentions légales du site uneformule.com.' })
+const { data: shop } = await useShop()
 </script>
 
 <template>
   <div class="pb-28 pt-40">
     <div class="container max-w-3xl">
       <p class="label-gold">Informations</p>
-      <h1 class="mt-5 font-display text-display-md">Mentions légales & conditions de vente</h1>
+      <h1 class="mt-5 font-display text-display-md">Mentions légales</h1>
       <div class="prose-book mt-12 space-y-10">
         <section>
-          <h2 class="font-display text-3xl text-ink">Éditeur du site</h2>
-          <p class="mt-3">Le site uneformule.com présente le livre <em>Une Formule… 7 leviers pour construire la vie que vous désirez</em>, de Dieudonné Sossa Gossou, Cotonou, Bénin.</p>
+          <h2 class="font-display text-3xl text-ink">Auteur et responsable du site</h2>
+          <p class="mt-3">Le site uneformule.com présente le livre <em>Une Formule… 7 leviers pour construire la vie que vous désirez</em>, de {{ BOOK.author }}, Cotonou, Bénin.</p>
+          <p v-if="shop?.isbn">ISBN : {{ shop.isbn }}</p>
+        </section>
+        <section v-if="shop?.contactEmail">
+          <h2 class="font-display text-3xl text-ink">Contact</h2>
+          <p class="mt-3"><a :href="`mailto:${shop.contactEmail}`" class="link-underline">{{ shop.contactEmail }}</a></p>
+        </section>
+        <section>
+          <h2 class="font-display text-3xl text-ink">Hébergement</h2>
+          <p class="mt-3">Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis — vercel.com</p>
         </section>
         <section>
           <h2 class="font-display text-3xl text-ink">Données personnelles</h2>
           <p class="mt-3">Les retours de lecteurs ne sont publiés qu’avec l’accord explicite de leur auteur, anonymement ou avec son seul prénom. L’adresse email, facultative, n’est jamais publiée : elle sert uniquement à recontacter le lecteur si besoin.</p>
-          <p>Les informations de commande (nom, téléphone, adresse) servent exclusivement à traiter et livrer la commande.</p>
+          <p v-if="shop?.salesOpen">Les informations saisies lors d’un achat direct (nom, téléphone, adresse) servent uniquement à traiter et livrer la commande.</p>
         </section>
-        <section>
-          <h2 class="font-display text-3xl text-ink">Commande et paiement</h2>
-          <p class="mt-3">Les prix sont indiqués en francs CFA (XOF), toutes taxes comprises. Le paiement est traité par KkiaPay (Mobile Money et carte bancaire) ; aucune donnée bancaire ne transite par ce site.</p>
-          <p>En précommande, l’exemplaire est expédié dès la sortie officielle du livre. Lorsque le livre est disponible, la commande est préparée dès réception du paiement.</p>
-        </section>
-        <section>
-          <h2 class="font-display text-3xl text-ink">Livraison</h2>
-          <p class="mt-3">Les modalités et délais de livraison sont précisés au moment de la commande. Une question sur une commande ? Indiquez sa référence (UF-…) lorsque vous nous contactez.</p>
+        <section v-if="shop?.salesOpen">
+          <h2 class="font-display text-3xl text-ink">Vente directe</h2>
+          <p class="mt-3">Les prix de la page Commander sont indiqués en francs CFA, toutes taxes comprises. Le paiement est traité par KkiaPay (Mobile Money et carte bancaire) ; aucune donnée bancaire ne transite par ce site. Pour toute question sur une commande, indiquez sa référence (UF-…).</p>
         </section>
       </div>
     </div>

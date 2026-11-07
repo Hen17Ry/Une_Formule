@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { PenLine, Star } from '@lucide/vue'
+import { PenLine } from '@lucide/vue'
 import type { PublicReview } from '#shared/types'
 import { LEVERS } from '~/data/book'
 
 useSeo({ title: 'Avis des lecteurs', description: 'Les retours des lecteurs du livre Une Formule, relus et publiés avec leur accord.' })
 
 const filter = ref<'all' | 'general' | number>('all')
-const { data } = await useFetch<{ reviews: PublicReview[], count: number, average: number | null }>('/api/reviews', { key: 'all-reviews' })
+const { data } = await useFetch<{ reviews: PublicReview[], count: number }>('/api/reviews', { key: 'all-reviews' })
 const list = computed(() => {
   const all = data.value?.reviews ?? []
   if (filter.value === 'all') return all
@@ -25,13 +25,6 @@ const countFor = (f: 'general' | number) => (data.value?.reviews ?? []).filter(r
           <p v-reveal class="label-gold">Ils ont lu Une Formule</p>
           <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Avis des <em class="text-caramel">lecteurs</em>.</UiSplitReveal>
           <p v-reveal class="mt-6 max-w-xl font-serif text-[1.2rem] leading-relaxed text-ink-soft">Relus par l’auteur, publiés avec l’accord des lecteurs.</p>
-        </div>
-        <div v-if="data?.count" v-reveal class="flex items-center gap-5 rounded-[24px] border border-line bg-white/70 px-6 py-5">
-          <p class="font-display text-6xl leading-none"><UiNumberTicker :value="data.average ?? 0" :decimals="1" /></p>
-          <div>
-            <div class="flex gap-0.5" aria-hidden="true"><Star v-for="n in 5" :key="n" class="h-4 w-4 fill-gold text-gold-deep" :stroke-width="1.4" /></div>
-            <p class="mt-1 font-sans text-sm text-ink-muted">sur {{ data.count }} avis</p>
-          </div>
         </div>
       </header>
 

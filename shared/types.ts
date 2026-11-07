@@ -63,6 +63,12 @@ export interface Order {
   updatedAt: string | Date
 }
 
+/** Lien vers une plateforme où acheter le livre (TheBookEdition, Amazon…). */
+export interface PlatformLink {
+  label: string
+  url: string
+}
+
 export interface ShopSettings {
   /** Prix unitaire en FCFA (KkiaPay encaisse en XOF). */
   priceXof: number
@@ -77,6 +83,11 @@ export interface ShopSettings {
   edition: string
   deliveryNote: string
   preorderNote: string
+  /** Section « Où trouver le livre ». */
+  platformLinks: PlatformLink[]
+  /** Adresse de contact publique (mentions légales, pied de page). */
+  contactEmail: string
+  isbn: string
 }
 
 export interface PublicSettings extends ShopSettings {

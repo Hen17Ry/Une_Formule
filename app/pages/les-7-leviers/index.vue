@@ -11,7 +11,7 @@ const hovered = ref<number | null>(null)
     <div class="container relative">
       <header class="grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <p v-reveal class="label-gold">β, en sept facettes</p>
+          <p v-reveal class="label-gold">Le livre</p>
           <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Les 7 <em class="text-caramel">leviers</em>.</UiSplitReveal>
         </div>
         <p v-reveal class="font-serif text-[1.2rem] leading-relaxed text-ink-soft">
