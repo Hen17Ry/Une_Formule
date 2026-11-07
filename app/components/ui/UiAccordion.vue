@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* Accordéon animé (inspiré des accordéons shadcn/21st.dev), accessible au clavier. */
-const props = withDefaults(defineProps<{ items: { q: string, a: string }[], defaultOpen?: number | null, idPrefix?: string }>(), { defaultOpen: null, idPrefix: 'acc' })
+const props = withDefaults(defineProps<{ items: { q: string, a: string, link?: { to: string, label: string } }[], defaultOpen?: number | null, idPrefix?: string }>(), { defaultOpen: null, idPrefix: 'acc' })
 const open = ref<number | null>(props.defaultOpen)
 const uid = useId()
 const toggle = (i: number) => { open.value = open.value === i ? null : i }
@@ -34,7 +34,8 @@ const toggle = (i: number) => { open.value = open.value === i ? null : i }
         :inert="open !== i || undefined"
       >
         <div class="overflow-hidden">
-          <p class="max-w-3xl pb-7 pr-12 font-serif text-[1.12rem] leading-relaxed text-ink-soft">{{ item.a }}</p>
+          <p class="max-w-3xl pr-12 font-serif text-[1.12rem] leading-relaxed text-ink-soft" :class="item.link ? 'pb-3' : 'pb-7'">{{ item.a }}</p>
+          <NuxtLink v-if="item.link" :to="item.link.to" class="link-underline mb-7 inline-block font-sans text-[0.95rem] text-copper">{{ item.link.label }} →</NuxtLink>
         </div>
       </div>
     </div>

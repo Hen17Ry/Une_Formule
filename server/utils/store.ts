@@ -46,6 +46,9 @@ export interface Store {
 
   /** Valeur technique persistée (ex. secret de session) ; créée une seule fois si absente. */
   ensureKv<T>(key: string, create: () => T): Promise<T>
+  /** Valeur persistée par clé (null si absente). */
+  getKv<T>(key: string): Promise<T | null>
+  setKv<T>(key: string, value: T): Promise<T>
 
   createReview(input: NewReview): Promise<Review>
   getReview(id: number): Promise<Review | null>
@@ -172,6 +175,17 @@ class PgStore implements Store {
     await this.db.insert(schema.settings).values({ key, value: create() as any }).onConflictDoNothing()
     const [saved] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, key))
     return saved!.value as T
+  }
+
+  async getKv<T>(key: string): Promise<T | null> {
+    const [row] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, key))
+    return row ? (row.value as T) : null
+  }
+
+  async setKv<T>(key: string, value: T): Promise<T> {
+    await this.db.insert(schema.settings).values({ key, value: value as any, updatedAt: now() })
+      .onConflictDoUpdate({ target: schema.settings.key, set: { value: value as any, updatedAt: now() } })
+    return value
   }
 
   async createReview(input: NewReview) {
@@ -356,6 +370,17 @@ class FileStore implements Store {
       this.save()
     }
     return this.data.kv[key] as T
+  }
+
+  async getKv<T>(key: string): Promise<T | null> {
+    return (this.data.kv?.[key] as T) ?? null
+  }
+
+  async setKv<T>(key: string, value: T): Promise<T> {
+    this.data.kv ??= {}
+    this.data.kv[key] = value
+    this.save()
+    return value
   }
 
   async createReview(input: NewReview) {

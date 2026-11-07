@@ -278,7 +278,8 @@ export const AUTHOR = {
   ]
 }
 
-export interface FaqGroup { title: string, items: { q: string, a: string }[] }
+export interface FaqItem { q: string, a: string, link?: { to: string, label: string } }
+export interface FaqGroup { title: string, items: FaqItem[] }
 
 export const FAQ: FaqGroup[] = [
   {
@@ -286,7 +287,7 @@ export const FAQ: FaqGroup[] = [
     items: [
       { q: 'Qu’est-ce qu’Une Formule ?', a: 'Un livre de développement personnel organisé en sept leviers, chacun appuyé sur des références scientifiques nommées et datées, plutôt que sur la seule inspiration. La formule Α + β = Ω en résume l’idée centrale : vous, plus le mécanisme activé un levier à la fois, égale la version de vous déjà en germe.' },
       { q: 'À qui s’adresse ce livre ?', a: 'À toute personne qui veut avancer concrètement plutôt que seulement se sentir inspirée. Chaque levier se termine par des exercices pratiques, pensés pour être faits, pas seulement lus.' },
-      { q: 'Le livre s’appuie-t-il vraiment sur des données scientifiques ?', a: 'Le livre nomme les recherches sur lesquelles il s’appuie : chercheur, étude, date. Elles sont regroupées dans la section Sources, en fin d’ouvrage, pour que chacun puisse les retrouver.' },
+      { q: 'Le livre s’appuie-t-il vraiment sur des données scientifiques ?', a: 'Le livre nomme les recherches sur lesquelles il s’appuie : chercheur, étude, date. La rubrique « À propos des sources » les présente une par une, avec ce que le livre en dit et le lien vers la publication d’origine.', link: { to: '/sources', label: 'À propos des sources' } },
       { q: 'Faut-il lire les sept leviers dans l’ordre ?', a: 'Non. Chaque levier peut s’activer indépendamment des six autres, à son propre rythme.' },
       { q: 'Comment donner un retour sur le livre ?', a: 'Depuis l’entrée Retours du menu (uneformule.com/retours), en choisissant le levier concerné ou le retour sur le livre entier.' }
     ]
@@ -302,7 +303,7 @@ export const FAQ: FaqGroup[] = [
     title: 'Sur ce qui distingue ce livre du reste du genre',
     items: [
       { q: 'Le livre parle-t-il de la loi de l’attraction ?', a: 'Oui, mais pas comme on l’attend. Le livre reformule la loi de l’attraction comme un mécanisme psychologique observable, biais de confirmation, prophétie autoréalisatrice, plutôt que comme une force magique extérieure à soi. C’est l’un des sept leviers du livre, et l’un des points qui distinguent le plus nettement cet ouvrage dans son genre.' },
-      { q: 'Peut-on lire ce livre en étant sceptique du développement personnel ?', a: 'C’est même exactement le lecteur que ce livre cherche à atteindre. Chaque levier s’appuie sur des références scientifiques nommées (chercheur, étude, date) plutôt que sur la seule inspiration. La section Sources, en fin d’ouvrage, permet de les retrouver.' },
+      { q: 'Peut-on lire ce livre en étant sceptique du développement personnel ?', a: 'C’est même exactement le lecteur que ce livre cherche à atteindre. Chaque levier s’appuie sur des références scientifiques nommées (chercheur, étude, date) plutôt que sur la seule inspiration. Elles sont toutes listées, avec leur lien d’origine, dans la rubrique « À propos des sources ».', link: { to: '/sources', label: 'À propos des sources' } },
       { q: 'Le livre promet-il des résultats rapides ?', a: 'Non, et c’est volontaire. Le livre ne promet ni richesse instantanée ni transformation en une nuit. Ce qu’il propose, ce sont des mécanismes réels, expliqués avec leurs limites, et des exercices concrets à pratiquer, pas seulement à lire. Le dernier exercice invite même à revenir sur ses réponses plusieurs mois plus tard, pour mesurer un chemin réel plutôt qu’un simple sursaut de motivation.' }
     ]
   },

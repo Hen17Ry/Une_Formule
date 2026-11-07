@@ -103,3 +103,22 @@ export interface AppEvent {
   actor: string
   createdAt: string | Date
 }
+
+/* ───────────── Sources ───────────── */
+
+/** '' : à préciser · consultee : publication lue · connue : non consultée, largement connue. */
+export type SourceStatus = '' | 'consultee' | 'connue'
+
+export interface SourceEntry {
+  id: string
+  /** Levier concerné (1 à 7), ou null pour le livre entier. */
+  lever: number | null
+  name: string
+  /** Référence bibliographique courte (auteurs, année, revue). */
+  reference: string
+  /** Ce que dit le livre. */
+  claim: string
+  /** Lien officiel (DOI, éditeur, institution). */
+  url: string
+  status: SourceStatus
+}

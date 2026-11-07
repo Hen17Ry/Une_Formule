@@ -2,7 +2,7 @@ import { LEVERS } from '~~/app/data/book'
 
 export default defineEventHandler((event) => {
   const site = String(useRuntimeConfig().public.siteUrl).replace(/\/$/, '')
-  const paths = ['/', '/extraits', '/auteur', '/faq', '/les-7-leviers', '/retours', '/avis', '/commander',
+  const paths = ['/', '/extraits', '/auteur', '/faq', '/sources', '/les-7-leviers', '/retours', '/avis', '/commander',
     ...LEVERS.map(l => `/les-7-leviers/${l.slug}`), ...LEVERS.map(l => `/retours/${l.slug}`), '/retours/general']
   const today = new Date().toISOString().slice(0, 10)
   setResponseHeader(event, 'content-type', 'application/xml; charset=utf-8')
