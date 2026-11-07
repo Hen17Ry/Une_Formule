@@ -13,6 +13,27 @@ export const BOOK = {
   hook: 'Sept leviers pour construire la vie que vous désirez, appuyés sur la science plutôt que sur la seule inspiration.'
 }
 
+/** Visuels de la couverture (version V8). */
+export type CoverSide = 'front' | 'back'
+export const COVERS: Record<CoverSide, { title: string, short: string, src: string, sm: string, hd: string, alt: string }> = {
+  front: {
+    title: 'Première couverture',
+    short: 'Première',
+    src: '/images/couverture.webp?v=8',
+    sm: '/images/couverture-sm.webp?v=8',
+    hd: '/images/couverture-hd.webp',
+    alt: 'Première couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou'
+  },
+  back: {
+    title: 'Quatrième de couverture',
+    short: 'Quatrième',
+    src: '/images/quatrieme.webp',
+    sm: '/images/quatrieme-sm.webp',
+    hd: '/images/quatrieme-hd.webp',
+    alt: 'Quatrième de couverture : Quand l’intuition et la rationalité se rejoignent'
+  }
+}
+
 /** Quatrième de couverture (version V8), reprise telle quelle. */
 export const BACK_COVER = {
   heading: 'Quand l’intuition et la rationalité se rejoignent',

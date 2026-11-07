@@ -168,3 +168,7 @@ html.lenis, html.lenis body { height: auto; }
   }
   .js-ready [data-reveal], .js-ready [data-reveal-stagger] > * { opacity: 1 !important; transform: none !important; }
 }
+
+/* Barre d’onglets défilante sans barre de défilement visible */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

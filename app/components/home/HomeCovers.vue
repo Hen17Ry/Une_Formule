@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Maximize2, X, RotateCcw } from '@lucide/vue'
-import { BACK_COVER, BOOK } from '~/data/book'
+import { Maximize2, RotateCcw } from '@lucide/vue'
+import { BOOK, COVERS, type CoverSide } from '~/data/book'
 
 /*
  * « Recto, verso » : la première couverture et la quatrième de couverture.
@@ -8,9 +8,9 @@ import { BACK_COVER, BOOK } from '~/data/book'
  * Mobile : on touche le livre pour le retourner.
  * Un clic sur « Agrandir » ouvre la couverture en grand.
  */
-type Side = 'front' | 'back'
-const FRONT = { src: '/images/couverture.webp?v=8', sm: '/images/couverture-sm.webp?v=8', hd: '/images/couverture-hd.webp', alt: 'Première couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou' }
-const BACK = { src: '/images/quatrieme.webp', sm: '/images/quatrieme-sm.webp', hd: '/images/quatrieme-hd.webp', alt: 'Quatrième de couverture : Quand l’intuition et la rationalité se rejoignent' }
+type Side = CoverSide
+const FRONT = COVERS.front
+const BACK = COVERS.back
 
 const root = ref<HTMLElement>()
 const scrollMode = ref(false)   // ordinateur, animations autorisées
@@ -50,29 +50,10 @@ function onLeave() { tilt.x = 0; tilt.y = 0 }
 
 /* ── Agrandissement ── */
 const zoom = ref<Side | null>(null)
-const closeBtn = ref<HTMLButtonElement>()
-let lastFocus: HTMLElement | null = null
-const { $stopScroll, $startScroll } = useNuxtApp()
-function openZoom(s: Side = side.value) {
-  lastFocus = document.activeElement as HTMLElement
-  zoom.value = s
-  ;($stopScroll as any)?.()
-  nextTick(() => closeBtn.value?.focus())
-}
-function closeZoom() {
-  zoom.value = null
-  ;($startScroll as any)?.()
-  lastFocus?.focus()
-}
-function onKey(e: KeyboardEvent) {
-  if (!zoom.value) return
-  if (e.key === 'Escape') closeZoom()
-  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') zoom.value = zoom.value === 'front' ? 'back' : 'front'
-}
+function openZoom(s: Side = side.value) { zoom.value = s }
 
 let mm: any
 onMounted(async () => {
-  window.addEventListener('keydown', onKey)
   if (prefersReducedMotion()) { rot.value = -14; return }
   const { gsap, ScrollTrigger } = await useGsap()
   mm = gsap.matchMedia()
@@ -94,11 +75,7 @@ onMounted(async () => {
   })
   mm.add('(max-width: 1023px)', () => { rot.value = -14 })
 })
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', onKey)
-  mm?.revert()
-  if (zoom.value) ($startScroll as any)?.()
-})
+onBeforeUnmount(() => mm?.revert())
 
 const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotateY(${rot.value + tilt.y}deg)` }))
 </script>
@@ -188,42 +165,14 @@ const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotate
                 <p class="mt-7 font-sans text-[0.8rem] uppercase tracking-[0.3em] text-ink-muted">{{ BOOK.author }}</p>
               </div>
               <!-- Verso, tel qu’imprimé -->
-              <div class="panel [grid-area:1/1] font-serif text-[clamp(0.98rem,1.85vh,1.08rem)] leading-[1.6] text-ink-soft" :class="side === 'back' ? 'is-on' : 'is-off'" :aria-hidden="side !== 'back'">
-                <p class="font-sans text-[1.15rem] font-semibold leading-snug text-copper">{{ BACK_COVER.heading }}</p>
-                <p class="mt-4"><em>{{ BACK_COVER.intro }}</em> {{ BACK_COVER.text }}</p>
-                <p class="mt-3">{{ BACK_COVER.key }}</p>
-                <p class="formula my-3 text-center text-[1.9rem] leading-none text-ink" aria-label="Alpha plus bêta égale oméga">Α <span class="text-gold">+</span> <em class="text-caramel">β</em> <span class="text-gold">=</span> Ω</p>
-                <ul class="space-y-1">
-                  <li v-for="t in BACK_COVER.terms" :key="t.sym" class="flex gap-2"><span class="text-caramel" aria-hidden="true">•</span><span><strong class="font-semibold text-ink">{{ t.sym }}</strong>{{ t.text }}</span></li>
-                </ul>
-                <p class="mt-4">{{ BACK_COVER.closing }} <em class="text-caramel">{{ BACK_COVER.quote }}</em></p>
-                <p class="mt-4 border-b border-caramel/50 pb-4 text-center font-semibold text-copper">{{ BACK_COVER.call }}</p>
-              </div>
+              <BookBackCoverText class="panel [grid-area:1/1] font-serif text-[clamp(0.98rem,1.85vh,1.08rem)] leading-[1.6] text-ink-soft" :class="side === 'back' ? 'is-on' : 'is-off'" :aria-hidden="side !== 'back'" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Agrandissement -->
-    <Teleport to="body">
-      <Transition enter-active-class="transition duration-500 ease-expo" enter-from-class="opacity-0" leave-active-class="transition duration-300" leave-to-class="opacity-0">
-        <div v-if="zoom" class="fixed inset-0 z-[80] flex flex-col bg-paper/95 backdrop-blur-xl" role="dialog" aria-modal="true" :aria-label="zoom === 'front' ? 'Première couverture' : 'Quatrième de couverture'" data-lenis-prevent @click.self="closeZoom">
-          <div class="flex items-center justify-between gap-3 px-4 py-4 md:px-8">
-            <div class="flex rounded-full border border-line bg-white/80 p-1" role="group" aria-label="Face affichée">
-              <button v-for="s in (['front', 'back'] as const)" :key="s" type="button" class="min-h-[40px] rounded-full px-4 font-sans text-[0.85rem] transition-colors" :class="zoom === s ? 'bg-copper text-[#FFFDF9]' : 'text-ink-soft hover:text-ink'" :aria-pressed="zoom === s" @click="zoom = s">
-                {{ s === 'front' ? 'Première' : 'Quatrième' }}
-              </button>
-            </div>
-            <button ref="closeBtn" type="button" class="grid h-11 w-11 place-items-center rounded-full border border-line bg-white/80 text-ink hover:border-caramel" aria-label="Fermer" @click="closeZoom"><X class="h-5 w-5" aria-hidden="true" /></button>
-          </div>
-          <div class="flex min-h-0 flex-1 items-center justify-center overflow-auto px-4 pb-8" @click.self="closeZoom">
-            <Transition mode="out-in" enter-active-class="transition duration-500 ease-expo" enter-from-class="opacity-0 scale-[.97]" leave-active-class="transition duration-150" leave-to-class="opacity-0">
-              <img :key="zoom" :src="zoom === 'front' ? FRONT.hd : BACK.hd" :alt="zoom === 'front' ? FRONT.alt : BACK.alt" class="max-h-full w-auto max-w-full rounded-[4px] object-contain shadow-book" width="1600" height="2270">
-            </Transition>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+    <BookCoverZoom v-model="zoom" />
   </section>
 </template>
 
