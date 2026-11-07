@@ -1,54 +1,54 @@
 <script setup lang="ts">
 import { ArrowLeft, ArrowRight } from '@lucide/vue'
-import { BOOK_SECTIONS, EXCERPTS } from '~/data/book'
+import { EXCERPTS } from '~/data/book'
 
 const route = useRoute()
-const section = BOOK_SECTIONS.find(s => s.slug === String(route.params.slug))
-if (!section) throw createError({ statusCode: 404, statusMessage: 'Page introuvable', fatal: true })
-const s = section!
-const text = EXCERPTS.find(e => e.slug === s.excerpt)!
-const i = BOOK_SECTIONS.indexOf(s)
-const prev = BOOK_SECTIONS[i - 1]
-const next = BOOK_SECTIONS[i + 1]
+const found = EXCERPTS.find(e => e.path === `/le-livre/${route.params.slug}`)
+if (!found) throw createError({ statusCode: 404, statusMessage: 'Page introuvable', fatal: true })
+const text = found!
+const i = EXCERPTS.indexOf(text)
+const prev = EXCERPTS[i - 1]
+const next = EXCERPTS[i + 1]
 
-useSeo({ title: s.title, description: s.lead, type: 'article' })
+const first = text.blocks.find(b => b.k === 'p')!.t
+useSeo({ title: text.title, description: first.length > 155 ? `${first.slice(0, 152).replace(/\s+\S*$/, '')}…` : first, type: 'article' })
+
+/* Barre de progression de lecture */
+const wrap = ref<HTMLElement>()
+const progress = ref(0)
+function onScroll() {
+  const el = wrap.value
+  if (!el) return
+  const r = el.getBoundingClientRect()
+  progress.value = Math.min(1, Math.max(0, (window.innerHeight * 0.5 - r.top) / r.height))
+}
+onMounted(() => { window.addEventListener('scroll', onScroll, { passive: true }); onScroll() })
+onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
-  <div class="relative overflow-x-clip pb-28 pt-40">
+  <div class="relative overflow-x-clip pb-28 pt-36">
+    <div class="fixed inset-x-0 top-0 z-[55] h-[3px] origin-left bg-caramel" :style="{ transform: `scaleX(${progress})` }" aria-hidden="true" />
     <BrandRings class="pointer-events-none absolute -right-56 -top-32 h-[46rem] w-[46rem] opacity-40" />
     <div class="container relative">
-      <header class="mx-auto max-w-3xl text-center">
-        <p v-reveal class="label-gold">Le livre</p>
-        <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">{{ s.title }}</UiSplitReveal>
-        <p v-reveal class="mx-auto mt-6 max-w-xl font-serif text-[1.2rem] leading-relaxed text-ink-soft">{{ s.lead }}</p>
-      </header>
+      <nav class="mx-auto flex max-w-3xl items-center justify-center gap-2 font-sans text-sm text-ink-muted" aria-label="Fil d’Ariane">
+        <NuxtLink to="/les-7-leviers" class="hover:text-ink">Le livre</NuxtLink>
+        <span aria-hidden="true">/</span>
+        <span class="text-ink">{{ text.menu }}</span>
+      </nav>
 
-      <article class="relative mx-auto mt-14 max-w-3xl rounded-[8px] border border-line bg-[#fffdf8] px-7 py-14 shadow-lift sm:px-12 md:px-20 md:py-20">
-        <p v-if="text.formula" class="formula text-center text-6xl text-ink" aria-label="Alpha plus bêta égale oméga">Α <span class="text-gold">+</span> <em class="text-caramel">β</em> <span class="text-gold">=</span> Ω</p>
-        <div class="prose-book" :class="text.formula && 'mt-10'">
-          <p v-for="(p, k) in text.paragraphs" :key="k" :class="k === 0 && 'first-letter:float-left first-letter:mr-3 first-letter:mt-1.5 first-letter:font-display first-letter:text-[4.8rem] first-letter:leading-[0.78] first-letter:text-caramel'">{{ p }}</p>
-        </div>
-        <p v-if="text.note" class="mt-10 border-t border-line pt-6 text-center font-sans text-sm italic text-ink-muted">{{ text.note }}</p>
-        <p class="mt-12 text-center font-sans text-[0.68rem] uppercase tracking-[0.3em] text-ink-muted">Une Formule …</p>
-      </article>
+      <div ref="wrap" class="mx-auto mt-8 max-w-3xl">
+        <BookTextArticle :text="text" heading="h1" />
+      </div>
 
-      <nav class="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2" aria-label="Rubriques du livre">
-        <NuxtLink v-if="prev" :to="`/le-livre/${prev.slug}`" class="group rounded-[24px] border border-line p-6 transition-colors hover:border-caramel">
+      <nav class="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-2" aria-label="Pages du livre">
+        <NuxtLink :to="prev ? prev.path : '/les-7-leviers'" class="group rounded-[24px] border border-line p-6 transition-colors hover:border-caramel">
           <span class="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted"><ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" /> Précédent</span>
-          <span class="mt-2 block font-display text-2xl">{{ prev.label }}</span>
+          <span class="mt-2 block font-display text-2xl">{{ prev ? prev.menu : 'Les 7 leviers' }}</span>
         </NuxtLink>
-        <NuxtLink v-else to="/les-7-leviers" class="group rounded-[24px] border border-line p-6 transition-colors hover:border-caramel">
-          <span class="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted"><ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" /> Le livre</span>
-          <span class="mt-2 block font-display text-2xl">Les 7 leviers</span>
-        </NuxtLink>
-        <NuxtLink v-if="next" :to="`/le-livre/${next.slug}`" class="group rounded-[24px] border border-line p-6 text-right transition-colors hover:border-caramel">
+        <NuxtLink :to="next ? next.path : '/les-7-leviers'" class="group rounded-[24px] border border-line p-6 text-right transition-colors hover:border-caramel">
           <span class="flex items-center justify-end gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted">Suivant <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-          <span class="mt-2 block font-display text-2xl">{{ next.label }}</span>
-        </NuxtLink>
-        <NuxtLink v-else to="/les-7-leviers" class="group rounded-[24px] border border-line p-6 text-right transition-colors hover:border-caramel">
-          <span class="flex items-center justify-end gap-2 font-sans text-xs uppercase tracking-[0.22em] text-ink-muted">Suivant <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-          <span class="mt-2 block font-display text-2xl">Les 7 leviers</span>
+          <span class="mt-2 block font-display text-2xl">{{ next ? next.menu : 'Les 7 leviers' }}</span>
         </NuxtLink>
       </nav>
     </div>

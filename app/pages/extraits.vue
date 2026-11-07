@@ -2,7 +2,7 @@
 import { BookOpen } from '@lucide/vue'
 import { EXCERPTS } from '~/data/book'
 
-useSeo({ title: 'Extraits du livre', description: 'Lisez trois extraits d’Une Formule : La magie du titre, la note explicative de la formule Α + β = Ω et l’ouverture de l’avant-propos.' })
+useSeo({ title: 'Extraits du livre', description: 'Lisez trois extraits d’Une Formule : La magie du titre, la note explicative de la formule Α + β = Ω et l’avant-propos.' })
 
 const route = useRoute()
 const current = ref(EXCERPTS.findIndex(e => `#${e.slug}` === route.hash))
@@ -37,7 +37,6 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       <header class="mx-auto max-w-3xl text-center">
         <p v-reveal class="label-gold">Extraits du livre</p>
         <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Ouvrir le livre, <em class="text-caramel">un peu</em>.</UiSplitReveal>
-        <p v-reveal class="mx-auto mt-6 max-w-xl font-serif text-[1.2rem] leading-relaxed text-ink-soft">Trois extraits, publiés tels quels, dans l’ordre voulu par l’auteur.</p>
       </header>
 
       <div id="lecture" role="tablist" aria-label="Extraits" class="sticky top-[84px] z-20 mx-auto mt-14 flex max-w-3xl gap-1 overflow-x-auto rounded-full border border-line bg-paper/85 p-1.5 shadow-soft backdrop-blur-xl" data-lenis-prevent>
@@ -58,24 +57,16 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       </div>
 
       <Transition mode="out-in" enter-active-class="transition duration-700 ease-expo" enter-from-class="opacity-0 translate-y-6" leave-active-class="transition duration-200" leave-to-class="opacity-0">
-        <article
+        <div
           :id="`panel-${excerpt.slug}`"
           ref="article"
           :key="excerpt.slug"
           role="tabpanel"
           :aria-labelledby="`tab-${excerpt.slug}`"
-          class="relative mx-auto mt-12 max-w-3xl rounded-[8px] border border-line bg-[#fffdf8] px-7 py-14 shadow-lift sm:px-12 md:px-20 md:py-20"
+          class="relative mx-auto mt-12 max-w-3xl"
         >
-          <p class="text-center font-sans text-[0.68rem] uppercase tracking-[0.3em] text-ink-muted">{{ excerpt.label }}</p>
-          <h2 class="mt-3 text-center font-display text-display-sm">{{ excerpt.title }}</h2>
-          <span class="rule-gold mx-auto mt-6" aria-hidden="true" />
-          <p v-if="excerpt.formula" class="formula mt-8 text-center text-6xl text-ink" aria-label="Alpha plus bêta égale oméga">Α <span class="text-gold">+</span> <em class="text-caramel">β</em> <span class="text-gold">=</span> Ω</p>
-          <div class="prose-book mt-10">
-            <p v-for="(p, i) in excerpt.paragraphs" :key="i" :class="i === 0 && 'first-letter:float-left first-letter:mr-3 first-letter:mt-1.5 first-letter:font-display first-letter:text-[4.8rem] first-letter:leading-[0.78] first-letter:text-caramel'">{{ p }}</p>
-          </div>
-          <p v-if="excerpt.note" class="mt-10 border-t border-line pt-6 text-center font-sans text-sm italic text-ink-muted">{{ excerpt.note }}</p>
-          <p class="mt-12 text-center font-sans text-[0.68rem] uppercase tracking-[0.3em] text-ink-muted">Une Formule …</p>
-        </article>
+          <BookTextArticle :text="excerpt" :label="excerpt.label" />
+        </div>
       </Transition>
 
       <div class="mx-auto mt-10 flex max-w-3xl items-center justify-between gap-4">

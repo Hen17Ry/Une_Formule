@@ -170,90 +170,90 @@ export const FORMULA_TERMS = [
   }
 ]
 
+/** Bloc de texte du livre : paragraphe, intertitre, formule de fin, signature. */
+export interface TextBlock { k: 'p' | 'h' | 'end' | 'sign', t: string }
+
+/**
+ * Textes du livre publiés sur le site, repris tels quels (pages 9 à 19 de l’extrait).
+ * Affichés dans « Extraits » et dans les pages du menu « Le livre ».
+ */
 export interface Excerpt {
+  /** Ancre dans la page Extraits. */
   slug: string
+  /** Page dédiée, dans le menu « Le livre ». */
+  path: string
+  /** Libellé dans le menu. */
+  menu: string
   label: string
+  /** Titre, tel qu’il figure dans le livre. */
   title: string
+  subtitle?: string
   formula?: boolean
-  paragraphs: string[]
-  note?: string
+  blocks: TextBlock[]
 }
 
 export const EXCERPTS: Excerpt[] = [
   {
     slug: 'la-magie-du-titre',
+    path: '/le-livre/la-magie-du-titre',
+    menu: 'La magie du titre',
     label: 'Extrait 1',
     title: 'La magie du titre',
-    paragraphs: [
-      'Avant de retenir le titre « Une Formule », ce livre a longtemps porté un autre nom possible : La Lumière.',
-      'Les deux mots se sont disputé la couverture. Et si Formule l’a emporté, c’est qu’elle porte quelque chose que Lumière ne pouvait pas dire seule. Formule, c’est la question qui traverse chaque page de ce livre, posée ici sous trois formes. Connaissez-vous déjà cette chose que vous êtes la seule personne à pouvoir offrir au monde ? Cette capacité créative qui est déjà en vous, est-elle alignée sur vos talents, sur le fonctionnement de votre subconscient, pour se déployer d’elle-même et sans effort ? Avez-vous identifié, activé dans le bon sens, les forces et les ressources déjà à votre disposition ?',
-      'Chercher la formule, c’est chercher la lumière qui éclaire ces questions. Une étincelle suffit parfois pour changer la trajectoire d’une vie entière.',
-      'Les deux mots ne sont pas seulement proches par le sens. Formule et Lumière comptent chacun sept lettres. Et sept, ce n’est pas un hasard non plus ailleurs. La lumière blanche du soleil se décompose en sept couleurs quand elle traverse un prisme ou une goutte de pluie, du rouge au violet, chacune voyageant à sa propre longueur d’onde.',
-      'Sept lettres, sept couleurs. Deux échos qui se répondent sans qu’on ait eu besoin de forcer quoi que ce soit pour les faire coïncider.',
-      'Il y en a peut-être d’autres. Je ne les ai pas tous trouvés, et ce n’est pas grave. À vous de continuer à chercher, selon vos propres croyances, vos propres expériences. Sortez du livre si besoin, et revenez l’enrichir de ce que vous aurez trouvé. C’est exactement l’esprit dans lequel cette formule a été pensée : jamais figée, toujours à améliorer, la vôtre autant que la mienne.'
+    subtitle: 'Une Formule',
+    blocks: [
+      { k: 'p', t: 'Avant de retenir le titre « Une Formule », ce livre a longtemps porté un autre nom possible : La Lumière.' },
+      { k: 'p', t: 'Les deux mots se sont disputé la couverture. Et si Formule l’a emporté, c’est qu’elle porte quelque chose que Lumière ne pouvait pas dire seule. Formule, c’est la question qui traverse chaque page de ce livre, posée ici sous trois formes. Connaissez-vous déjà cette chose que vous êtes la seule personne à pouvoir offrir au monde ? Cette capacité créative qui est déjà en vous, est-elle alignée sur vos talents, sur le fonctionnement de votre subconscient, pour se déployer d’elle-même et sans effort ? Avez-vous identifié, activé dans le bon sens, les forces et les ressources déjà à votre disposition ?' },
+      { k: 'p', t: 'Chercher la formule, c’est chercher la lumière qui éclaire ces questions. Une étincelle suffit parfois pour changer la trajectoire d’une vie entière.' },
+      { k: 'p', t: 'Les deux mots ne sont pas seulement proches par le sens. Formule et Lumière comptent chacun sept lettres. Et sept, ce n’est pas un hasard non plus ailleurs. La lumière blanche du soleil se décompose en sept couleurs quand elle traverse un prisme ou une goutte de pluie, du rouge au violet, chacune voyageant à sa propre longueur d’onde.' },
+      { k: 'p', t: 'Sept lettres, sept couleurs. Deux échos qui se répondent sans qu’on ait eu besoin de forcer quoi que ce soit pour les faire coïncider.' },
+      { k: 'p', t: 'Il y en a peut-être d’autres. Je ne les ai pas tous trouvés, et ce n’est pas grave. À vous de continuer à chercher, selon vos propres croyances, vos propres expériences. Sortez du livre si besoin, et revenez l’enrichir de ce que vous aurez trouvé. C’est l’esprit dans lequel cette formule a été pensée : jamais figée, toujours à améliorer, la vôtre autant que la mienne.' }
     ]
   },
   {
     slug: 'note-explicative-de-la-formule',
+    path: '/le-livre/explication-de-la-formule',
+    menu: 'Explication de la formule',
     label: 'Extrait 2',
     title: 'Note explicative de la formule',
     formula: true,
-    paragraphs: [
-      'Vous l’avez déjà vue sur la couverture : Α + β = Ω. Ce n’est pas un ornement mathématique choisi pour faire sérieux. C’est un raccourci volontaire des convictions qui portent ce livre, écrit par quelqu’un qui est, entre autres titres, mathématicien.',
-      'Α, c’est vous, aujourd’hui, tel que vous êtes déjà : vos ressources, vos échecs, vos talents encore en jachère, votre histoire entière, tout ce que vous apportez à l’équation sans avoir eu besoin de le demander à personne.',
-      'β, c’est le mécanisme. Pas un mécanisme abstrait : une seule et même dynamique, qui se donne à voir sous sept facettes, une par levier de ce livre, chacune éclairant une part différente du même geste. β ne se révèle jamais en une seule fois. Il se découvre facette après facette, à votre rythme, dans l’ordre qui vous convient.',
-      'Ω, enfin, n’est pas en réalité un autre vous. C’est la version de vous qui existait déjà en germe dans Α, révélée par l’activation de β. Rien n’est ajouté de l’extérieur : l’équation ne fait que rendre visible ce qui était déjà là, en attente.',
-      'Cette équation reprend, sous une autre forme, la phrase qui traverse tout ce livre : « vous êtes l’architecte, le matériau et le magicien de votre vie ». Le matériau, c’est Α, c’est vous. Le magicien, c’est vous aussi, dès que vous actionnez le mécanisme β. Et l’architecte, celui qui dessine les plans d’Ω avant même de commencer à construire, à travers l’exercice que ce livre appelle escalader le temps, c’est encore vous, depuis le début.',
-      'Ce n’est qu’une façon de présenter la formule. Vous en trouverez peut-être une autre, la vôtre, en avançant dans ce livre.'
+    blocks: [
+      { k: 'p', t: 'Vous l’avez déjà vue sur la couverture : Α + β = Ω. Ce n’est pas un ornement mathématique choisi pour faire sérieux. C’est un raccourci volontaire des convictions qui portent ce livre, écrit par quelqu’un qui est, entre autres titres, mathématicien.' },
+      { k: 'p', t: 'Α, c’est vous, aujourd’hui, tel que vous êtes déjà : vos ressources, vos échecs, vos talents encore en jachère, votre histoire entière, tout ce que vous apportez à l’équation sans avoir eu besoin de le demander à personne.' },
+      { k: 'p', t: 'β, c’est le mécanisme. Pas un mécanisme abstrait : une seule et même dynamique, qui se donne à voir sous sept facettes, une par levier de ce livre, chacune éclairant une part différente du même geste. β ne se révèle jamais en une seule fois. Il se découvre facette après facette, à votre rythme, dans l’ordre qui vous convient.' },
+      { k: 'p', t: 'Ω, enfin, n’est pas en réalité un autre vous. C’est une version de vous qui existait déjà en germe dans Α, révélée par l’activation de β. Rien n’est ajouté de l’extérieur : l’équation ne fait que rendre visible ce qui était déjà là, en attente.' },
+      { k: 'p', t: 'Cette équation reprend, sous une autre forme, la phrase qui traverse tout ce livre : « vous êtes l’architecte, le matériau et le magicien de votre vie ». Le matériau, c’est Α, c’est vous. Le magicien, c’est vous aussi, dès que vous actionnez le mécanisme β. Et l’architecte, celui qui dessine les plans d’Ω avant même de commencer à construire, à travers l’exercice que ce livre appelle escalader le temps, c’est encore vous, depuis le début.' },
+      { k: 'p', t: 'Ce n’est qu’une façon de présenter la formule. Vous en trouverez peut-être une autre, la vôtre, en avançant dans ce livre.' },
+      { k: 'h', t: 'Ancrage mathématique de la formule' },
+      { k: 'p', t: 'Α + β = Ω se lit aussi en termes de chances, ou, en mathématiques, de probabilités. Α, c’est toujours vous, aujourd’hui, tel que vous êtes déjà. Ω, c’est vous demain, sous deux versions possibles que vous découvrirez dans ce livre : la gagnante et la perdante. Pour simplifier, à elles deux, elles totalisent 100 % des chances de se réaliser : si la gagnante en a 40 %, la perdante en a 60 %. β est constitué des mécanismes des sept leviers. Ils servent à déplacer ces chances en faveur de la version gagnante, par exemple de 40 % à 70 % (la perdante passerait alors de 60 % à 30 %). Ces chiffres ne sont là que pour fixer les idées : personne ne peut les mesurer avec précision.' },
+      { k: 'p', t: 'Une dernière précision, valable pour tout le reste du livre. Ce livre passe, parfois sans prévenir, d’un vocabulaire scientifique à un vocabulaire plus intuitif, parfois même mystique. Ce n’est pas un manque de rigueur : c’est un choix assumé. La science éclaire certains des mécanismes qui traversent ce livre ; elle ne prétend jamais prouver chacune de ses métaphores. Là où un mécanisme est documenté, il vous sera montré comme tel, avec sa source. Là où une image reste une image, elle vous sera offerte pour ce qu’elle est : un moyen de ressentir ce que la science, seule, ne fait encore qu’effleurer.' }
     ]
   },
   {
     slug: 'avant-propos',
+    path: '/le-livre/avant-propos',
+    menu: 'Avant-propos',
     label: 'Extrait 3',
     title: 'Avant-propos',
-    paragraphs: [
-      'En 1993, j’étais en deuxième année de mathématiques à l’université d’Abomey-Calavi, au Bénin, quand je suis tombé gravement malade deux semaines avant la session d’examens qui devait décider de mon maintien à la faculté. La veille des épreuves, mon pronostic vital était engagé, au point que personne, dans le service où j’étais soigné, ne pariait sur ma survie jusqu’au lendemain. J’ai demandé au corps médical l’autorisation d’aller composer. On m’a répondu, avec une pointe de moquerie, que je ferais mieux de me concentrer sur ma guérison. Mais dans mon esprit, réussir cet examen n’était plus une question de moyenne à valider, c’était devenu, littéralement, une question de survie. À l’aube du jour J, j’ai trouvé la force de quitter mon lit d’hôpital pour aller composer. Sur environ trois cents candidats, sept ont été déclarés admis. J’en faisais partie.'
-    ],
-    note: 'La suite de l’avant-propos est réservée au livre.'
+    blocks: [
+      { k: 'p', t: 'En 1993, j’étais en deuxième année de mathématiques à l’université d’Abomey-Calavi, au Bénin, quand je suis tombé gravement malade deux semaines avant la session d’examens qui devait décider de mon maintien à la faculté. La veille des épreuves, mon pronostic vital était engagé, au point que personne, dans le service où j’étais soigné, ne pariait sur ma survie jusqu’au lendemain. J’ai demandé au corps médical l’autorisation d’aller composer. On m’a répondu, avec une pointe de moquerie, que je ferais mieux de me concentrer sur ma guérison. Mais dans mon esprit, réussir cet examen n’était plus une question de moyenne à valider, c’était devenu, littéralement, une question de survie. À l’aube du jour J, j’ai trouvé la force de quitter mon lit d’hôpital pour aller composer. Sur environ trois cents candidats, sept ont été déclarés admis. J’en faisais partie.' },
+      { k: 'p', t: 'Ce n’était ni la première ni la dernière fois que ce même réflexe allait me servir. Au début des années 2000, je poursuivais mes études tout en tenant une petite boutique à Cotonou. Un ami de l’époque avait une occasion rare de partir à l’étranger, mais il lui manquait un peu plus d’un millier d’euros et le départ était imminent. Confiant dans son plan de remboursement, j’ai fermé temporairement ma boutique, réuni toutes mes économies et accepté qu’un autre ami m’avance le complément pour lui remettre la somme.' },
+      { k: 'p', t: 'Il est parti, mais le retour espéré n’a pas eu lieu. L’engagement a été rompu, la dette est restée partiellement payée, et le silence s’est installé pour longtemps. J’aurais pu nourrir du regret, de l’amertume, entrer dans une stratégie de colère. Rien de tout cela ne m’aurait construit. Plutôt que de m’attarder sur ce qui manquait et sur cette trahison apparente, je me suis reconnecté à mes forces et à mes talents. J’ai rouvert ma boutique et je l’ai reconstruite pas à pas. Cette reconstruction a fini par financer, des années plus tard, une partie des formations qui ont façonné la suite de mon parcours.' },
+      { k: 'p', t: 'Ces deux histoires, séparées de plusieurs années, disent la même chose : un choc, même injuste, même presque mortel, peut devenir le point de départ d’une force qu’on ignorait posséder, à condition de savoir où regarder plutôt que de se laisser envahir par la colère ou la peur.' },
+      { k: 'p', t: 'Il m’a fallu plus longtemps pour comprendre une autre leçon, plus discrète mais tout aussi centrale dans ce livre. J’ai longtemps confondu rester bon et rester silencieux face à ce qui me faisait du mal, comme si la moindre fermeté envers moi-même trahissait une bonté que je voulais absolue. Il m’a fallu être déçu plus d’une fois par des personnes qui prenaient ma gentillesse pour une invitation à en abuser, pour comprendre enfin que protéger sa bonté n’est pas la renier. Pendant longtemps aussi, j’ai cru que c’était à moi de changer pour que cesse ce mépris silencieux. Ce que j’ai fini par comprendre, c’est l’inverse : je ne contrôle jamais ce que l’autre décide de faire de ma bonté, mais je contrôle entièrement le regard que je porte sur elle. Le jour où j’ai arrêté de mesurer ma valeur au jugement de ceux qui en profitaient, ma façon même d’être bon a changé, et avec elle, les gens qu’elle attirait autour de moi.' },
+      { k: 'p', t: 'Je ne suis pas arrivé aux idées de ce livre par une révélation soudaine, ni par un seul diplôme accroché au mur. J’ai commencé ma carrière en 1997 comme enseignant de mathématiques, avant de passer, sur plus de vingt ans, par l’économie, l’aide à la décision, l’ingénierie et le conseil en formation (master de l’Université de Rouen), le conseil en politiques publiques, puis le coaching certifié à Genève. Dix-sept ans de terrain auprès de ministères, d’institutions internationales et d’organisations de la société civile m’ont appris à distinguer ce qui fonctionne réellement de ce qui ne fonctionne que sur le papier, avant même que je mette ces mêmes principes au service des personnes plutôt que des seules organisations. Ce livre est fait de ce même mélange : la rigueur d’un mathématicien et l’expérience vécue d’un homme qui a lui-même traversé ce qu’il décrit.' },
+      { k: 'p', t: 'Deux idées précises de ce livre, escalader le temps et la maxime qui l’accompagne, me sont venues bien avant l’idée d’écrire quoi que ce soit, au fil d’une centaine de visionnages en famille de quelques films et documentaires sur la loi de l’attraction dont The Meta Secret, Le Secret et 3 Magic Words. J’y reviens plus longuement en fin d’ouvrage. Retenez pour l’instant que ces intuitions, une fois posées, m’ont poussé à chercher ce que la science pouvait en confirmer avant d’écrire une seule ligne.' },
+      { k: 'p', t: 'Ce livre lui-même a suivi cette même leçon. Au moment d’en poser les premières idées, j’ai eu la tentation d’identifier des auteurs déjà reconnus, d’étudier leurs œuvres, et d’orienter mon propre travail dans leur continuité, en espérant qu’un partenariat avec eux lui donnerait un jour de la crédibilité. Puis j’ai compris ce que j’étais en train de faire : je cherchais sous le lampadaire du village, en demandant à la réussite des autres de me dire ce que mon propre livre devait devenir. J’ai changé d’approche. Avant de chercher autour de moi, j’ai décidé de chercher en moi, et je me suis fixé une règle simple : le lecteur d’abord, la reconnaissance ensuite. Ce que vous avez entre les mains est le résultat de cette décision.' },
+      { k: 'p', t: 'Si vous ouvrez ce livre, c’est peut-être que vous portez, vous aussi, un rêve resté trop longtemps sur le rebord. Peut-être qu’une trahison, une maladie, ou simplement le poids du quotidien vous a fait douter de vos propres forces. Peut-être qu’on vous a déjà pris pour quelqu’un de naïf parce que vous restiez bienveillant malgré tout. Ce livre est écrit pour vous.' },
+      { k: 'p', t: 'Il ne se contente pas de se lire. Chaque levier se termine par des exercices concrets, pensés pour être pratiqués et non simplement parcourus des yeux. Je vous invite à garder un carnet à portée de main pendant la lecture, à y noter ce qui vous traverse, même une phrase, même un doute. Certains passages vont vous mettre face à des vérités inconfortables sur vous-même. C’est normal, et c’est même le signe que le travail est en train de se faire.' },
+      { k: 'p', t: 'Je tiens à remercier ici toutes les personnes qui, parfois sans le savoir, ont nourri ce livre : les équipes et les institutions que j’ai accompagnées pendant dix-sept ans, mes formateurs à Rouen et à Genève, et jusqu’à cet ami resté sans nom dans ces pages, qui m’a involontairement appris ce que je n’aurais jamais choisi d’apprendre seul.' },
+      { k: 'end', t: 'Bonne lecture, et bon voyage.' },
+      { k: 'sign', t: 'Dieudonné GOSSOU' }
+    ]
   }
 ]
 
-/**
- * Rubriques du menu « Le livre ».
- * Contenu provisoire, repris des extraits : à remplacer par le texte intégral du livre.
- */
-export interface BookSection {
-  slug: string
-  label: string
-  title: string
-  lead: string
-  /** Extrait dont le texte est repris en attendant le texte du livre. */
-  excerpt: string
-}
-
-export const BOOK_SECTIONS: BookSection[] = [
-  {
-    slug: 'la-magie-du-titre',
-    label: 'La magie du titre',
-    title: 'La magie du titre',
-    lead: 'Avant de s’appeler Une Formule, ce livre a failli s’appeler La Lumière. Deux mots de sept lettres, qui se répondent.',
-    excerpt: 'la-magie-du-titre'
-  },
-  {
-    slug: 'explication-de-la-formule',
-    label: 'Explication de la formule',
-    title: 'Explication de la formule',
-    lead: 'Α + β = Ω : vous, plus le mécanisme activé un levier à la fois, égale la version de vous déjà en germe.',
-    excerpt: 'note-explicative-de-la-formule'
-  },
-  {
-    slug: 'avant-propos',
-    label: 'Avant-propos',
-    title: 'Avant-propos',
-    lead: 'Cotonou, 1993 : une session d’examens, trois cents candidats, sept admis. L’histoire d’où vient ce livre.',
-    excerpt: 'avant-propos'
-  }
-]
+/** Temps de lecture estimé, en minutes. */
+export const readingMinutes = (e: Excerpt) => Math.max(1, Math.round(e.blocks.reduce((n, b) => n + b.t.split(/\s+/).length, 0) / 220))
 
 export const AUTHOR = {
   name: 'Dieudonné Sossa Gossou',

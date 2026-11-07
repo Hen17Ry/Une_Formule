@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Menu, X, ChevronDown } from '@lucide/vue'
-import { BOOK_SECTIONS } from '~/data/book'
+import { EXCERPTS } from '~/data/book'
 
 const route = useRoute()
 const scrolled = ref(false)
@@ -13,7 +13,7 @@ interface NavLink { to: string, label: string, also?: string[], children?: NavCh
 
 const HINTS: Record<string, string> = {
   'la-magie-du-titre': 'Formule ou Lumière ?',
-  'explication-de-la-formule': 'Α + β = Ω, terme à terme',
+  'note-explicative-de-la-formule': 'Α + β = Ω, terme à terme',
   'avant-propos': 'D’où vient ce livre'
 }
 /* Cinq entrées ; « Le livre » ouvre un sous-menu. */
@@ -24,7 +24,7 @@ const links: NavLink[] = [
     also: ['/le-livre'],
     children: [
       { to: '/les-7-leviers', label: 'Les leviers', hint: 'Sept leviers, seize exercices' },
-      ...BOOK_SECTIONS.map(b => ({ to: `/le-livre/${b.slug}`, label: b.label, hint: HINTS[b.slug] ?? '' }))
+      ...EXCERPTS.map(e => ({ to: e.path, label: e.menu, hint: HINTS[e.slug] ?? '' }))
     ]
   },
   { to: '/extraits', label: 'Extraits' },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { BookOpen } from '@lucide/vue'
 import { EXCERPTS } from '~/data/book'
-const avantPropos = EXCERPTS[2]!
+const avantPropos = EXCERPTS.find(e => e.slug === 'avant-propos')!
 </script>
 
 <template>
@@ -24,7 +24,7 @@ const avantPropos = EXCERPTS[2]!
           <h3 class="mt-3 text-center font-display text-3xl">Avant-propos</h3>
           <span class="rule-gold mx-auto mt-5" aria-hidden="true" />
           <div class="relative mt-8 max-h-[19rem] overflow-hidden [mask-image:linear-gradient(#000_55%,transparent)]">
-            <p class="prose-book first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-[4.6rem] first-letter:leading-[0.8] first-letter:text-caramel">{{ avantPropos.paragraphs[0] }}</p>
+            <p class="prose-book first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-display first-letter:text-[4.6rem] first-letter:leading-[0.8] first-letter:text-caramel">{{ avantPropos.blocks[0]!.t }}</p>
           </div>
           <p class="mt-4 text-center font-sans text-[0.7rem] uppercase tracking-[0.3em] text-ink-muted">Une Formule …</p>
         </article>
