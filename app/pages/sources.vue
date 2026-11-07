@@ -48,8 +48,8 @@ const host = (url: string) => { try { return new URL(url).hostname.replace(/^www
               <p v-if="s.claim" class="mt-2 font-serif text-[1.08rem] leading-relaxed text-ink-soft"><span class="font-sans text-xs uppercase tracking-[0.18em] text-ink-muted">Dans le livre · </span>{{ s.claim }}</p>
             </div>
             <div class="flex flex-wrap items-start gap-2 md:flex-col md:items-end">
-              <a v-if="s.url" :href="s.url" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-white/70 px-4 font-sans text-sm text-ink transition-colors hover:border-caramel">
-                {{ host(s.url) || 'Publication' }} <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
+              <a v-if="s.url" :href="s.url" :title="host(s.url)" target="_blank" rel="noopener" class="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-white/70 px-4 font-sans text-sm text-ink transition-colors hover:border-caramel">
+                Lire la source <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
               </a>
               <span v-if="s.status" class="rounded-full px-3 py-1 font-sans text-xs" :class="s.status === 'consultee' ? 'bg-ok/10 text-ok' : 'bg-gold/15 text-gold-deep'">{{ STATUS[s.status] }}</span>
             </div>
