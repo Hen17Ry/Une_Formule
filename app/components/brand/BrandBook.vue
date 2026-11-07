@@ -35,7 +35,7 @@ const depth = computed(() => Math.round(props.width * 0.12))
       />
       <!-- couverture -->
       <div class="absolute inset-0 overflow-hidden rounded-r-[4px] rounded-l-[2px] shadow-book">
-        <img src="/images/couverture.webp" alt="Couverture du livre Une Formule… 7 leviers pour construire la vie que vous désirez, de Dieudonné Gossou" class="h-full w-full object-cover" :width="width" :height="height" loading="lazy" decoding="async">
+        <img src="/images/couverture.webp?v=8" alt="Couverture du livre Une Formule… 7 leviers pour construire la vie que vous désirez, de Dieudonné Gossou" class="h-full w-full object-cover" :width="width" :height="height" loading="lazy" decoding="async">
         <div class="pointer-events-none absolute inset-y-0 left-0 w-[7%] bg-gradient-to-r from-black/25 via-white/10 to-transparent" />
         <div class="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-white/15" />
       </div>

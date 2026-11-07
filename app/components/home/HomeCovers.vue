@@ -9,7 +9,7 @@ import { BACK_COVER, BOOK } from '~/data/book'
  * Un clic sur « Agrandir » ouvre la couverture en grand.
  */
 type Side = 'front' | 'back'
-const FRONT = { src: '/images/couverture.webp', sm: '/images/couverture-sm.webp', hd: '/images/couverture-hd.webp', alt: 'Première de couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou' }
+const FRONT = { src: '/images/couverture.webp?v=8', sm: '/images/couverture-sm.webp?v=8', hd: '/images/couverture-hd.webp', alt: 'Première de couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou' }
 const BACK = { src: '/images/quatrieme.webp', sm: '/images/quatrieme-sm.webp', hd: '/images/quatrieme-hd.webp', alt: 'Quatrième de couverture : Quand l’intuition et la rationalité se rejoignent' }
 
 const root = ref<HTMLElement>()

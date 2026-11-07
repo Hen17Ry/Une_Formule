@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
 /**
- * Scène WebGL du hero : le vrai modèle 3D du livre (UNE_FORMULE_BOOK_LOW.glb),
+ * Scène WebGL du hero : le vrai modèle 3D du livre (une-formule-livre-v8.glb),
  * piloté par la progression du scroll (pose + animation d’ouverture « Book_Open »).
  */
 

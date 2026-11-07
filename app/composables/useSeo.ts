@@ -4,7 +4,7 @@ export function useSeo(input: SeoInput) {
   const site = String(useRuntimeConfig().public.siteUrl).replace(/\/$/, '')
   const route = useRoute()
   const url = site + (input.path ?? route.path)
-  const image = site + (input.image ?? '/images/og-une-formule.jpg')
+  const image = site + (input.image ?? '/images/og-une-formule.jpg?v=8')
   const fullTitle = input.title.includes('Une Formule') ? input.title : `${input.title} — Une Formule`
   useSeoMeta({
     title: fullTitle,

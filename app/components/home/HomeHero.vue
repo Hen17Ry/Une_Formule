@@ -70,7 +70,7 @@ onMounted(async () => {
     applyLayout()
     mq.addEventListener('change', applyLayout)
     cleanups.push(() => mq?.removeEventListener('change', applyLayout))
-    scene.load('/models/UNE_FORMULE_BOOK_LOW.glb')
+    scene.load('/models/une-formule-livre-v8.glb')
     if (import.meta.dev) (window as any).__bookScene = scene
 
     const onResize = () => scene?.resize()
