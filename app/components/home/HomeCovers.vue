@@ -3,13 +3,13 @@ import { Maximize2, X, RotateCcw } from '@lucide/vue'
 import { BACK_COVER, BOOK } from '~/data/book'
 
 /*
- * « Recto, verso » : la première et la quatrième de couverture.
+ * « Recto, verso » : la première couverture et la quatrième de couverture.
  * Ordinateur : le livre se retourne au fil du défilement (section collante).
  * Mobile : on touche le livre pour le retourner.
  * Un clic sur « Agrandir » ouvre la couverture en grand.
  */
 type Side = 'front' | 'back'
-const FRONT = { src: '/images/couverture.webp?v=8', sm: '/images/couverture-sm.webp?v=8', hd: '/images/couverture-hd.webp', alt: 'Première de couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou' }
+const FRONT = { src: '/images/couverture.webp?v=8', sm: '/images/couverture-sm.webp?v=8', hd: '/images/couverture-hd.webp', alt: 'Première couverture : Une Formule… 7 leviers pour construire la vie que vous désirez, Α + β = Ω, Dieudonné Gossou' }
 const BACK = { src: '/images/quatrieme.webp', sm: '/images/quatrieme-sm.webp', hd: '/images/quatrieme-hd.webp', alt: 'Quatrième de couverture : Quand l’intuition et la rationalité se rejoignent' }
 
 const root = ref<HTMLElement>()
@@ -118,7 +118,7 @@ const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotate
               class="book relative block [transform-style:preserve-3d] motion-safe:transition-transform"
               :class="scrollMode ? 'duration-200 ease-out' : 'duration-[1100ms] ease-in-out-expo'"
               :style="bookStyle"
-              :aria-label="scrollMode ? `Agrandir la ${side === 'front' ? 'première' : 'quatrième'} de couverture` : 'Retourner le livre'"
+              :aria-label="scrollMode ? `Agrandir la ${side === 'front' ? 'première couverture' : 'quatrième de couverture'}` : 'Retourner le livre'"
               @click="scrollMode ? openZoom() : flip()"
             >
               <span class="face front">
@@ -173,7 +173,7 @@ const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotate
           <p class="label-gold">Le livre, recto verso</p>
           <h2 id="couverture-title" class="mt-4 font-display text-display-md">
             <Transition mode="out-in" enter-active-class="transition duration-500 ease-expo" enter-from-class="opacity-0 translate-y-3" leave-active-class="transition duration-200" leave-to-class="opacity-0 -translate-y-2">
-              <span :key="side" class="block">{{ side === 'front' ? 'Première' : 'Quatrième' }}<br>de couverture</span>
+              <span :key="side" class="block"><template v-if="side === 'front'">Première<br>couverture</template><template v-else>Quatrième<br>de couverture</template></span>
             </Transition>
           </h2>
 
@@ -207,7 +207,7 @@ const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotate
     <!-- Agrandissement -->
     <Teleport to="body">
       <Transition enter-active-class="transition duration-500 ease-expo" enter-from-class="opacity-0" leave-active-class="transition duration-300" leave-to-class="opacity-0">
-        <div v-if="zoom" class="fixed inset-0 z-[80] flex flex-col bg-paper/95 backdrop-blur-xl" role="dialog" aria-modal="true" :aria-label="zoom === 'front' ? 'Première de couverture' : 'Quatrième de couverture'" data-lenis-prevent @click.self="closeZoom">
+        <div v-if="zoom" class="fixed inset-0 z-[80] flex flex-col bg-paper/95 backdrop-blur-xl" role="dialog" aria-modal="true" :aria-label="zoom === 'front' ? 'Première couverture' : 'Quatrième de couverture'" data-lenis-prevent @click.self="closeZoom">
           <div class="flex items-center justify-between gap-3 px-4 py-4 md:px-8">
             <div class="flex rounded-full border border-line bg-white/80 p-1" role="group" aria-label="Face affichée">
               <button v-for="s in (['front', 'back'] as const)" :key="s" type="button" class="min-h-[40px] rounded-full px-4 font-sans text-[0.85rem] transition-colors" :class="zoom === s ? 'bg-copper text-[#FFFDF9]' : 'text-ink-soft hover:text-ink'" :aria-pressed="zoom === s" @click="zoom = s">
