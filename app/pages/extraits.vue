@@ -48,8 +48,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     <BrandRings class="pointer-events-none absolute -left-56 -top-32 h-[46rem] w-[46rem] opacity-40" />
     <div class="container relative">
       <header class="mx-auto max-w-3xl text-center">
-        <p v-reveal class="label-gold">Extraits du livre</p>
-        <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Ouvrir le livre, <em class="text-caramel">un peu</em>.</UiSplitReveal>
+        <p v-reveal class="label-gold">Le livre</p>
+        <UiSplitReveal tag="h1" immediate class="mt-5 font-display text-display-lg">Extraits <em class="text-caramel">éditoriaux</em> du livre</UiSplitReveal>
       </header>
 
       <div id="lecture" role="tablist" aria-label="Couvertures et extraits" class="no-scrollbar z-20 mx-auto mt-14 flex max-w-6xl flex-wrap justify-center gap-1 rounded-[26px] border border-line bg-paper/85 p-1.5 shadow-soft backdrop-blur-xl lg:sticky lg:top-[84px] lg:flex-nowrap lg:overflow-x-auto lg:rounded-full" data-lenis-prevent>
