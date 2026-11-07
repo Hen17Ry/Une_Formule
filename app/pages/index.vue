@@ -15,6 +15,7 @@ useSeo({
     <HomeTitleMagic />
     <HomeExcerpt />
     <HomeAuthor />
+    <HomeCovers />
     <HomeWhere />
     <HomeReviews />
   </div>

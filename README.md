@@ -1,6 +1,6 @@
 # Une Formule — uneformule.com
 
-Plateforme du livre **Une Formule… 7 leviers pour construire la vie que vous désirez** de Dieudonné Sossa Gossou.
+Plateforme du livre **Une Formule… 7 leviers pour construire la vie que vous désirez** de Dieudonné Gossou.
 
 - Site vitrine animé (modèle 3D du livre piloté au scroll, GSAP + Lenis), thème clair aux couleurs de la couverture.
 - **Retours des lecteurs** : un formulaire par levier (7) + un retour général, selon le document de contenu.

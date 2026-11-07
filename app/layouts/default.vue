@@ -6,7 +6,7 @@ useHead({
       '@context': 'https://schema.org',
       '@type': 'Book',
       'name': 'Une Formule… 7 leviers pour construire la vie que vous désirez',
-      'author': { '@type': 'Person', 'name': 'Dieudonné Sossa Gossou' },
+      'author': { '@type': 'Person', 'name': 'Dieudonné Gossou' },
       'inLanguage': 'fr',
       'genre': 'Développement personnel',
       'image': 'https://www.uneformule.com/images/couverture.webp'

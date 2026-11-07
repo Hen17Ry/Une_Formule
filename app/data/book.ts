@@ -8,10 +8,26 @@ export const BOOK = {
   kicker: '7 leviers pour',
   subtitle: 'Construire la vie que vous désirez',
   formula: 'Α + β = Ω',
-  author: 'Dieudonné Sossa Gossou',
+  author: 'Dieudonné Gossou',
   maxim: 'Vous êtes l’architecte, le matériau et le magicien de votre vie.',
-  hook: 'Sept leviers pour construire la vie que vous désirez, appuyés sur la science plutôt que sur la seule inspiration.',
-  backCover: 'Et si votre vie obéissait à une équation ? Une équation simple, que chacun porte en soi et que presque personne n’ose écrire.'
+  hook: 'Sept leviers pour construire la vie que vous désirez, appuyés sur la science plutôt que sur la seule inspiration.'
+}
+
+/** Quatrième de couverture (version V8), reprise telle quelle. */
+export const BACK_COVER = {
+  heading: 'Quand l’intuition et la rationalité se rejoignent',
+  intro: 'Vous aimez l’idée d’un univers qui répond à vos intentions ? Ou, avant d’essayer la loi de l’attraction, vous voulez d’abord comprendre ce que dit la science des mécanismes cérébraux en jeu ?',
+  text: 'Ce livre vous mène de l’une à l’autre. Il relie la loi de l’attraction aux découvertes des neurosciences, de la psychologie et des sciences cognitives, et en tire une méthode concrète, bâtie avec la rigueur des mathématiques.',
+  key: 'Sa clé tient en une équation toute simple, que chacun comprend :',
+  terms: [
+    { sym: 'Α', text: ', c’est vous aujourd’hui, avec votre situation, vos ressources et vos talents.' },
+    { sym: 'β', text: ', c’est le mécanisme central, activé par les 7 leviers.' },
+    { sym: 'Ω', text: ', c’est la version accomplie de vous-même, révélée quand β s’active.' }
+  ],
+  closing: 'Que vous y entriez par le raisonnement scientifique ou par la force de l’intuition, ce livre vous remet au cœur de votre transformation :',
+  quote: '« Vous êtes l’architecte, le matériau et le magicien de votre vie. »',
+  call: 'Activez le mécanisme, mettez les chances de votre côté et construisez la vie que vous désirez.',
+  author: 'Mathématicien, Dieudonné GOSSOU a d’abord enseigné les mathématiques, dès 1997. Titulaire d’un master en ingénierie et conseil en formation de l’Université de Rouen, il s’est tourné vers l’économie et l’aide à la décision, puis a passé dix-sept ans de terrain auprès de ministères, d’institutions internationales et d’organisations de la société civile. Coach certifié à Genève, il met ici sa double expertise, en mathématiques et en sciences sociales, au service de la transformation de chacun.'
 }
 
 export interface Lever {
@@ -256,7 +272,7 @@ export const EXCERPTS: Excerpt[] = [
 export const readingMinutes = (e: Excerpt) => Math.max(1, Math.round(e.blocks.reduce((n, b) => n + b.t.split(/\s+/).length, 0) / 220))
 
 export const AUTHOR = {
-  name: 'Dieudonné Sossa Gossou',
+  name: 'Dieudonné Gossou',
   photo: '/images/auteur.webp',
   photoSmall: '/images/auteur-sm.webp',
   /** Biographie : le titre du livre est mis en italique à l’affichage. */
