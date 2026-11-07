@@ -26,11 +26,6 @@ const { data: shop } = await useShop()
         <section>
           <h2 class="font-display text-3xl text-ink">Données personnelles</h2>
           <p class="mt-3">Les retours de lecteurs ne sont publiés qu’avec l’accord explicite de leur auteur, anonymement ou avec son seul prénom. L’adresse email, facultative, n’est jamais publiée : elle sert uniquement à recontacter le lecteur si besoin.</p>
-          <p v-if="shop?.salesOpen">Les informations saisies lors d’un achat direct (nom, téléphone, adresse) servent uniquement à traiter et livrer la commande.</p>
-        </section>
-        <section v-if="shop?.salesOpen">
-          <h2 class="font-display text-3xl text-ink">Vente directe</h2>
-          <p class="mt-3">Les prix de la page Commander sont indiqués en francs CFA, toutes taxes comprises. Le paiement est traité par KkiaPay (Mobile Money et carte bancaire) ; aucune donnée bancaire ne transite par ce site. Pour toute question sur une commande, indiquez sa référence (UF-…).</p>
         </section>
       </div>
     </div>

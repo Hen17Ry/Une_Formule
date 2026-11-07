@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, integer, timestamp, index, jsonb, boolean, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, varchar, integer, timestamp, index, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 export const adminUsers = pgTable('admin_users', {
   id: serial('id').primaryKey(),
@@ -29,35 +29,6 @@ export const reviews = pgTable('reviews', {
 }, table => [
   index('idx_reviews_status').on(table.status),
   index('idx_reviews_lever').on(table.lever)
-])
-
-export const orders = pgTable('orders', {
-  id: serial('id').primaryKey(),
-  reference: varchar('reference', { length: 24 }).notNull().unique(),
-  status: varchar('status', { length: 16 }).notNull().default('PENDING'), // PENDING | PAID | FAILED | CANCELLED | SHIPPED | DELIVERED
-  saleMode: varchar('sale_mode', { length: 16 }).notNull(), // PREORDER | AVAILABLE
-  firstName: varchar('first_name', { length: 120 }).notNull(),
-  lastName: varchar('last_name', { length: 120 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull(),
-  phone: varchar('phone', { length: 40 }).notNull(),
-  address: text('address').notNull(),
-  city: varchar('city', { length: 120 }).notNull(),
-  country: varchar('country', { length: 80 }).notNull(),
-  notes: text('notes'),
-  quantity: integer('quantity').notNull(),
-  unitPrice: integer('unit_price').notNull(),
-  shippingFee: integer('shipping_fee').notNull().default(0),
-  total: integer('total').notNull(),
-  currency: varchar('currency', { length: 8 }).notNull().default('XOF'),
-  transactionId: varchar('transaction_id', { length: 80 }),
-  paymentMethod: varchar('payment_method', { length: 40 }),
-  paidAt: timestamp('paid_at', { withTimezone: true }),
-  adminNote: text('admin_note'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull()
-}, table => [
-  index('idx_orders_status').on(table.status),
-  uniqueIndex('uq_orders_transaction').on(table.transactionId)
 ])
 
 export const settings = pgTable('settings', {

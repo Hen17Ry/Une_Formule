@@ -1,11 +1,10 @@
 /**
- * Diagnostic de production : base de données, tables, Redis, KkiaPay.
+ * Diagnostic de production : base de données, tables, Redis.
  * Ne renvoie aucun secret ; ouvrir https://<domaine>/api/health en cas d’« Erreur serveur ».
  */
 const EXPECTED: Record<string, string[]> = {
   admin_users: ['id', 'email', 'password_hash', 'role', 'created_at'],
   reviews: ['id', 'kind', 'lever', 'practiced', 'rating', 'consent', 'first_name', 'email', 'answers', 'public_quote', 'status', 'featured', 'moderated_by', 'moderated_at', 'created_at', 'updated_at'],
-  orders: ['id', 'reference', 'status', 'sale_mode', 'first_name', 'last_name', 'email', 'phone', 'address', 'city', 'country', 'notes', 'quantity', 'unit_price', 'shipping_fee', 'total', 'currency', 'transaction_id', 'payment_method', 'paid_at', 'admin_note', 'created_at', 'updated_at'],
   settings: ['key', 'value', 'updated_at'],
   events: ['id', 'entity', 'entity_id', 'action', 'actor', 'created_at']
 }
@@ -16,7 +15,6 @@ export default defineApiHandler(async (event) => {
   const report: Record<string, any> = {
     storage: store.kind,
     database: store.kind === 'postgres' ? 'connectée' : 'NON connectée (stockage fichier temporaire)',
-    kkiapay: (() => { const k = kkiapayConfig(); return { configured: k.ready, sandbox: k.sandbox } })(),
     redis: process.env.REDIS_URL || process.env.KV_URL ? 'défini' : 'non défini'
   }
   if (store.kind === 'file' && lastDbError) report.databaseError = lastDbError
@@ -44,6 +42,6 @@ export default defineApiHandler(async (event) => {
       report.tablesError = { code: err?.code, message: String(err?.message || '').slice(0, 200) }
     }
   }
-  report.ok = store.kind === 'postgres' && !report.tablesError && Object.values(report.tables || {}).every(v => v === 'ok') && report.kkiapay.configured
+  report.ok = store.kind === 'postgres' && !report.tablesError && Object.values(report.tables || {}).every(v => v === 'ok')
   return report
 })

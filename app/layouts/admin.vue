@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LayoutDashboard, MessageSquareQuote, Package, Settings, LogOut, ExternalLink, Menu, X, KeyRound, BookMarked } from '@lucide/vue'
+import { LayoutDashboard, MessageSquareQuote, Settings, LogOut, ExternalLink, Menu, X, KeyRound } from '@lucide/vue'
 
 const route = useRoute()
 const open = ref(false)
@@ -11,8 +11,6 @@ provide('refreshOverview', refresh)
 const nav = computed(() => [
   { to: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, exact: true },
   { to: '/admin/avis', label: 'Avis des lecteurs', icon: MessageSquareQuote, badge: overview.value?.reviews?.pending },
-  { to: '/admin/commandes', label: 'Commandes', icon: Package, badge: overview.value?.orders?.toShip },
-  { to: '/admin/sources', label: 'Sources', icon: BookMarked },
   { to: '/admin/reglages', label: 'Réglages', icon: Settings },
   { to: '/admin/acces', label: 'Accès', icon: KeyRound }
 ])
@@ -67,9 +65,8 @@ useHead({ title: 'Administration — Une Formule', meta: [{ name: 'robots', cont
         <span class="w-11" />
       </header>
       <main class="mx-auto max-w-7xl px-5 py-8 md:px-10 md:py-12">
-        <div v-if="overview && (overview.storage === 'file' || !overview.paymentReady)" class="mb-8 space-y-2">
-          <p v-if="overview.storage === 'file'" class="rounded-2xl border border-gold/40 bg-gold/10 px-5 py-3 text-sm text-ink-soft"><strong>Base de données non connectée :</strong> les données sont stockées dans un fichier local. En production, définissez <code>DATABASE_URL</code> (PostgreSQL).</p>
-          <p v-if="!overview.paymentReady" class="rounded-2xl border border-gold/40 bg-gold/10 px-5 py-3 text-sm text-ink-soft"><strong>Paiement non configuré :</strong> ajoutez les clés KkiaPay (voir Réglages) pour ouvrir les commandes en ligne.</p>
+        <div v-if="overview && overview.storage === 'file'" class="mb-8 space-y-2">
+          <p class="rounded-2xl border border-gold/40 bg-gold/10 px-5 py-3 text-sm text-ink-soft"><strong>Base de données non connectée :</strong> les données sont stockées dans un fichier local. En production, définissez <code>DATABASE_URL</code> (PostgreSQL).</p>
         </div>
         <slot />
       </main>

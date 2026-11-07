@@ -34,65 +34,19 @@ export interface PublicReview {
   date: string
 }
 
-export type OrderStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'SHIPPED' | 'DELIVERED'
-export type SaleMode = 'PREORDER' | 'AVAILABLE'
-
-export interface Order {
-  id: number
-  reference: string
-  status: OrderStatus
-  saleMode: SaleMode
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  address: string
-  city: string
-  country: string
-  notes: string | null
-  quantity: number
-  unitPrice: number
-  shippingFee: number
-  total: number
-  currency: string
-  transactionId: string | null
-  paymentMethod: string | null
-  paidAt: string | Date | null
-  adminNote: string | null
-  createdAt: string | Date
-  updatedAt: string | Date
-}
-
 /** Lien vers une plateforme où acheter le livre (TheBookEdition, Amazon…). */
 export interface PlatformLink {
   label: string
   url: string
 }
 
-export interface ShopSettings {
-  /** Prix unitaire en FCFA (KkiaPay encaisse en XOF). */
-  priceXof: number
-  /** Prix barré facultatif (FCFA). */
-  compareAtXof: number | null
-  saleMode: SaleMode
-  salesOpen: boolean
-  shippingFeeXof: number
-  /** Stock restant ; null = illimité. */
-  stock: number | null
-  maxPerOrder: number
-  edition: string
-  deliveryNote: string
-  preorderNote: string
-  /** Section « Où trouver le livre ». */
+/** Réglages du site, modifiables dans l’admin. */
+export interface SiteSettings {
+  /** Section « Où trouver le livre » : un bouton par plateforme. */
   platformLinks: PlatformLink[]
   /** Adresse de contact publique (mentions légales, pied de page). */
   contactEmail: string
   isbn: string
-}
-
-export interface PublicSettings extends ShopSettings {
-  paymentReady: boolean
-  sandbox: boolean
 }
 
 export interface AppEvent {
@@ -102,23 +56,4 @@ export interface AppEvent {
   action: string
   actor: string
   createdAt: string | Date
-}
-
-/* ───────────── Sources ───────────── */
-
-/** '' : à préciser · consultee : publication lue · connue : non consultée, largement connue. */
-export type SourceStatus = '' | 'consultee' | 'connue'
-
-export interface SourceEntry {
-  id: string
-  /** Levier concerné (1 à 7), ou null pour le livre entier. */
-  lever: number | null
-  name: string
-  /** Référence bibliographique courte (auteurs, année, revue). */
-  reference: string
-  /** Ce que dit le livre. */
-  claim: string
-  /** Lien officiel (DOI, éditeur, institution). */
-  url: string
-  status: SourceStatus
 }

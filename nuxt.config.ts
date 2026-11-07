@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Les secrets (KkiaPay, session) sont lus directement dans process.env côté serveur :
+    // Les secrets (base de données, session) sont lus directement dans process.env côté serveur :
     // voir server/utils/env.ts. Rien de secret n’est exposé au navigateur.
     public: {
       siteUrl,
@@ -58,6 +58,10 @@ export default defineNuxtConfig({
     '/articles': { redirect: { to: '/', statusCode: 301 } },
     '/articles/**': { redirect: { to: '/', statusCode: 301 } },
     '/questions': { redirect: { to: '/faq', statusCode: 301 } },
+    // Plus de vente sur le site : le livre se commande sur les plateformes.
+    '/commander': { redirect: { to: '/#ou-trouver', statusCode: 301 } },
+    '/commander/**': { redirect: { to: '/#ou-trouver', statusCode: 301 } },
+    '/sources': { redirect: { to: '/', statusCode: 301 } },
     '/admin/**': { ssr: false, headers: { 'x-robots-tag': 'noindex, nofollow' } },
     '/admin': { ssr: false, headers: { 'x-robots-tag': 'noindex, nofollow' } },
     '/api/**': { headers: { 'x-robots-tag': 'noindex' } },

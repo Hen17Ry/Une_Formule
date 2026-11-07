@@ -55,7 +55,7 @@ if (url) {
   console.log(res.rows[0]?.created ? `✓ Administrateur créé : ${email}` : `✓ Mot de passe mis à jour : ${email}`)
 } else {
   const file = path.join(root, '.data', 'une-formule.json')
-  const data = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { adminUsers: [], reviews: [], orders: [], settings: {}, events: [] }
+  const data = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { adminUsers: [], reviews: [], settings: {}, events: [] }
   data.adminUsers ??= []
   const existing = data.adminUsers.find(u => u.email === email)
   if (existing) existing.passwordHash = passwordHash

@@ -27,7 +27,6 @@ const links = [
         <div>
           <ul class="space-y-3 text-[0.95rem]">
             <li><NuxtLink to="/#ou-trouver" class="link-underline text-ink-soft hover:text-ink">Où trouver le livre</NuxtLink></li>
-            <li><NuxtLink to="/sources" class="link-underline text-ink-soft hover:text-ink">À propos des sources</NuxtLink></li>
             <li><NuxtLink to="/avis" class="link-underline text-ink-soft hover:text-ink">Avis publiés</NuxtLink></li>
             <li><NuxtLink to="/mentions-legales" class="link-underline text-ink-soft hover:text-ink">Mentions légales</NuxtLink></li>
             <li v-if="shop?.contactEmail"><a :href="`mailto:${shop.contactEmail}`" class="link-underline text-ink-soft hover:text-ink">{{ shop.contactEmail }}</a></li>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight, Star, Check, EyeOff } from '@lucide/vue'
-import { LEVERS, formatXof } from '~/data/book'
+import { LEVERS } from '~/data/book'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { data, refresh } = useFetch<any>('/api/admin/overview', { server: false, key: 'admin-overview' })
@@ -23,7 +23,6 @@ async function quick(id: number, status: 'APPROVED' | 'REJECTED') {
 
 const EVENT_LABELS: Record<string, string> = {
   'review:created': 'Nouvel avis reçu', 'review:approved': 'Avis rendu visible', 'review:hidden': 'Avis masqué', 'review:reset': 'Avis remis en attente', 'review:edited': 'Avis modifié', 'review:deleted': 'Avis supprimé',
-  'order:created': 'Commande créée', 'order:paid': 'Paiement confirmé', 'order:status_shipped': 'Commande expédiée', 'order:status_delivered': 'Commande livrée', 'order:status_cancelled': 'Commande annulée', 'order:note': 'Note ajoutée',
   'settings:updated': 'Réglages mis à jour', 'auth:login': 'Connexion admin'
 }
 const eventLabel = (e: any) => EVENT_LABELS[`${e.entity}:${e.action}`] || `${e.entity} · ${e.action}`
@@ -36,14 +35,13 @@ const eventLabel = (e: any) => EVENT_LABELS[`${e.entity}:${e.action}`] || `${e.e
         <p class="label">Tableau de bord</p>
         <h1 class="mt-2 font-display text-[2.6rem] leading-tight">Bonjour.</h1>
       </div>
-      <p v-if="data" class="text-sm text-ink-muted">Mode de vente : <strong class="text-ink">{{ data.settings.saleMode === 'PREORDER' ? 'Précommande' : 'Disponible' }}</strong> · {{ formatXof(data.settings.priceXof) }}</p>
     </header>
 
-    <div v-if="!data" class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <div v-for="i in 4" :key="i" class="h-32 animate-pulse rounded-[24px] bg-white/70" />
+    <div v-if="!data" class="mt-10 grid gap-4 sm:grid-cols-3">
+      <div v-for="i in 3" :key="i" class="h-32 animate-pulse rounded-[24px] bg-white/70" />
     </div>
     <template v-else>
-      <div class="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="mt-10 grid gap-4 sm:grid-cols-3">
         <NuxtLink to="/admin/avis?status=PENDING" class="group rounded-[24px] border border-line bg-white p-6 shadow-soft transition-shadow hover:shadow-lift">
           <p class="label">Avis en attente</p>
           <p class="mt-3 font-display text-5xl">{{ data.reviews.pending }}</p>
@@ -54,16 +52,11 @@ const eventLabel = (e: any) => EVENT_LABELS[`${e.entity}:${e.action}`] || `${e.e
           <p class="mt-3 flex items-baseline gap-2 font-display text-5xl">{{ data.reviews.average ? String(data.reviews.average).replace('.', ',') : '—' }}<Star class="h-6 w-6 fill-gold text-gold-deep" :stroke-width="1.4" aria-hidden="true" /></p>
           <p class="mt-2 text-sm text-ink-muted">{{ data.reviews.total }} avis · {{ data.reviews.approved }} visibles</p>
         </div>
-        <NuxtLink to="/admin/commandes?status=PAID" class="group rounded-[24px] border border-line bg-white p-6 shadow-soft transition-shadow hover:shadow-lift">
-          <p class="label">Commandes payées</p>
-          <p class="mt-3 font-display text-5xl">{{ data.orders.paid }}</p>
-          <p class="mt-2 flex items-center gap-1 text-sm text-ink-muted">{{ data.orders.toShip }} à expédier <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></p>
+        <NuxtLink to="/admin/reglages" class="group rounded-[24px] p-6 text-[#FFFDF9] shadow-soft [background:var(--cover-soft)]">
+          <p class="font-sans text-[0.72rem] font-medium uppercase tracking-label text-white/85">Où trouver le livre</p>
+          <p class="mt-3 font-display text-5xl">{{ data.settings.platformLinks.length }}</p>
+          <p class="mt-2 flex items-center gap-1 text-sm text-white/90">{{ data.settings.platformLinks.length ? `plateforme${data.settings.platformLinks.length > 1 ? 's' : ''} en ligne` : 'Aucun lien pour l’instant' }} <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></p>
         </NuxtLink>
-        <div class="rounded-[24px] p-6 text-[#FFFDF9] shadow-soft [background:var(--cover-soft)]">
-          <p class="font-sans text-[0.72rem] font-medium uppercase tracking-label text-white/85">Chiffre d’affaires</p>
-          <p class="mt-3 font-display text-[2.4rem] leading-tight">{{ formatXof(data.orders.revenue) }}</p>
-          <p class="mt-2 text-sm text-white/90">{{ data.orders.copies }} exemplaire{{ data.orders.copies > 1 ? 's' : '' }} vendu{{ data.orders.copies > 1 ? 's' : '' }}</p>
-        </div>
       </div>
 
       <div class="mt-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">
@@ -101,28 +94,6 @@ const eventLabel = (e: any) => EVENT_LABELS[`${e.entity}:${e.action}`] || `${e.e
       </div>
 
       <div class="mt-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">
-        <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="orders-title">
-          <div class="flex items-center justify-between">
-            <h2 id="orders-title" class="font-display text-2xl">Dernières commandes</h2>
-            <NuxtLink to="/admin/commandes" class="text-sm text-copper hover:underline">Tout voir</NuxtLink>
-          </div>
-          <ul v-if="data.orders.latest.length" class="mt-5 divide-y divide-line">
-            <li v-for="o in data.orders.latest" :key="o.id">
-              <NuxtLink :to="`/admin/commandes?id=${o.id}`" class="flex flex-wrap items-center justify-between gap-3 py-4">
-                <div>
-                  <p class="font-medium text-ink">{{ o.firstName }} {{ o.lastName }} <span class="font-normal text-ink-muted">· {{ o.city }}</span></p>
-                  <p class="text-xs text-ink-muted">{{ o.reference }} · {{ fmtDate(o.createdAt) }}</p>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="tabular-nums">{{ formatXof(o.total) }}</span>
-                  <span class="rounded-full px-3 py-1 text-xs" :class="ORDER_STATUS[o.status]?.cls">{{ ORDER_STATUS[o.status]?.label }}</span>
-                </div>
-              </NuxtLink>
-            </li>
-          </ul>
-          <p v-else class="mt-6 rounded-2xl bg-paper-2/60 px-5 py-8 text-center text-sm text-ink-muted">Aucune commande pour l’instant.</p>
-        </section>
-
         <section class="rounded-[24px] border border-line bg-white p-6 shadow-soft md:p-8" aria-labelledby="activity-title">
           <h2 id="activity-title" class="font-display text-2xl">Activité</h2>
           <ol v-if="data.events.length" class="mt-5 space-y-4">

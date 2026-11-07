@@ -4,38 +4,34 @@ import pg from 'pg'
 import fs from 'node:fs'
 import path from 'node:path'
 import * as schema from '../db/schema'
-import type { AppEvent, Order, OrderStatus, Review, ReviewStatus, ShopSettings } from '#shared/types'
+import type { AppEvent, Review, ReviewStatus, SiteSettings } from '#shared/types'
 
 /* ───────────────────────────────────────────────────────────────
    Stockage : PostgreSQL (production) ou fichier JSON local (dev).
    La même API est exposée dans les deux cas.
    ─────────────────────────────────────────────────────────────── */
 
-export const DEFAULT_SETTINGS: ShopSettings = {
-  priceXof: 32000,
-  compareAtXof: null,
-  saleMode: 'PREORDER',
-  salesOpen: true,
-  shippingFeeXof: 0,
-  stock: null,
-  maxPerOrder: 10,
-  edition: 'Édition originale',
-  deliveryNote: 'Livraison offerte à Cotonou et environs. Envoi possible partout au Bénin et dans la sous-région.',
-  preorderNote: 'Précommande : votre exemplaire vous est expédié dès la sortie officielle du livre.',
+export const DEFAULT_SETTINGS: SiteSettings = {
   platformLinks: [],
   contactEmail: '',
   isbn: ''
+}
+
+/** Ne garde que les réglages connus (les anciennes valeurs de vente sont ignorées). */
+function pickSettings(v: Partial<SiteSettings> | null | undefined): SiteSettings {
+  return {
+    platformLinks: Array.isArray(v?.platformLinks) ? v!.platformLinks : DEFAULT_SETTINGS.platformLinks,
+    contactEmail: typeof v?.contactEmail === 'string' ? v.contactEmail : DEFAULT_SETTINGS.contactEmail,
+    isbn: typeof v?.isbn === 'string' ? v.isbn : DEFAULT_SETTINGS.isbn
+  }
 }
 
 export interface AdminUser { id: number, email: string, passwordHash: string, role: string, createdAt?: string | Date }
 
 export type NewReview = Omit<Review, 'id' | 'status' | 'featured' | 'moderatedBy' | 'moderatedAt' | 'createdAt' | 'updatedAt' | 'publicQuote'> & { publicQuote?: string | null }
 export type ReviewPatch = Partial<Pick<Review, 'status' | 'publicQuote' | 'featured' | 'firstName'>>
-export type NewOrder = Omit<Order, 'id' | 'status' | 'transactionId' | 'paymentMethod' | 'paidAt' | 'adminNote' | 'createdAt' | 'updatedAt'>
-export type OrderPatch = Partial<Pick<Order, 'status' | 'adminNote' | 'transactionId' | 'paymentMethod' | 'paidAt'>>
 
 export interface ReviewFilters { status?: ReviewStatus, lever?: number | 'GENERAL', q?: string }
-export interface OrderFilters { status?: OrderStatus, q?: string }
 
 export interface Store {
   readonly kind: 'postgres' | 'file'
@@ -46,9 +42,6 @@ export interface Store {
 
   /** Valeur technique persistée (ex. secret de session) ; créée une seule fois si absente. */
   ensureKv<T>(key: string, create: () => T): Promise<T>
-  /** Valeur persistée par clé (null si absente). */
-  getKv<T>(key: string): Promise<T | null>
-  setKv<T>(key: string, value: T): Promise<T>
 
   createReview(input: NewReview): Promise<Review>
   getReview(id: number): Promise<Review | null>
@@ -56,15 +49,8 @@ export interface Store {
   updateReview(id: number, patch: ReviewPatch, actor: string): Promise<Review | null>
   deleteReview(id: number): Promise<boolean>
 
-  createOrder(input: NewOrder): Promise<Order>
-  getOrderByRef(ref: string): Promise<Order | null>
-  getOrderById(id: number): Promise<Order | null>
-  getOrderByTransaction(transactionId: string): Promise<Order | null>
-  listOrders(f?: OrderFilters): Promise<Order[]>
-  updateOrder(id: number, patch: OrderPatch): Promise<Order | null>
-
-  getSettings(): Promise<ShopSettings>
-  saveSettings(next: ShopSettings): Promise<ShopSettings>
+  getSettings(): Promise<SiteSettings>
+  saveSettings(next: SiteSettings): Promise<SiteSettings>
 
   logEvent(e: Omit<AppEvent, 'id' | 'createdAt'>): Promise<void>
   listEvents(limit?: number): Promise<AppEvent[]>
@@ -102,33 +88,6 @@ CREATE TABLE IF NOT EXISTS reviews (
 );
 CREATE INDEX IF NOT EXISTS idx_reviews_status ON reviews(status);
 CREATE INDEX IF NOT EXISTS idx_reviews_lever ON reviews(lever);
-CREATE TABLE IF NOT EXISTS orders (
-  id SERIAL PRIMARY KEY,
-  reference VARCHAR(24) UNIQUE NOT NULL,
-  status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
-  sale_mode VARCHAR(16) NOT NULL,
-  first_name VARCHAR(120) NOT NULL,
-  last_name VARCHAR(120) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  phone VARCHAR(40) NOT NULL,
-  address TEXT NOT NULL,
-  city VARCHAR(120) NOT NULL,
-  country VARCHAR(80) NOT NULL,
-  notes TEXT NULL,
-  quantity INT NOT NULL,
-  unit_price INT NOT NULL,
-  shipping_fee INT NOT NULL DEFAULT 0,
-  total INT NOT NULL,
-  currency VARCHAR(8) NOT NULL DEFAULT 'XOF',
-  transaction_id VARCHAR(80) NULL,
-  payment_method VARCHAR(40) NULL,
-  paid_at TIMESTAMPTZ NULL,
-  admin_note TEXT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
-CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_transaction ON orders(transaction_id);
 CREATE TABLE IF NOT EXISTS settings (
   key VARCHAR(64) PRIMARY KEY,
   value JSONB NOT NULL,
@@ -177,16 +136,6 @@ class PgStore implements Store {
     return saved!.value as T
   }
 
-  async getKv<T>(key: string): Promise<T | null> {
-    const [row] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, key))
-    return row ? (row.value as T) : null
-  }
-
-  async setKv<T>(key: string, value: T): Promise<T> {
-    await this.db.insert(schema.settings).values({ key, value: value as any, updatedAt: now() })
-      .onConflictDoUpdate({ target: schema.settings.key, set: { value: value as any, updatedAt: now() } })
-    return value
-  }
 
   async createReview(input: NewReview) {
     const [row] = await this.db.insert(schema.reviews).values({ ...input, status: 'PENDING' }).returning()
@@ -231,60 +180,12 @@ class PgStore implements Store {
     return rows.length > 0
   }
 
-  async createOrder(input: NewOrder) {
-    const [row] = await this.db.insert(schema.orders).values({ ...input, status: 'PENDING' }).returning()
-    return row as Order
-  }
-
-  async getOrderByRef(ref: string) {
-    const [row] = await this.db.select().from(schema.orders).where(eq(schema.orders.reference, ref))
-    return (row as Order) ?? null
-  }
-
-  async getOrderById(id: number) {
-    const [row] = await this.db.select().from(schema.orders).where(eq(schema.orders.id, id))
-    return (row as Order) ?? null
-  }
-
-  async getOrderByTransaction(transactionId: string) {
-    const [row] = await this.db.select().from(schema.orders).where(eq(schema.orders.transactionId, transactionId))
-    return (row as Order) ?? null
-  }
-
-  async listOrders(f: OrderFilters = {}) {
-    const where: SQL[] = []
-    if (f.status) where.push(eq(schema.orders.status, f.status))
-    if (f.q) {
-      const like = `%${f.q}%`
-      where.push(or(
-        ilike(schema.orders.reference, like),
-        ilike(schema.orders.firstName, like),
-        ilike(schema.orders.lastName, like),
-        ilike(schema.orders.email, like),
-        ilike(schema.orders.phone, like),
-        ilike(schema.orders.city, like)
-      )!)
-    }
-    const rows = await this.db.select().from(schema.orders)
-      .where(where.length ? and(...where) : undefined)
-      .orderBy(desc(schema.orders.createdAt))
-      .limit(2000)
-    return rows as Order[]
-  }
-
-  async updateOrder(id: number, patch: OrderPatch) {
-    const [row] = await this.db.update(schema.orders)
-      .set({ ...patch, paidAt: patch.paidAt ? new Date(patch.paidAt) : patch.paidAt, updatedAt: now() } as any)
-      .where(eq(schema.orders.id, id)).returning()
-    return (row as Order) ?? null
-  }
-
   async getSettings() {
     const [row] = await this.db.select().from(schema.settings).where(eq(schema.settings.key, 'shop'))
-    return { ...DEFAULT_SETTINGS, ...((row?.value as Partial<ShopSettings>) ?? {}) }
+    return pickSettings(row?.value as Partial<SiteSettings>)
   }
 
-  async saveSettings(next: ShopSettings) {
+  async saveSettings(next: SiteSettings) {
     await this.db.insert(schema.settings).values({ key: 'shop', value: next, updatedAt: now() })
       .onConflictDoUpdate({ target: schema.settings.key, set: { value: next, updatedAt: now() } })
     return next
@@ -311,14 +212,13 @@ interface FileData {
   kv?: Record<string, unknown>
   adminUsers: AdminUser[]
   reviews: Review[]
-  orders: Order[]
-  settings: Partial<ShopSettings>
+  settings: Partial<SiteSettings>
   events: AppEvent[]
 }
 
 class FileStore implements Store {
   readonly kind = 'file' as const
-  private data: FileData = { adminUsers: [], reviews: [], orders: [], settings: {}, events: [] }
+  private data: FileData = { adminUsers: [], reviews: [], settings: {}, events: [] }
 
   constructor(private file: string) {
     try {
@@ -372,16 +272,6 @@ class FileStore implements Store {
     return this.data.kv[key] as T
   }
 
-  async getKv<T>(key: string): Promise<T | null> {
-    return (this.data.kv?.[key] as T) ?? null
-  }
-
-  async setKv<T>(key: string, value: T): Promise<T> {
-    this.data.kv ??= {}
-    this.data.kv[key] = value
-    this.save()
-    return value
-  }
 
   async createReview(input: NewReview) {
     const t = now().toISOString()
@@ -430,46 +320,8 @@ class FileStore implements Store {
     return this.data.reviews.length < before
   }
 
-  async createOrder(input: NewOrder) {
-    const t = now().toISOString()
-    const order: Order = {
-      ...input,
-      id: this.nextId(this.data.orders),
-      status: 'PENDING',
-      transactionId: null,
-      paymentMethod: null,
-      paidAt: null,
-      adminNote: null,
-      createdAt: t,
-      updatedAt: t
-    }
-    this.data.orders.unshift(order)
-    this.save()
-    return order
-  }
-
-  async getOrderByRef(ref: string) { return this.data.orders.find(o => o.reference === ref) ?? null }
-  async getOrderById(id: number) { return this.data.orders.find(o => o.id === id) ?? null }
-  async getOrderByTransaction(tx: string) { return this.data.orders.find(o => o.transactionId === tx) ?? null }
-
-  async listOrders(f: OrderFilters = {}) {
-    const q = f.q?.toLowerCase()
-    return this.data.orders
-      .filter(o => !f.status || o.status === f.status)
-      .filter(o => !q || [o.reference, o.firstName, o.lastName, o.email, o.phone, o.city].join(' ').toLowerCase().includes(q))
-      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-  }
-
-  async updateOrder(id: number, patch: OrderPatch) {
-    const o = this.data.orders.find(x => x.id === id)
-    if (!o) return null
-    Object.assign(o, patch, { updatedAt: now().toISOString() })
-    this.save()
-    return o
-  }
-
-  async getSettings() { return { ...DEFAULT_SETTINGS, ...this.data.settings } }
-  async saveSettings(next: ShopSettings) { this.data.settings = next; this.save(); return next }
+  async getSettings() { return pickSettings(this.data.settings) }
+  async saveSettings(next: SiteSettings) { this.data.settings = next; this.save(); return next }
 
   async logEvent(e: Omit<AppEvent, 'id' | 'createdAt'>) {
     this.data.events.unshift({ ...e, id: this.nextId(this.data.events), createdAt: now().toISOString() })

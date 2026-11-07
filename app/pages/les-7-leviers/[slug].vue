@@ -53,7 +53,6 @@ useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.me
           <ul v-reveal.stagger class="mt-6 flex flex-wrap gap-2">
             <li v-for="r in l.references" :key="r" class="rounded-full border border-line bg-white/70 px-4 py-2 font-sans text-sm text-ink-soft">{{ r }}</li>
           </ul>
-          <NuxtLink :to="`/sources#levier-${l.n}`" class="link-underline mt-5 inline-block font-sans text-[0.95rem] text-copper">Liens et détails des sources →</NuxtLink>
           <p v-if="l.echo" v-reveal class="mt-8 rounded-[22px] bg-paper-2 px-6 py-5 font-serif text-[1.05rem] leading-relaxed text-ink-soft"><span class="font-sans text-xs uppercase tracking-[0.2em] text-ink-muted">Un écho extérieur · </span>{{ l.echo }}</p>
         </section>
 
@@ -82,7 +81,7 @@ useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.me
           </div>
           <div class="rounded-[28px] border border-line bg-white/70 p-7">
             <p class="font-display text-[1.5rem] leading-tight">Le livre complet</p>
-            <p class="mt-2 font-sans text-sm text-ink-muted">Sept leviers, seize exercices, une section Sources.</p>
+            <p class="mt-2 font-sans text-sm text-ink-muted">Sept leviers, seize exercices.</p>
             <UiButton to="/#ou-trouver" size="sm" class="mt-5">Où trouver le livre</UiButton>
           </div>
         </div>

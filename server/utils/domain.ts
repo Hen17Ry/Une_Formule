@@ -1,5 +1,4 @@
-import crypto from 'node:crypto'
-import type { Order, PublicReview, PublicSettings, Review, ShopSettings } from '#shared/types'
+import type { PublicReview, Review } from '#shared/types'
 
 /* ───────────── Texte ───────────── */
 
@@ -41,35 +40,3 @@ export function toPublicReview(r: Review): PublicReview {
     date: new Date(r.moderatedAt || r.createdAt).toISOString()
   }
 }
-
-/* ───────────── Boutique ───────────── */
-
-export function toPublicSettings(s: ShopSettings): PublicSettings {
-  const { ready, sandbox } = kkiapayConfig()
-  return { ...s, paymentReady: ready, sandbox }
-}
-
-export function newOrderReference() {
-  const d = new Date()
-  const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
-  const rand = crypto.randomBytes(3).toString('hex').toUpperCase()
-  return `UF-${ymd}-${rand}`
-}
-
-/** Vue publique d’une commande : jamais l’adresse complète ni le téléphone. */
-export function toPublicOrder(o: Order) {
-  return {
-    reference: o.reference,
-    status: o.status,
-    saleMode: o.saleMode,
-    firstName: o.firstName,
-    email: o.email.replace(/^(.).*(@.*)$/, '$1•••$2'),
-    quantity: o.quantity,
-    total: o.total,
-    currency: o.currency,
-    paidAt: o.paidAt,
-    createdAt: o.createdAt
-  }
-}
-
-export const PAID_STATUSES = ['PAID', 'SHIPPED', 'DELIVERED'] as const

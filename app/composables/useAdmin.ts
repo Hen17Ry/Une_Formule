@@ -27,14 +27,6 @@ export const REVIEW_STATUS: Record<string, { label: string, cls: string }> = {
   REJECTED: { label: 'Masqué', cls: 'bg-ink/[.06] text-ink-muted' }
 }
 
-export const ORDER_STATUS: Record<string, { label: string, cls: string }> = {
-  PENDING: { label: 'Paiement en attente', cls: 'bg-gold/15 text-gold-deep' },
-  PAID: { label: 'Payée · à expédier', cls: 'bg-copper/10 text-copper' },
-  SHIPPED: { label: 'Expédiée', cls: 'bg-[#4F7A86]/15 text-[#3d6470]' },
-  DELIVERED: { label: 'Livrée', cls: 'bg-ok/10 text-ok' },
-  FAILED: { label: 'Échec paiement', cls: 'bg-danger/10 text-danger' },
-  CANCELLED: { label: 'Annulée', cls: 'bg-ink/[.06] text-ink-muted' }
-}
 
 export const fmtDate = (d: string | Date | null | undefined, withTime = true) =>
   d ? new Date(d).toLocaleString('fr-FR', withTime ? { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' } : { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
