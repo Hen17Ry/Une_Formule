@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Menu, X } from '@lucide/vue'
+import { Menu, X, ChevronDown } from '@lucide/vue'
+import { BOOK_SECTIONS } from '~/data/book'
 
 const route = useRoute()
 const scrolled = ref(false)
@@ -7,27 +8,57 @@ const hidden = ref(false)
 const menuOpen = ref(false)
 const { $stopScroll, $startScroll } = useNuxtApp()
 
-/* Cinq entrées, pas de sous-menu. */
-const links = [
-  { to: '/les-7-leviers', label: 'Le livre' },
+interface NavChild { to: string, label: string, hint: string }
+interface NavLink { to: string, label: string, also?: string[], children?: NavChild[] }
+
+const HINTS: Record<string, string> = {
+  'la-magie-du-titre': 'Formule ou Lumière ?',
+  'explication-de-la-formule': 'Α + β = Ω, terme à terme',
+  'avant-propos': 'D’où vient ce livre'
+}
+/* Cinq entrées ; « Le livre » ouvre un sous-menu. */
+const links: NavLink[] = [
+  {
+    to: '/les-7-leviers',
+    label: 'Le livre',
+    also: ['/le-livre'],
+    children: [
+      { to: '/les-7-leviers', label: 'Les leviers', hint: 'Sept leviers, seize exercices' },
+      ...BOOK_SECTIONS.map(b => ({ to: `/le-livre/${b.slug}`, label: b.label, hint: HINTS[b.slug] ?? '' }))
+    ]
+  },
   { to: '/extraits', label: 'Extraits' },
   { to: '/auteur', label: 'L’auteur' },
   { to: '/faq', label: 'Questions' },
   { to: '/retours', label: 'Retours', also: ['/avis'] }
 ]
 
+const bookOpen = ref(false)
+const mobileBookOpen = ref(false)
+const bookEl = ref<HTMLElement[]>([])
+function onPointerDown(e: PointerEvent) {
+  if (bookOpen.value && !bookEl.value.some(el => el.contains(e.target as Node))) bookOpen.value = false
+}
+
 let lastY = 0
 function onScroll() {
   const y = window.scrollY
   scrolled.value = y > 24
-  hidden.value = y > 420 && y > lastY + 4 && !menuOpen.value
+  hidden.value = y > 420 && y > lastY + 4 && !menuOpen.value && !bookOpen.value
   if (y < lastY - 4) hidden.value = false
   lastY = y
 }
-onMounted(() => { window.addEventListener('scroll', onScroll, { passive: true }); onScroll() })
-onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
+  document.addEventListener('pointerdown', onPointerDown)
+  onScroll()
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
+  document.removeEventListener('pointerdown', onPointerDown)
+})
 
-watch(() => route.fullPath, () => { menuOpen.value = false })
+watch(() => route.fullPath, () => { menuOpen.value = false; bookOpen.value = false })
 watch(menuOpen, (v) => {
   if (import.meta.server) return
   document.documentElement.style.overflow = v ? 'hidden' : ''
@@ -36,7 +67,7 @@ watch(menuOpen, (v) => {
 
 const isActive = (l: { to: string, also?: string[] }) => [l.to, ...(l.also ?? [])].some(to => route.path === to || route.path.startsWith(to + '/'))
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') menuOpen.value = false
+  if (e.key === 'Escape') { menuOpen.value = false; bookOpen.value = false }
 }
 </script>
 
@@ -59,8 +90,37 @@ function onKey(e: KeyboardEvent) {
       </NuxtLink>
 
       <ul class="hidden items-center gap-0.5 lg:flex">
-        <li v-for="l in links" :key="l.to">
+        <li v-for="l in links" :key="l.to" class="relative">
+          <div v-if="l.children" ref="bookEl">
+            <button
+              type="button"
+              class="relative flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
+              :class="isActive(l) || bookOpen ? 'text-ink' : 'text-ink-soft hover:text-ink'"
+              :aria-expanded="bookOpen"
+              aria-controls="menu-le-livre"
+              @click="bookOpen = !bookOpen"
+            >
+              {{ l.label }}
+              <ChevronDown class="h-4 w-4 transition-transform duration-500 ease-expo" :class="bookOpen && 'rotate-180'" aria-hidden="true" />
+              <span v-if="isActive(l)" class="absolute bottom-1 left-[calc(50%-8px)] h-1 w-1 -translate-x-1/2 rounded-full bg-caramel" />
+            </button>
+            <Transition enter-active-class="transition duration-500 ease-expo" enter-from-class="opacity-0 translate-y-2" leave-active-class="transition duration-200" leave-to-class="opacity-0 translate-y-1">
+              <div v-if="bookOpen" id="menu-le-livre" class="absolute left-1/2 top-full z-10 mt-4 w-[21rem] -translate-x-1/2 rounded-[26px] border border-line bg-paper/95 p-2 shadow-lift backdrop-blur-xl">
+                <NuxtLink
+                  v-for="c in l.children"
+                  :key="c.to"
+                  :to="c.to"
+                  class="block rounded-[20px] px-4 py-3 transition-colors hover:bg-paper-2"
+                  :class="route.path === c.to && 'bg-paper-2'"
+                >
+                  <span class="block font-display text-[1.3rem] leading-tight text-ink">{{ c.label }}</span>
+                  <span class="mt-0.5 block font-sans text-[0.8rem] text-ink-muted">{{ c.hint }}</span>
+                </NuxtLink>
+              </div>
+            </Transition>
+          </div>
           <NuxtLink
+            v-else
             :to="l.to"
             class="relative whitespace-nowrap rounded-full px-4 py-2 font-sans text-[0.92rem] transition-colors duration-300"
             :class="l.to === '/retours'
@@ -99,7 +159,29 @@ function onKey(e: KeyboardEvent) {
       <nav aria-label="Menu mobile" class="relative">
         <ul class="space-y-1">
           <li v-for="(l, i) in links" :key="l.to" class="mobile-item" :style="{ '--i': i }">
-            <NuxtLink :to="l.to" class="flex items-baseline justify-between border-b border-line py-4 font-display text-[2.1rem] leading-none" :class="isActive(l) ? 'text-caramel' : 'text-ink'">
+            <template v-if="l.children">
+              <button
+                type="button"
+                class="flex w-full items-baseline justify-between border-b border-line py-4 text-left font-display text-[2.1rem] leading-none"
+                :class="isActive(l) ? 'text-caramel' : 'text-ink'"
+                :aria-expanded="mobileBookOpen"
+                aria-controls="mobile-le-livre"
+                @click="mobileBookOpen = !mobileBookOpen"
+              >
+                <span class="flex items-center gap-2">{{ l.label }} <ChevronDown class="h-6 w-6 transition-transform duration-500 ease-expo" :class="mobileBookOpen && 'rotate-180'" aria-hidden="true" /></span>
+                <span class="font-sans text-xs text-ink-muted">0{{ i + 1 }}</span>
+              </button>
+              <div id="mobile-le-livre" class="grid transition-[grid-template-rows] duration-500 ease-expo" :class="mobileBookOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'" :inert="!mobileBookOpen || undefined">
+                <ul class="overflow-hidden">
+                  <li v-for="c in l.children" :key="c.to">
+                    <NuxtLink :to="c.to" class="flex items-baseline justify-between border-b border-line/70 py-3 pl-5 font-serif text-[1.3rem]" :class="route.path === c.to ? 'text-caramel' : 'text-ink-soft'">
+                      {{ c.label }}
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <NuxtLink v-else :to="l.to" class="flex items-baseline justify-between border-b border-line py-4 font-display text-[2.1rem] leading-none" :class="isActive(l) ? 'text-caramel' : 'text-ink'">
               {{ l.label }}
               <span class="font-sans text-xs text-ink-muted">0{{ i + 1 }}</span>
             </NuxtLink>

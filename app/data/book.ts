@@ -19,40 +19,34 @@ export interface Lever {
   slug: string
   short: string
   title: string
+  /** Question de possibilité (« Sept questions avant de commencer »). */
   question: string
+  /** Citation phare : l’accroche de la page de titre du levier. */
   quote: string
-  role: string
-  mechanism: string[]
+  /** Mécanisme, version allégée. */
+  mechanism: string
+  /** Socle scientifique (encadré « Mécanisme du levier »). */
   science: string
-  references: string[]
-  exercises: { n: number, title: string, text: string }[]
-  practice: string
-  echo?: string
+  exercises: { n: number, title: string }[]
   color: string
 }
 
-/** Sept leviers, sept couleurs : la lumière blanche décomposée par le prisme (cf. « La magie du titre »). */
+/** Sept leviers, sept couleurs : la lumière blanche décomposée par le prisme (cf. « La magie du titre »).
+ *  Textes des pages de titre repris de la version aj14 du livre (mécanisme : version allégée). */
 export const LEVERS: Lever[] = [
   {
     n: 1,
     slug: 'escalader-le-temps',
     short: 'Escalader le temps',
-    title: 'Comment escalader le temps ?',
-    question: 'Pour quelle raison m’est-il déjà possible d’accéder à la sagesse d’une version de moi qui a réussi ?',
-    quote: 'Se souvenir du futur n’est pas une métaphore. Pour le cerveau, c’est exactement le même geste que se souvenir du passé.',
-    role: 'pose le geste central : se relier à une version de soi qui a déjà atteint ce qu’on vise, le Moi futur gagnant, non comme une possibilité lointaine, mais comme un souvenir déjà installé.',
-    mechanism: [
-      'Ce levier repose sur une technique simple et corporelle : descendre l’attention jusqu’à se relier directement à une version de soi qui a déjà atteint ce qu’on vise, le Moi futur gagnant.',
-      'Il ne s’agit pas d’une visualisation vague, mais d’un protocole précis. Le geste central n’est pas d’imaginer un futur possible, mais de s’en souvenir, presque littéralement : un souvenir, même construit à l’avance, installe dans le corps une conviction qu’une simple projection ne produit jamais.'
-    ],
-    science: 'Ce geste s’appuie avant tout sur la simulation épisodique constructive : le cerveau utilise les mêmes circuits, notamment l’hippocampe, pour se souvenir du passé et pour imaginer le futur. Ce résultat a depuis été confirmé auprès de patients amnésiques, chez qui les deux facultés s’effondrent ensemble.',
-    references: ['Schacter & Addis — Harvard, 2007', 'Tour de chute libre d’Eagleman — Baylor, 2007', 'Paradoxe des jumeaux — Langevin, 1911 (analogie)'],
+    title: 'Comment escalader le temps ?',
+    question: 'Pour quelle raison m’est-il déjà possible d’accéder à la sagesse d’une version de moi qui a réussi ?',
+    quote: 'Se souvenir du futur n’est pas une métaphore. Pour le cerveau, c’est le même geste que se souvenir du passé.',
+    mechanism: 'Votre cerveau se souvient du futur comme du passé : consultez dès maintenant la version de vous qui a déjà réussi.',
+    science: 'Schacter et Addis, Université Harvard, 2007 : en comparant par imagerie cérébrale une personne qui se souvient d’un événement passé et une personne qui imagine un événement futur, ils ont montré que les deux activités mobilisent un réseau largement commun de régions cérébrales.',
     exercises: [
-      { n: 1, title: 'Se souvenir de son Moi futur gagnant', text: 'Installe dans le corps la conviction d’une version de soi qui a déjà réussi.' },
-      { n: 2, title: 'Repérer ses propres élasticités du temps', text: 'Apprend à retrouver cette sensation et à l’utiliser dans le quotidien le plus ordinaire.' }
+      { n: 1, title: 'Se souvenir de son Moi futur gagnant' },
+      { n: 2, title: 'Repérer ses propres élasticités du temps' }
     ],
-    practice: 'Deux exercices, quelques minutes, et cette connexion devient concrète.',
-    echo: 'Ce mécanisme rejoint ce que le Dr Joe Vitale, dans The Remembering Process, appelle un état unifié : deux démarches qui arrivent, indépendamment, au même geste.',
     color: '#B5523B'
   },
   {
@@ -60,63 +54,45 @@ export const LEVERS: Lever[] = [
     slug: 'tourner-son-cerveau-dans-le-sens-du-succes',
     short: 'Tourner son cerveau dans le sens du succès',
     title: 'Tournez votre cerveau dans le sens du succès',
-    question: 'Pourquoi mon cerveau peut-il apprendre à chercher ce qui me libère plutôt que ce qui me limite ?',
-    quote: 'C’est ce langage-là, celui d’un désir qui renforce la survie plutôt qu’il ne la menace, que le cerveau reconnaît comme une commande à exécuter plutôt que comme un danger à écarter.',
-    role: 'protège cette sensation des croyances limitantes que le cerveau installe sans qu’on s’en aperçoive, en montrant que la croyance en soi, la sienne et celle des autres, façonne réellement ce qui devient possible.',
-    mechanism: [
-      'Ce levier s’intéresse à l’organe qui rend la connexion au Moi futur gagnant possible, ou qui l’empêche : le cerveau lui-même, et la façon dont il décide, à chaque instant, ce qu’il croit possible.',
-      'La croyance, la sienne et celle des autres, façonne réellement ce qui devient possible, parce que le cerveau part ensuite à la recherche de tout ce qui peut la confirmer.'
-    ],
-    science: 'Ce mécanisme s’appuie sur l’effet Pygmalion, où la croyance d’un enseignant suffit à transformer la réussite réelle d’un élève, sur l’exploit de Roger Bannister, sur l’état d’esprit de croissance, et sur des études cliniques où l’effet placebo modifie un genou opéré ou non.',
-    references: ['Effet Pygmalion — Rosenthal', 'Roger Bannister — le mile en moins de 4 minutes, 1954', 'État d’esprit de croissance — Carol Dweck', 'Études cliniques sur l’effet placebo'],
+    question: 'Pourquoi mon cerveau peut-il apprendre à chercher ce qui me libère plutôt que ce qui me limite ?',
+    quote: 'Pour le cerveau, le désir perçu comme vital est un ordre à exécuter ; celui perçu comme une menace pour la survie est un danger à bloquer.',
+    mechanism: 'Ce que votre cerveau croit possible oriente tout ce qu’il met en œuvre : changez la question, il change de direction.',
+    science: 'Albert Bandura, à partir des années 1970 : ses travaux ont donné un nom précis, le sentiment d’efficacité personnelle, à ce que les histoires de Rosenthal (l’effet Pygmalion chez les enseignants) et de Bannister (le record du mile) illustraient chacune séparément, en le confirmant à travers de nombreuses études menées dans des domaines aussi différents que le sport, la santé ou l’éducation.',
     exercises: [
-      { n: 3, title: 'Repérer ses zones de capacité et d’incapacité', text: 'Identifie où une croyance limitante freine, domaine par domaine.' },
-      { n: 4, title: 'Le pari de vingt-quatre heures', text: 'Teste concrètement, en une journée, une action qui contredit cette croyance.' }
+      { n: 3, title: 'Repérer ses zones de capacité et d’incapacité' },
+      { n: 4, title: 'Le pari de vingt-quatre heures' }
     ],
-    practice: 'Ces exercices entraîneront votre cerveau à chercher, sans effort supplémentaire, des raisons plutôt que des excuses.',
     color: '#A85C28'
   },
   {
     n: 3,
     slug: 'la-loi-de-l-attraction',
     short: 'La loi de l’attraction',
-    title: 'La loi de l’attraction : quand nos sentiments profonds nous induisent en erreur',
-    question: 'Pourquoi le sentiment que je choisis aujourd’hui peut-il déjà attirer ce que je vis demain ?',
+    title: 'La loi de l’attraction : quand nos sentiments profonds nous induisent en erreur',
+    question: 'Pourquoi le sentiment que je choisis aujourd’hui peut-il déjà attirer ce que je vis demain ?',
     quote: 'La vie est un grand marché où chacun vient acheter ce qu’il a lui-même apporté.',
-    role: 'protège cette même sensation des sentiments dominants mal dirigés, en montrant que ce qu’on appelle loi de l’attraction n’est rien d’autre qu’un mécanisme cognitif observable, jamais une force extérieure à soi.',
-    mechanism: [
-      'Ce levier s’attaque à un mécanisme aussi têtu qu’un biais cognitif bien documenté, et tout aussi indifférent à ce qu’on en pense : la loi de l’attraction, qui n’agit jamais sur les faits, mais toujours sur le sentiment qu’on laisse dominer face à eux.',
-      'Elle est ici reformulée comme un mécanisme psychologique observable, jamais comme une force magique extérieure à soi.'
-    ],
-    science: 'Le levier s’appuie sur le biais de confirmation, qui explique pourquoi un filtre mental cherche toujours ce qui confirme ce qu’il croit déjà, et sur la prophétie autoréalisatrice, où une croyance non exprimée change le comportement réel de la personne en face. La recherche sur l’empathie et la compassion vient compléter ce levier sur le terrain relationnel.',
-    references: ['Biais de confirmation — Peter Wason', 'Prophétie autoréalisatrice', 'Recherche sur l’empathie et la compassion'],
+    mechanism: 'Le sentiment que vous laissez dominer filtre ce que vous voyez et façonne ce que vous récoltez : il peut être choisi plutôt que subi.',
+    science: 'Peter Wason, psychologue cognitif britannique, 1960 : en soumettant des volontaires à un test logique, il a montré qu’ils choisissaient le plus souvent les vérifications capables de confirmer leur première hypothèse, plutôt que celles, tout aussi informatives, qui auraient pu la contredire.',
     exercises: [
-      { n: 5, title: 'Le relevé de sentiments', text: 'Repère le sentiment dominant avant de pouvoir le corriger.' },
-      { n: 6, title: 'L’ancrage du sentiment recherché', text: 'Installe physiquement, dans le corps, le sentiment que l’on souhaite voir dominer à sa place.' }
+      { n: 5, title: 'Le relevé de sentiments' },
+      { n: 6, title: 'L’ancrage du sentiment recherché' }
     ],
-    practice: 'L’objectif est de reprendre la main sur ce filtre, sans jamais y laisser trop de vous-même.',
     color: '#977424'
   },
   {
     n: 4,
     slug: 'le-grand-moi-et-le-petit-moi',
     short: 'Le Grand Moi et le petit Moi',
-    title: 'Le Grand Moi et le petit Moi : lequel gouverne votre vie ?',
-    question: 'Comment se fait-il que je puisse agir avec confiance, même quand la peur est encore là ?',
-    quote: 'Nous ne sommes ni notre petit Moi ni notre Grand Moi : ce ne sont que deux outils à notre disposition, et il nous revient de choisir lequel nous utilisons.',
-    role: 'apprend à faire gouverner cette sensation face à la peur, en distinguant les deux voix intérieures, le petit Moi qui protège, le Grand Moi qui ose, et en redonnant à la personne l’arbitrage entre les deux.',
-    mechanism: [
-      'Ce levier distingue deux forces intérieures : le petit Moi, qui protège, et le Grand Moi, qui ose malgré la peur encore présente plutôt que d’attendre qu’elle disparaisse.',
-      'Reconnaître laquelle des deux voix a pris le contrôle d’une décision permet de reprendre l’arbitrage entre les deux, plutôt que de le subir.'
-    ],
-    science: 'Ce levier s’appuie sur le syndrome de l’imposteur, qui montre que le petit Moi ne s’arrête pas devant le succès, sur l’autocompassion, qui distingue la fermeté de la dureté envers soi-même, et sur la croissance post-traumatique, qui documente comment une épreuve peut devenir un tournant plutôt qu’une simple perte.',
-    references: ['Syndrome de l’imposteur — Pauline Clance', 'Autocompassion — Kristin Neff', 'Croissance post-traumatique — Calhoun & Tedeschi'],
+    title: 'Le Grand Moi et le petit Moi : lequel gouverne votre vie ?',
+    question: 'Comment se fait-il que je puisse agir avec confiance, même quand la peur est encore là ?',
+    quote: 'Nous ne sommes ni notre petit Moi ni notre Grand Moi : ce ne sont que deux outils à notre disposition, et il nous revient de choisir lequel nous utilisons.',
+    mechanism: 'Le petit Moi est un mécanisme construit, pas un trait de caractère : il est réversible, et vos ailes n’ont jamais cessé de fonctionner.',
+    science: 'Seligman et Maier, 1967 : en exposant des chiens à des chocs électriques inévitables, ils ont montré qu’ils cessaient ensuite d’essayer d’échapper à un choc devenu évitable, un renoncement appris plutôt qu’une incapacité réelle, retrouvé depuis chez l’humain sous le nom d’impuissance apprise.',
     exercises: [
-      { n: 7, title: 'L’ancrage du Grand Moi', text: 'Installe un état de confiance dans le corps.' },
-      { n: 8, title: 'Le carton rouge de la semaine', text: 'Prouve par une action concrète que la peur n’empêche pas d’agir.' },
-      { n: 9, title: 'La lettre à votre Moi futur', text: 'Couche sur le papier un engagement daté à tenir.' }
+      { n: 7, title: 'L’ancrage du Grand Moi' },
+      { n: 8, title: 'Le carton rouge de la semaine' },
+      { n: 9, title: 'La lettre à votre Moi futur' }
     ],
-    practice: 'Sur le vif, ces exercices aident à reconnaître laquelle des deux voix a pris le micro.',
     color: '#667A49'
   },
   {
@@ -124,21 +100,15 @@ export const LEVERS: Lever[] = [
     slug: 'la-monnaie-la-plus-puissante-au-monde',
     short: 'La monnaie la plus puissante au monde',
     title: 'La monnaie la plus puissante au monde',
-    question: 'Pourquoi ma richesse la plus puissante peut-elle déjà circuler, avant le premier euro gagné ?',
+    question: 'Pourquoi ma richesse la plus puissante peut-elle déjà circuler, avant le premier euro gagné ?',
     quote: 'La valeur d’une chose ne se lit jamais sur la chose elle-même. Elle se lit dans le regard de celui qui la contemple, et ce regard peut toujours changer.',
-    role: 'convertit cette même sensation en une monnaie intérieure, faite de sentiments positifs, capable de circuler en soi avant même de devenir de l’argent réel.',
-    mechanism: [
-      'Ce levier applique l’arbitrage entre petit Moi et Grand Moi à un terrain où presque tout le monde se sent jugé sans appel : l’argent.',
-      'Il pose l’existence d’une monnaie intérieure, faite de sentiments positifs, activable à volonté, distincte de l’argent réel mais capable de s’y convertir.'
-    ],
-    science: 'Ce levier s’appuie sur la recherche sur les scripts financiers hérités, sur l’étude des gagnants de loterie qui retrouvent souvent leur niveau de richesse intérieure d’origine, sur le biais d’ancrage, et sur la charge mentale de la rareté, mesurée en laboratoire, qui montre que le manque occupe l’esprit autant que le compte en banque.',
-    references: ['Scripts financiers — Brad Klontz', 'Gagnants de loterie', 'Biais d’ancrage — Jared Curhan', 'Charge mentale de la rareté — Anandi Mani'],
+    mechanism: 'La valeur ne se lit pas sur la chose, mais dans le regard posé sur elle : votre monnaie intérieure peut précéder l’argent.',
+    science: 'Kahneman et Deaton, Université Princeton, prix Nobel, 2010 : en analysant les réponses de plus de quatre cent cinquante mille Américains, ils ont montré que le bien-être émotionnel ressenti au quotidien progresse avec le revenu jusqu’à un certain seuil, puis semble cesser de progresser. En 2023, Killingsworth, Kahneman et Mellers ont montré que, en moyenne, il continue pourtant de progresser, sans plateau.',
     exercises: [
-      { n: 10, title: 'Réécrire son script financier', text: 'Identifie et corrige un programme hérité.' },
-      { n: 11, title: 'La visite chez votre Moi déjà riche', text: 'Fait ressentir la richesse intérieure déjà présente.' },
-      { n: 12, title: 'Le bilan hebdomadaire de la monnaie intérieure', text: 'En suit la production régulière.' }
+      { n: 10, title: 'Réécrire son script financier' },
+      { n: 11, title: 'La visite chez votre Moi déjà riche' },
+      { n: 12, title: 'Le bilan hebdomadaire de la monnaie intérieure' }
     ],
-    practice: 'Ces exercices vous serviront à identifier votre monnaie intérieure, à la rendre plus mesurable et à apprendre à l’activer volontairement.',
     color: '#4F7A86'
   },
   {
@@ -146,20 +116,14 @@ export const LEVERS: Lever[] = [
     slug: 'le-grand-reve-aligne',
     short: 'Le grand rêve aligné',
     title: 'Le grand rêve aligné',
-    question: 'Pourquoi le rêve qui me ressemble vraiment est-il déjà en moi, et non chez les autres ?',
+    question: 'Pourquoi le rêve qui me ressemble vraiment est-il déjà en moi, et non chez les autres ?',
     quote: 'La solution à un problème se trouve rarement là où il y a le plus de lumière. Elle se trouve là où le problème est réellement né.',
-    role: 'aligne cette sensation avec les talents propres de la personne, pour qu’un rêve poursuivi lui appartienne vraiment, plutôt que d’être emprunté à la réussite de quelqu’un d’autre.',
-    mechanism: [
-      'Ce levier s’attaque au syndrome du lampadaire, ce réflexe qui pousse à chercher une solution ou un rêve là où d’autres l’ont déjà trouvé, plutôt qu’à l’intérieur de soi.',
-      'Il pose une question différente de celle qu’on se pose d’habitude : non pas comment devenir capable, mais quel rêve utilise déjà les talents qu’on possède.'
-    ],
-    science: 'Ce levier s’appuie sur les travaux consacrés à l’évaluation du potentiel créatif, et sur l’effet de surjustification, qui montre qu’une récompense extérieure peut affaiblir un plaisir qui existait déjà, aux dépens d’une motivation plus durable.',
-    references: ['Potentiel créatif — Justin Berg (Stanford, Michigan Ross)', 'Effet de surjustification — Deci & Ryan'],
+    mechanism: 'La solution naît d’abord à l’intérieur de vous : un rêve qui vous ressemble tient seul, et votre esprit se met à le travailler.',
+    science: 'Deci et Ryan, théorie de l’autodétermination, à partir de 1971 et 1985 : leurs travaux montrent qu’une action motivée par le choix, la compétence et le lien à autrui se maintient d’elle-même, contrairement à une action motivée uniquement par une récompense extérieure.',
     exercises: [
-      { n: 13, title: 'L’inventaire des talents', text: 'Liste les talents naturels de la personne.' },
-      { n: 14, title: 'Le diagnostic d’alignement', text: 'Vérifie si le rêve poursuivi les utilise réellement.' }
+      { n: 13, title: 'L’inventaire des talents' },
+      { n: 14, title: 'Le diagnostic d’alignement' }
     ],
-    practice: 'Ces exercices donnent enfin à ce rêve une forme suffisamment concrète pour tenir dans le temps.',
     color: '#5D6290'
   },
   {
@@ -167,20 +131,14 @@ export const LEVERS: Lever[] = [
     slug: 'puiser-a-la-source-infinie',
     short: 'Puiser à la source infinie',
     title: 'Puisez à la source infinie',
-    question: 'Pourquoi un simple souffle peut-il déjà me relier à une source sans fond ?',
+    question: 'Pourquoi un simple souffle peut-il déjà me relier à une source sans fond ?',
     quote: 'Les organes du corps ne cherchent jamais de chemin détourné vers ce dont ils ont besoin. Ils puisent directement, sans se demander si la source est assez proche pour être vraie.',
-    role: 'relie enfin cette sensation à une source d’énergie intérieure disponible à tout moment, par la respiration et la présence, pour qu’elle ne s’épuise jamais.',
-    mechanism: [
-      'Ce dernier levier répond à une question différente de celle qu’on se pose d’habitude : non pas où trouver l’énergie qui manque, mais pourquoi elle est déjà là, disponible sans détour.',
-      'Une pratique de respiration et de présence relie directement à une source d’énergie intérieure, plutôt que de la chercher à l’extérieur, comme le lion de la fable qui chassait ce que l’herbe donnait déjà directement.'
-    ],
-    science: 'Ce levier s’appuie sur la recherche sur la respiration et la cohérence cardiaque, sur l’étude de la gratitude et de la longévité menée sur plusieurs décennies, et sur les travaux consacrés à l’émerveillement, qui montrent qu’il rend mesurablement plus généreux.',
-    references: ['Cohérence cardiaque — Paul Lehrer', 'Gratitude et longévité — Danner, Snowdon & Friesen', 'Émerveillement — Dacher Keltner'],
+    mechanism: 'Les sources directes comblent mieux que les détours spectaculaires : la respiration est la plus à portée, environ vingt mille fois par jour.',
+    science: 'Lehrer et Vaschillo, début des années 2000 : ils ont identifié une fréquence de résonance propre au système cardiovasculaire, proche de six respirations par minute, à laquelle les oscillations du rythme cardiaque et celles du réflexe barorécepteur s’amplifient au lieu de s’annuler.',
     exercises: [
-      { n: 15, title: 'Construire son protocole d’Attraction Active Augmentée', text: 'Met en pratique, avec le corps entier, l’ensemble de ce que le livre a construit.' },
-      { n: 16, title: 'La revue complète du chemin parcouru', text: 'Referme le livre par un bilan sur les sept leviers pratiqués.' }
+      { n: 15, title: 'Construire son protocole d’Attraction Active Augmentée' },
+      { n: 16, title: 'La revue complète du chemin parcouru' }
     ],
-    practice: 'Cette source, quelques respirations suffisent à la vivre plutôt qu’à seulement la comprendre.',
     color: '#84597E'
   }
 ]
@@ -257,6 +215,43 @@ export const EXCERPTS: Excerpt[] = [
       'En 1993, j’étais en deuxième année de mathématiques à l’université d’Abomey-Calavi, au Bénin, quand je suis tombé gravement malade deux semaines avant la session d’examens qui devait décider de mon maintien à la faculté. La veille des épreuves, mon pronostic vital était engagé, au point que personne, dans le service où j’étais soigné, ne pariait sur ma survie jusqu’au lendemain. J’ai demandé au corps médical l’autorisation d’aller composer. On m’a répondu, avec une pointe de moquerie, que je ferais mieux de me concentrer sur ma guérison. Mais dans mon esprit, réussir cet examen n’était plus une question de moyenne à valider, c’était devenu, littéralement, une question de survie. À l’aube du jour J, j’ai trouvé la force de quitter mon lit d’hôpital pour aller composer. Sur environ trois cents candidats, sept ont été déclarés admis. J’en faisais partie.'
     ],
     note: 'La suite de l’avant-propos est réservée au livre.'
+  }
+]
+
+/**
+ * Rubriques du menu « Le livre ».
+ * Contenu provisoire, repris des extraits : à remplacer par le texte intégral du livre.
+ */
+export interface BookSection {
+  slug: string
+  label: string
+  title: string
+  lead: string
+  /** Extrait dont le texte est repris en attendant le texte du livre. */
+  excerpt: string
+}
+
+export const BOOK_SECTIONS: BookSection[] = [
+  {
+    slug: 'la-magie-du-titre',
+    label: 'La magie du titre',
+    title: 'La magie du titre',
+    lead: 'Avant de s’appeler Une Formule, ce livre a failli s’appeler La Lumière. Deux mots de sept lettres, qui se répondent.',
+    excerpt: 'la-magie-du-titre'
+  },
+  {
+    slug: 'explication-de-la-formule',
+    label: 'Explication de la formule',
+    title: 'Explication de la formule',
+    lead: 'Α + β = Ω : vous, plus le mécanisme activé un levier à la fois, égale la version de vous déjà en germe.',
+    excerpt: 'note-explicative-de-la-formule'
+  },
+  {
+    slug: 'avant-propos',
+    label: 'Avant-propos',
+    title: 'Avant-propos',
+    lead: 'Cotonou, 1993 : une session d’examens, trois cents candidats, sept admis. L’histoire d’où vient ce livre.',
+    excerpt: 'avant-propos'
   }
 ]
 

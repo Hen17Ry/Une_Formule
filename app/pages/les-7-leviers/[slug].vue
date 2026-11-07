@@ -9,7 +9,7 @@ const l = lever.value!
 const prev = LEVERS.find(x => x.n === l.n - 1)
 const next = LEVERS.find(x => x.n === l.n + 1)
 
-useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.mechanism[0]}`, type: 'article' })
+useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.mechanism}`, type: 'article' })
 </script>
 
 <template>
@@ -34,37 +34,28 @@ useSeo({ title: `Levier ${l.n} : ${l.short}`, description: `${l.question} ${l.me
         <figure v-reveal class="relative rounded-[28px] border border-line bg-white/70 p-8 shadow-soft md:p-12">
           <span aria-hidden="true" class="absolute -top-7 left-8 font-display text-[6rem] leading-none" :style="{ color: l.color }">“</span>
           <blockquote class="font-display text-[1.7rem] leading-snug text-ink md:text-[2rem]">{{ l.quote }}</blockquote>
-          <figcaption class="mt-5 font-sans text-xs uppercase tracking-[0.24em] text-ink-muted">Ouverture du levier {{ l.n }}</figcaption>
+          <figcaption class="mt-5 font-sans text-xs uppercase tracking-[0.24em] text-ink-muted">Citation phare · levier {{ l.n }}</figcaption>
         </figure>
 
         <section class="mt-16" aria-labelledby="mecanisme">
           <p class="label-gold">Le mécanisme</p>
           <h2 id="mecanisme" class="mt-3 font-display text-display-sm">Comment ce levier agit</h2>
-          <div class="prose-book mt-6">
-            <p v-for="(p, i) in l.mechanism" :key="i" v-reveal>{{ p }}</p>
-            <p v-reveal>Dans l’économie du livre, ce levier <em>{{ l.role }}</em></p>
-          </div>
+          <p v-reveal class="mt-6 font-display text-[1.6rem] leading-snug text-ink md:text-[1.85rem]">{{ l.mechanism }}</p>
         </section>
 
         <section class="mt-16" aria-labelledby="science">
           <p class="label-gold flex items-center gap-2"><FlaskConical class="h-4 w-4" aria-hidden="true" /> Le socle scientifique</p>
           <h2 id="science" class="mt-3 font-display text-display-sm">Sur quoi il s’appuie</h2>
           <p v-reveal class="prose-book mt-6">{{ l.science }}</p>
-          <ul v-reveal.stagger class="mt-6 flex flex-wrap gap-2">
-            <li v-for="r in l.references" :key="r" class="rounded-full border border-line bg-white/70 px-4 py-2 font-sans text-sm text-ink-soft">{{ r }}</li>
-          </ul>
-          <p v-if="l.echo" v-reveal class="mt-8 rounded-[22px] bg-paper-2 px-6 py-5 font-serif text-[1.05rem] leading-relaxed text-ink-soft"><span class="font-sans text-xs uppercase tracking-[0.2em] text-ink-muted">Un écho extérieur · </span>{{ l.echo }}</p>
         </section>
 
         <section class="mt-16" aria-labelledby="exercices">
           <p class="label-gold flex items-center gap-2"><NotebookPen class="h-4 w-4" aria-hidden="true" /> Application {{ l.n }}</p>
           <h2 id="exercices" class="mt-3 font-display text-display-sm">Les exercices</h2>
-          <p v-reveal class="mt-4 font-serif text-lg italic text-ink-soft">{{ l.practice }}</p>
           <div v-reveal.stagger class="mt-8 grid gap-4 sm:grid-cols-2">
             <div v-for="e in l.exercises" :key="e.n" class="rounded-[24px] border border-line bg-white/70 p-6">
               <p class="font-sans text-xs uppercase tracking-[0.22em]" :style="{ color: l.color }">Exercice {{ e.n }}</p>
               <h3 class="mt-2 font-display text-[1.45rem] leading-tight">{{ e.title }}</h3>
-              <p class="mt-3 font-serif text-[1.02rem] leading-relaxed text-ink-soft">{{ e.text }}</p>
             </div>
           </div>
           <p class="mt-6 font-sans text-sm text-ink-muted">Le déroulé complet de chaque exercice se trouve dans le livre.</p>
