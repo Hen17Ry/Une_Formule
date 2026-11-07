@@ -257,20 +257,11 @@ export const BOOK_SECTIONS: BookSection[] = [
 
 export const AUTHOR = {
   name: 'Dieudonné Sossa Gossou',
-  roles: ['Mathématicien', 'Économiste planificateur', 'Coach professionnel certifié'],
-  bio: [
-    'Sossa Dieudonné Gossou est mathématicien de formation, spécialisé en aide à la décision, économiste planificateur et coach professionnel certifié.',
-    'Sa carrière commence en 1997 dans l’enseignement des mathématiques, avant de s’élargir, sur plus de vingt ans, à l’économie, à l’ingénierie de la formation, au conseil en politiques publiques, puis au coaching certifié à Genève. Depuis 2007, il accompagne comme consultant indépendant des ministères, des institutions internationales et des organisations de la société civile, à travers le cabinet qu’il dirige.',
-    'Cette double expérience, la rigueur du mathématicien et le terrain de l’accompagnement humain, est au cœur d’Une Formule : un livre de développement personnel qui s’appuie sur des références scientifiques nommées plutôt que sur la seule inspiration.',
-    'Une Formule est son second ouvrage de développement personnel. Il vit et travaille au Bénin.'
-  ],
-  timeline: [
-    { year: '1993', title: 'Sept admis sur trois cents', text: 'Étudiant en mathématiques à l’université d’Abomey-Calavi, il quitte son lit d’hôpital à l’aube pour composer. Il fait partie des sept admis.' },
-    { year: '1997', title: 'Enseigner les mathématiques', text: 'Début de carrière dans l’enseignement des mathématiques.' },
-    { year: '+20 ans', title: 'Élargir le champ', text: 'Économie, ingénierie de la formation, conseil en politiques publiques, puis coaching certifié à Genève.' },
-    { year: '2007', title: 'Consultant indépendant', text: 'Il accompagne ministères, institutions internationales et organisations de la société civile, à travers le cabinet qu’il dirige.' },
-    { year: 'Aujourd’hui', title: 'Une Formule', text: 'Son second ouvrage de développement personnel, écrit au Bénin, où il vit et travaille.' }
-  ]
+  photo: '/images/auteur.webp',
+  photoSmall: '/images/auteur-sm.webp',
+  /** Biographie : le titre du livre est mis en italique à l’affichage. */
+  bio: 'Dieudonné GOSSOU est mathématicien de formation. Il débute en 1997 comme enseignant de mathématiques à Cotonou, puis complète son parcours par l’économie, l’aide à la décision, l’ingénierie et le conseil en formation (master de l’Université de Rouen), ainsi que par la planification stratégique et la budgétisation des programmes publics (Université Laval et IDEA International). Il obtient en 2017 une certification de Master Coach à Genève. Depuis 2009, il accompagne, à travers son cabinet, des ministères béninois, des institutions internationales et des organisations de la société civile, sur un terrain où il a appris à distinguer ce qui fonctionne réellement de ce qui ne fonctionne que sur le papier. Il met aujourd’hui cette double expertise, la rigueur des mathématiques et l’expérience de l’accompagnement, au service des personnes. Une formule… 7 leviers pour construire la vie que vous désirez est son deuxième ouvrage.',
+  bookTitle: 'Une formule… 7 leviers pour construire la vie que vous désirez'
 }
 
 export interface FaqGroup { title: string, items: { q: string, a: string }[] }
