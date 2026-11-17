@@ -163,7 +163,7 @@ const scrollToNext = () => scrollTo('leviers')
       </div>
 
       <!-- Étape 1 : le livre, accès direct aux retours -->
-      <div data-layer="1" class="container pointer-events-none absolute inset-0 flex items-end pb-[calc(max(3vh,0.75rem)+var(--tabbar))] lg:items-center lg:pb-0">
+      <div data-layer="1" class="container pointer-events-none absolute inset-0 flex items-end pb-[max(4.5vh,1.25rem)] lg:items-center lg:pb-0">
         <div class="pointer-events-auto w-full max-w-[46rem] max-lg:mx-auto max-lg:text-center">
           <p data-intro class="label mb-5 max-lg:hidden lg:mb-7">Le livre de {{ BOOK.author }}</p>
           <h1 id="hero-title" class="text-ink">
@@ -183,7 +183,7 @@ const scrollToNext = () => scrollTo('leviers')
       </div>
 
       <!-- Étape 2 : la maxime -->
-      <div data-layer="2" class="container pointer-events-none invisible absolute inset-0 flex items-end pb-[calc(8vh+var(--tabbar))] opacity-0 lg:items-center lg:justify-end lg:pb-0" :aria-hidden="reduced || undefined">
+      <div data-layer="2" class="container pointer-events-none invisible absolute inset-0 flex items-end pb-[12vh] opacity-0 lg:items-center lg:justify-end lg:pb-0" :aria-hidden="reduced || undefined">
         <div class="max-w-[36rem] max-lg:text-center">
           <p class="label-gold mb-6">La maxime du livre</p>
           <p class="font-display text-[clamp(2.1rem,4.6vw,4.4rem)] font-medium leading-[1.06] text-ink">

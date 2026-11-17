@@ -2,13 +2,14 @@
 import { ChevronDown } from '@lucide/vue'
 import { NAV_LINKS, isNavActive } from '~/data/nav'
 
-/* Barre du haut. Sur mobile, les liens sont dans la barre d’onglets en bas (NavMobileTabBar). */
+/* Barre du haut. Mobile et tablette : les cinq entrées en onglets (NavMobileTabs) ; ordinateur : liens + sous-menu. */
 const route = useRoute()
 const scrolled = ref(false)
 const hidden = ref(false)
 const links = NAV_LINKS
 
 const bookOpen = ref(false)
+const sheetOpen = ref(false)
 const bookEl = ref<HTMLElement[]>([])
 function onPointerDown(e: PointerEvent) {
   if (bookOpen.value && !bookEl.value.some(el => el.contains(e.target as Node))) bookOpen.value = false
@@ -18,7 +19,7 @@ let lastY = 0
 function onScroll() {
   const y = window.scrollY
   scrolled.value = y > 24
-  hidden.value = y > 420 && y > lastY + 4 && !bookOpen.value
+  hidden.value = y > 420 && y > lastY + 4 && !bookOpen.value && !sheetOpen.value
   if (y < lastY - 4) hidden.value = false
   lastY = y
 }
@@ -48,14 +49,14 @@ function onKey(e: KeyboardEvent) {
   >
     <nav
       aria-label="Navigation principale"
-      class="flex h-[60px] w-full max-w-6xl items-center justify-between gap-3 rounded-full border pl-5 pr-2 transition-all duration-700 ease-expo"
-      :class="scrolled ? 'border-line bg-paper/80 shadow-soft backdrop-blur-xl' : 'border-transparent bg-transparent'"
+      class="flex h-[62px] w-full max-w-6xl items-center justify-between gap-1.5 rounded-[22px] border border-line/80 bg-paper/85 pl-2 pr-1.5 shadow-soft backdrop-blur-xl transition-all duration-700 ease-expo md:gap-4 lg:h-[60px] lg:rounded-full lg:pl-5 lg:pr-2"
+      :class="!scrolled && 'lg:border-transparent lg:bg-transparent lg:shadow-none lg:backdrop-blur-none'"
     >
-      <NuxtLink to="/" class="group flex items-center gap-3" aria-label="Une Formule — accueil">
+      <NuxtLink to="/" class="group flex shrink-0 items-center gap-3" aria-label="Une Formule — accueil">
         <span class="grid h-9 w-9 place-items-center rounded-full text-[1.15rem] text-paper shadow-[0_6px_16px_-8px_rgba(113,67,36,.8)] [background:var(--cover-gradient)] transition-transform duration-700 ease-expo group-hover:rotate-[360deg]">
           <span class="font-display leading-none">Ω</span>
         </span>
-        <span class="whitespace-nowrap font-display text-[1.05rem] font-semibold uppercase tracking-[0.14em] text-ink sm:text-[1.25rem]">Une Formule<span class="text-caramel">…</span></span>
+        <span class="hidden whitespace-nowrap font-display text-[1.25rem] font-semibold uppercase tracking-[0.14em] text-ink md:inline">Une Formule<span class="text-caramel">…</span></span>
       </NuxtLink>
 
       <ul class="hidden items-center gap-0.5 lg:flex">
@@ -102,6 +103,7 @@ function onKey(e: KeyboardEvent) {
         </li>
       </ul>
 
+      <NavMobileTabs v-model:open="sheetOpen" class="max-w-xl lg:hidden" />
     </nav>
   </header>
 </template>

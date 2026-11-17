@@ -172,7 +172,3 @@ html.lenis, html.lenis body { height: auto; }
 /* Barre d’onglets défilante sans barre de défilement visible */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
-
-/* Hauteur réservée à la barre d’onglets mobile (en bas de l’écran) */
-:root { --tabbar: calc(78px + env(safe-area-inset-bottom, 0px)); }
-@media (min-width: 1024px) { :root { --tabbar: 0px; } }
