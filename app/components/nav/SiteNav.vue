@@ -1,40 +1,14 @@
 <script setup lang="ts">
-import { Menu, X, ChevronDown } from '@lucide/vue'
-import { EXCERPTS } from '~/data/book'
+import { ChevronDown } from '@lucide/vue'
+import { NAV_LINKS, isNavActive } from '~/data/nav'
 
+/* Barre du haut. Sur mobile, les liens sont dans la barre d’onglets en bas (NavMobileTabBar). */
 const route = useRoute()
 const scrolled = ref(false)
 const hidden = ref(false)
-const menuOpen = ref(false)
-const { $stopScroll, $startScroll } = useNuxtApp()
-
-interface NavChild { to: string, label: string, hint: string }
-interface NavLink { to: string, label: string, also?: string[], children?: NavChild[] }
-
-const HINTS: Record<string, string> = {
-  'la-magie-du-titre': 'Formule ou Lumière ?',
-  'note-explicative-de-la-formule': 'Α + β = Ω, terme à terme',
-  'avant-propos': 'D’où vient ce livre'
-}
-/* Cinq entrées ; « Le livre » ouvre un sous-menu. */
-const links: NavLink[] = [
-  {
-    to: '/les-7-leviers',
-    label: 'Le livre',
-    also: ['/le-livre'],
-    children: [
-      { to: '/les-7-leviers', label: 'Les leviers', hint: 'Sept leviers, seize exercices' },
-      ...EXCERPTS.map(e => ({ to: e.path, label: e.menu, hint: HINTS[e.slug] ?? '' }))
-    ]
-  },
-  { to: '/extraits', label: 'Extraits' },
-  { to: '/auteur', label: 'L’auteur' },
-  { to: '/faq', label: 'Questions' },
-  { to: '/retours', label: 'Retours', also: ['/avis'] }
-]
+const links = NAV_LINKS
 
 const bookOpen = ref(false)
-const mobileBookOpen = ref(false)
 const bookEl = ref<HTMLElement[]>([])
 function onPointerDown(e: PointerEvent) {
   if (bookOpen.value && !bookEl.value.some(el => el.contains(e.target as Node))) bookOpen.value = false
@@ -44,7 +18,7 @@ let lastY = 0
 function onScroll() {
   const y = window.scrollY
   scrolled.value = y > 24
-  hidden.value = y > 420 && y > lastY + 4 && !menuOpen.value && !bookOpen.value
+  hidden.value = y > 420 && y > lastY + 4 && !bookOpen.value
   if (y < lastY - 4) hidden.value = false
   lastY = y
 }
@@ -58,16 +32,11 @@ onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onPointerDown)
 })
 
-watch(() => route.fullPath, () => { menuOpen.value = false; bookOpen.value = false })
-watch(menuOpen, (v) => {
-  if (import.meta.server) return
-  document.documentElement.style.overflow = v ? 'hidden' : ''
-  v ? ($stopScroll as any)?.() : ($startScroll as any)?.()
-})
+watch(() => route.fullPath, () => { bookOpen.value = false })
 
-const isActive = (l: { to: string, also?: string[] }) => [l.to, ...(l.also ?? [])].some(to => route.path === to || route.path.startsWith(to + '/'))
+const isActive = (l: { to: string, also?: string[] }) => isNavActive(route.path, l)
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') { menuOpen.value = false; bookOpen.value = false }
+  if (e.key === 'Escape') bookOpen.value = false
 }
 </script>
 
@@ -80,7 +49,7 @@ function onKey(e: KeyboardEvent) {
     <nav
       aria-label="Navigation principale"
       class="flex h-[60px] w-full max-w-6xl items-center justify-between gap-3 rounded-full border pl-5 pr-2 transition-all duration-700 ease-expo"
-      :class="scrolled || menuOpen ? 'border-line bg-paper/80 shadow-soft backdrop-blur-xl' : 'border-transparent bg-transparent'"
+      :class="scrolled ? 'border-line bg-paper/80 shadow-soft backdrop-blur-xl' : 'border-transparent bg-transparent'"
     >
       <NuxtLink to="/" class="group flex items-center gap-3" aria-label="Une Formule — accueil">
         <span class="grid h-9 w-9 place-items-center rounded-full text-[1.15rem] text-paper shadow-[0_6px_16px_-8px_rgba(113,67,36,.8)] [background:var(--cover-gradient)] transition-transform duration-700 ease-expo group-hover:rotate-[360deg]">
@@ -133,72 +102,6 @@ function onKey(e: KeyboardEvent) {
         </li>
       </ul>
 
-      <div class="flex items-center gap-2 lg:hidden">
-        <button
-          type="button"
-          class="grid h-11 w-11 place-items-center rounded-full border border-line bg-white/60 text-ink transition-colors hover:border-caramel"
-          :aria-expanded="menuOpen"
-          aria-controls="mobile-menu"
-          :aria-label="menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
-          @click="menuOpen = !menuOpen"
-        >
-          <X v-if="menuOpen" class="h-5 w-5" aria-hidden="true" />
-          <Menu v-else class="h-5 w-5" aria-hidden="true" />
-        </button>
-      </div>
     </nav>
   </header>
-
-  <!-- Menu mobile plein écran -->
-  <Transition
-    enter-active-class="transition-[clip-path] duration-[900ms] ease-in-out-expo" enter-from-class="[clip-path:circle(0%_at_calc(100%-40px)_40px)]" enter-to-class="[clip-path:circle(150%_at_calc(100%-40px)_40px)]"
-    leave-active-class="transition-[clip-path] duration-500 ease-in-out-expo" leave-from-class="[clip-path:circle(150%_at_calc(100%-40px)_40px)]" leave-to-class="[clip-path:circle(0%_at_calc(100%-40px)_40px)]"
-  >
-    <div v-if="menuOpen" id="mobile-menu" class="fixed inset-0 z-40 overflow-y-auto bg-paper px-6 pb-10 pt-28 lg:hidden" data-lenis-prevent>
-      <BrandRings class="pointer-events-none absolute -right-48 top-10 h-[34rem] w-[34rem] opacity-50" />
-      <nav aria-label="Menu mobile" class="relative">
-        <ul class="space-y-1">
-          <li v-for="(l, i) in links" :key="l.to" class="mobile-item" :style="{ '--i': i }">
-            <template v-if="l.children">
-              <button
-                type="button"
-                class="flex w-full items-baseline justify-between border-b border-line py-4 text-left font-display text-[2.1rem] leading-none"
-                :class="isActive(l) ? 'text-caramel' : 'text-ink'"
-                :aria-expanded="mobileBookOpen"
-                aria-controls="mobile-le-livre"
-                @click="mobileBookOpen = !mobileBookOpen"
-              >
-                <span class="flex items-center gap-2">{{ l.label }} <ChevronDown class="h-6 w-6 transition-transform duration-500 ease-expo" :class="mobileBookOpen && 'rotate-180'" aria-hidden="true" /></span>
-                <span class="font-sans text-xs text-ink-muted">0{{ i + 1 }}</span>
-              </button>
-              <div id="mobile-le-livre" class="grid transition-[grid-template-rows] duration-500 ease-expo" :class="mobileBookOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'" :inert="!mobileBookOpen || undefined">
-                <ul class="overflow-hidden">
-                  <li v-for="c in l.children" :key="c.to">
-                    <NuxtLink :to="c.to" class="flex items-baseline justify-between border-b border-line/70 py-3 pl-5 font-serif text-[1.3rem]" :class="route.path === c.to ? 'text-caramel' : 'text-ink-soft'">
-                      {{ c.label }}
-                    </NuxtLink>
-                  </li>
-                </ul>
-              </div>
-            </template>
-            <NuxtLink v-else :to="l.to" class="flex items-baseline justify-between border-b border-line py-4 font-display text-[2.1rem] leading-none" :class="isActive(l) ? 'text-caramel' : 'text-ink'">
-              {{ l.label }}
-              <span class="font-sans text-xs text-ink-muted">0{{ i + 1 }}</span>
-            </NuxtLink>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </Transition>
 </template>
-
-<style scoped>
-.mobile-item {
-  animation: menu-in 0.9s var(--ease-out) both;
-  animation-delay: calc(0.18s + var(--i) * 0.05s);
-}
-@keyframes menu-in {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: none; }
-}
-</style>

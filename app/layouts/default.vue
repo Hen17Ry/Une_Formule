@@ -24,5 +24,6 @@ useHead({
       <slot />
     </main>
     <NavSiteFooter />
+    <NavMobileTabBar />
   </div>
 </template>

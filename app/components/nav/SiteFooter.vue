@@ -39,6 +39,8 @@ const links = [
         <p>© {{ year }} Une Formule · {{ BOOK.author }}</p>
         <p>uneformule.com</p>
       </div>
+      <!-- Place pour la barre d’onglets mobile -->
+      <div aria-hidden="true" class="h-[var(--tabbar)] lg:hidden" />
     </div>
   </footer>
 </template>
