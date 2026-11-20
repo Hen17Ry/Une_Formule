@@ -119,7 +119,7 @@ const bookStyle = computed(() => ({ transform: `rotateX(${6 + tilt.x}deg) rotate
           </div>
           <span aria-hidden="true" class="mt-10 block h-6 w-[240px] rounded-[50%] bg-umber/25 blur-xl transition-transform duration-300 lg:w-[300px]" :style="{ transform: `scaleX(${shadowScale})` }" />
 
-          <!-- Commandes -->
+          <!-- Boutons -->
           <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
             <div class="flex rounded-full border border-line bg-white/70 p-1 shadow-soft backdrop-blur" role="group" aria-label="Face affichée">
               <button

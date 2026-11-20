@@ -31,7 +31,7 @@ async function submit() {
       <div class="text-center">
         <span class="mx-auto grid h-16 w-16 place-items-center rounded-full font-display text-3xl text-[#FFFDF9] shadow-book [background:var(--cover-gradient)]">Ω</span>
         <h1 class="mt-6 font-display text-4xl">Administration</h1>
-        <p class="mt-2 font-sans text-sm text-ink-muted">Avis des lecteurs, commandes et réglages.</p>
+        <p class="mt-2 font-sans text-sm text-ink-muted">Avis des lecteurs et réglages du site.</p>
       </div>
       <form class="surface mt-10 space-y-6 p-8" @submit.prevent="submit">
         <UiField v-model="email" label="Email" type="email" autocomplete="username" required />
